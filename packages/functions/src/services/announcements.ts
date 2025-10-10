@@ -30,6 +30,21 @@ export async function updateAnnouncement(
   id: string,
   updates: Partial<Omit<Announcement, 'id' | 'created_at' | 'created_by'>>
 ) {
+  // If updating priority or status, we need to provide created_at for GSI key formatting
+  if (updates.priority !== undefined || updates.status !== undefined) {
+    const existing = await getAnnouncement(id);
+    if (!existing) {
+      return null;
+    }
+
+    const result = await AnnouncementEntity.patch({ id })
+      .set(updates)
+      .composite({ created_at: existing.created_at })
+      .go({ response: 'all_new' });
+    return result.data || null;
+  }
+
+  // For other updates, no composite needed
   const result = await AnnouncementEntity.patch({ id })
     .set(updates)
     .go({ response: 'all_new' });

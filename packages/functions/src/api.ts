@@ -2,9 +2,9 @@ import { Hono } from 'hono';
 import { handle } from 'hono/aws-lambda';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
-import { getPublishedEvents } from './services/events';
-import { getPublishedAnnouncements } from './services/announcements';
 import authRoutes from './routes/auth';
+import eventsRoutes from './routes/events';
+import announcementsRoutes from './routes/announcements';
 
 const app = new Hono();
 
@@ -45,26 +45,11 @@ app.get('/debug/headers', (c) => {
 // Authentication routes
 app.route('/api/auth', authRoutes);
 
-// Public API routes
-app.get('/api/events', async (c) => {
-  try {
-    const events = await getPublishedEvents();
-    return c.json({ events });
-  } catch (error) {
-    console.error('Error fetching events:', error);
-    return c.json({ error: 'Failed to fetch events' }, 500);
-  }
-});
+// Events routes
+app.route('/api/events', eventsRoutes);
 
-app.get('/api/announcements', async (c) => {
-  try {
-    const announcements = await getPublishedAnnouncements();
-    return c.json({ announcements });
-  } catch (error) {
-    console.error('Error fetching announcements:', error);
-    return c.json({ error: 'Failed to fetch announcements' }, 500);
-  }
-});
+// Announcements routes
+app.route('/api/announcements', announcementsRoutes);
 
 // 404 handler
 app.notFound((c) => {
