@@ -27,6 +27,60 @@ onMounted(async () => {
 
 const event = computed(() => eventsStore.currentEvent)
 
+const config = useRuntimeConfig()
+
+const downloadCalendar = () => {
+  if (!event.value) return
+  const eventId = route.params.id as string
+  const exportUrl = `${config.public.apiUrl}/api/events/${eventId}/export.ics`
+  window.open(exportUrl, '_blank')
+}
+
+const addToGoogleCalendar = () => {
+  if (!event.value) return
+
+  // Format dates for Google Calendar (YYYYMMDDTHHmmssZ format in UTC)
+  const formatGoogleDate = (dateStr: string) => {
+    const date = new Date(dateStr)
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
+  }
+
+  const startDate = formatGoogleDate(event.value.start_date)
+  const endDate = formatGoogleDate(event.value.end_date)
+
+  // Build description with extra details
+  let description = event.value.description
+  if (event.value.cost !== undefined && event.value.cost > 0) {
+    description += `\n\nCost: £${event.value.cost}`
+  }
+  if (event.value.what_to_bring) {
+    description += `\n\nWhat to bring: ${event.value.what_to_bring}`
+  }
+  if (event.value.organizer_name) {
+    description += `\n\nOrganizer: ${event.value.organizer_name}`
+    if (event.value.organizer_contact) {
+      description += ` (${event.value.organizer_contact})`
+    }
+  }
+
+  // Build Google Calendar URL
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: event.value.title,
+    dates: `${startDate}/${endDate}`,
+    details: description,
+    location: event.value.location,
+  })
+
+  // Add recurrence rule if applicable
+  if (event.value.is_recurring && event.value.recurrence_rule) {
+    params.append('recur', event.value.recurrence_rule)
+  }
+
+  const googleCalUrl = `https://calendar.google.com/calendar/render?${params.toString()}`
+  window.open(googleCalUrl, '_blank')
+}
+
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-GB', {
     weekday: 'long',
@@ -250,6 +304,39 @@ const goBack = () => {
                   </div>
                 </div>
               </div>
+            </BaseCard>
+
+            <!-- Add to Calendar Buttons -->
+            <BaseCard v-if="isUpcoming">
+              <h4 class="font-semibold text-gray-900 mb-3">Add to Calendar</h4>
+
+              <!-- Google Calendar Button -->
+              <button
+                @click="addToGoogleCalendar"
+                class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium mb-3"
+              >
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                  <path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" fill="#4285F4"/>
+                  <path d="M20 10H10v4h10v-4z" fill="#34A853"/>
+                  <path d="M20 14H4v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6z" fill="#FBBC04"/>
+                  <path d="M10 10h10V5a2 2 0 0 0-2-2h-6v7z" fill="#EA4335"/>
+                </svg>
+                Google Calendar
+              </button>
+
+              <!-- Generic iCal Download Button -->
+              <button
+                @click="downloadCalendar"
+                class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Other Calendars
+              </button>
+              <p class="text-xs text-gray-500 text-center mt-2">
+                Download .ics file for Apple Calendar, Outlook, etc.
+              </p>
             </BaseCard>
 
             <!-- RSVP Notice -->

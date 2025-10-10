@@ -12,6 +12,7 @@ import {
   duplicateEvent,
 } from '../services/events';
 import { requireAuth, requireEditor, getUserContext } from '../middleware/auth';
+import { generateICalEvent, generateICalFeed } from '../utils/icalendar';
 
 const app = new Hono();
 
@@ -275,6 +276,73 @@ app.post('/:id/duplicate', requireEditor, async (c) => {
       },
       500
     );
+  }
+});
+
+/**
+ * GET /api/events/:id/export.ics - Export single event as iCalendar file
+ */
+app.get('/:id/export.ics', async (c) => {
+  try {
+    let id = c.req.param('id');
+
+    // Handle expanded recurring event IDs
+    if (id.includes('_')) {
+      const parts = id.split('_');
+      if (parts.length === 2 && /^\d{4}-\d{2}-\d{2}$/.test(parts[1])) {
+        id = parts[0];
+      }
+    }
+
+    const event = await getEvent(id);
+
+    if (!event) {
+      return c.json({ error: 'Event not found' }, 404);
+    }
+
+    // Only export published events
+    if (event.status !== 'published') {
+      return c.json({ error: 'Event not found' }, 404);
+    }
+
+    const icalContent = generateICalEvent(event);
+    const fileName = `${event.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.ics`;
+
+    return c.body(icalContent, 200, {
+      'Content-Type': 'text/calendar; charset=utf-8',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+  } catch (error) {
+    console.error('Error exporting event:', error);
+    return c.json({ error: 'Failed to export event' }, 500);
+  }
+});
+
+/**
+ * GET /api/events/calendar.ics - Export all published events as iCalendar feed
+ */
+app.get('/calendar.ics', async (c) => {
+  try {
+    const events = await getPublishedEvents();
+
+    // Filter to only include upcoming and recent events (last 30 days, future events)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const relevantEvents = events.filter((event) => {
+      const eventDate = new Date(event.end_date);
+      return eventDate >= thirtyDaysAgo;
+    });
+
+    const icalContent = generateICalFeed(relevantEvents);
+
+    return c.body(icalContent, 200, {
+      'Content-Type': 'text/calendar; charset=utf-8',
+      'Content-Disposition': 'attachment; filename="cubs-events-calendar.ics"',
+    });
+  } catch (error) {
+    console.error('Error exporting calendar:', error);
+    return c.json({ error: 'Failed to export calendar' }, 500);
   }
 });
 

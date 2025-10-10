@@ -10,6 +10,27 @@ const eventsStore = useEventsStore()
 const searchQuery = ref('')
 const eventTypeFilter = ref<'all' | 'meeting' | 'camp' | 'trip' | 'special' | 'other'>('all')
 const viewMode = ref<'list' | 'calendar'>('list')
+const config = useRuntimeConfig()
+const showCalendarInstructions = ref(false)
+
+const subscribeToCalendar = () => {
+  const feedUrl = `${config.public.apiUrl}/api/events/calendar.ics`
+  window.open(feedUrl, '_blank')
+}
+
+const getCalendarFeedUrl = () => {
+  return `${config.public.apiUrl}/api/events/calendar.ics`
+}
+
+const copyFeedUrl = async () => {
+  const url = getCalendarFeedUrl()
+  try {
+    await navigator.clipboard.writeText(url)
+    alert('Calendar feed URL copied to clipboard!')
+  } catch (err) {
+    alert(`Calendar feed URL: ${url}`)
+  }
+}
 
 onMounted(async () => {
   await eventsStore.fetchPublishedEvents()
@@ -90,9 +111,103 @@ const getEventTypeColor = (type: string) => {
     <!-- Header -->
     <div class="text-center mb-12">
       <h1 class="text-4xl font-display font-bold text-primary-900 mb-4">Upcoming Events</h1>
-      <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-6">
         Join us for exciting Cubs activities, camps, trips, and special events throughout the year.
       </p>
+
+      <!-- Subscribe to Calendar Buttons -->
+      <div class="flex justify-center gap-3 flex-wrap">
+        <button
+          @click="subscribeToCalendar"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium shadow-sm"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Download Calendar Feed
+        </button>
+        <button
+          @click="showCalendarInstructions = !showCalendarInstructions"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium shadow-sm"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          How to Subscribe
+        </button>
+      </div>
+      <p class="text-xs text-gray-500 mt-3">
+        Stay up-to-date with all Cubs events in your preferred calendar app
+      </p>
+
+      <!-- Calendar Instructions -->
+      <div v-if="showCalendarInstructions" class="mt-6 max-w-2xl mx-auto">
+        <BaseCard class="bg-blue-50 border-blue-200">
+          <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            How to Subscribe to Cubs Events Calendar
+          </h3>
+
+          <!-- Google Calendar Instructions -->
+          <div class="mb-4">
+            <h4 class="font-medium text-gray-900 mb-2 flex items-center gap-2">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none">
+                <path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" fill="#4285F4"/>
+                <path d="M20 10H10v4h10v-4z" fill="#34A853"/>
+                <path d="M20 14H4v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6z" fill="#FBBC04"/>
+                <path d="M10 10h10V5a2 2 0 0 0-2-2h-6v7z" fill="#EA4335"/>
+              </svg>
+              Google Calendar
+            </h4>
+            <ol class="list-decimal list-inside space-y-1 text-sm text-gray-700 ml-4">
+              <li>Open Google Calendar on your computer</li>
+              <li>On the left, next to "Other calendars," click the + button</li>
+              <li>Click "From URL"</li>
+              <li>Paste this URL:
+                <div class="mt-2 flex items-center gap-2">
+                  <input
+                    type="text"
+                    readonly
+                    :value="getCalendarFeedUrl()"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded text-xs font-mono bg-white"
+                  />
+                  <button
+                    @click="copyFeedUrl"
+                    class="px-3 py-2 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 transition-colors"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </li>
+              <li>Click "Add calendar"</li>
+            </ol>
+          </div>
+
+          <!-- Apple Calendar Instructions -->
+          <div class="mb-4">
+            <h4 class="font-medium text-gray-900 mb-2">📅 Apple Calendar</h4>
+            <ol class="list-decimal list-inside space-y-1 text-sm text-gray-700 ml-4">
+              <li>Open Calendar on your Mac</li>
+              <li>Go to File → New Calendar Subscription</li>
+              <li>Paste the URL above and click Subscribe</li>
+              <li>Choose your preferred update frequency</li>
+            </ol>
+          </div>
+
+          <!-- Outlook Instructions -->
+          <div>
+            <h4 class="font-medium text-gray-900 mb-2">📧 Outlook</h4>
+            <ol class="list-decimal list-inside space-y-1 text-sm text-gray-700 ml-4">
+              <li>Open Outlook Calendar</li>
+              <li>Click "Add Calendar" → "Subscribe from web"</li>
+              <li>Paste the URL above and give it a name</li>
+              <li>Click Import</li>
+            </ol>
+          </div>
+        </BaseCard>
+      </div>
     </div>
 
     <!-- Filters and View Toggle -->
