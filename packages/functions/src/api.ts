@@ -1,6 +1,5 @@
 import { Hono } from 'hono';
 import { handle } from 'hono/aws-lambda';
-import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import authRoutes from './routes/auth';
 import eventsRoutes from './routes/events';
@@ -12,13 +11,6 @@ const app = new Hono();
 
 // Middleware
 app.use('*', logger());
-app.use(
-  '*',
-  cors({
-    origin: ['http://localhost:3000', 'https://*.cubs-site.com'], // Update with your domain
-    credentials: true,
-  })
-);
 
 // Health check
 app.get('/health', (c) => {

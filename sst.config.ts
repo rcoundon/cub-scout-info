@@ -75,7 +75,14 @@ export default $config({
     const api = new sst.aws.Function('CubsSiteApi', {
       handler: 'packages/functions/src/api.handler',
       link: [table, uploadsBucket, auth],
-      url: true,
+      url: {
+        cors: {
+          allowOrigins: ['*'],
+          allowMethods: ['*'],
+          allowHeaders: ['*'],
+          allowCredentials: true,
+        }
+      },
       environment: {
         NODE_ENV: $app.stage === 'production' ? 'production' : 'development',
         USER_POOL_CLIENT_ID: authClient.id,

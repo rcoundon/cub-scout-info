@@ -1,0 +1,244 @@
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+
+interface User {
+  id: string
+  email: string
+  first_name: string
+  last_name: string
+  role: 'admin' | 'editor' | 'viewer'
+  last_login?: string
+}
+
+interface AuthTokens {
+  accessToken: string
+  refreshToken: string
+  idToken: string
+}
+
+export const useAuthStore = defineStore('auth', () => {
+  // State
+  const user = ref<User | null>(null)
+  const tokens = ref<AuthTokens | null>(null)
+  const loading = ref(false)
+  const error = ref<string | null>(null)
+
+  // Getters
+  const isAuthenticated = computed(() => !!user.value && !!tokens.value)
+  const isAdmin = computed(() => user.value?.role === 'admin')
+  const isEditor = computed(() => user.value?.role === 'editor' || isAdmin.value)
+
+  // Actions
+  async function login(email: string, password: string) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const config = useRuntimeConfig()
+      const response = await $fetch<{ success: boolean } & AuthTokens>(
+        `${config.public.apiUrl}/api/auth/login`,
+        {
+          method: 'POST',
+          body: { email, password },
+        }
+      )
+
+      if (response.success) {
+        tokens.value = {
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+          idToken: response.idToken,
+        }
+
+        // Store tokens in localStorage
+        if (process.client) {
+          localStorage.setItem('auth_tokens', JSON.stringify(tokens.value))
+        }
+
+        // Fetch user profile
+        await fetchUserProfile()
+
+        return true
+      }
+
+      return false
+    } catch (err: any) {
+      error.value = err.data?.message || 'Login failed'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function fetchUserProfile() {
+    if (!tokens.value) return
+
+    try {
+      const config = useRuntimeConfig()
+      console.log('Fetching user profile with token:', tokens.value.accessToken.substring(0, 20) + '...')
+      const response = await $fetch<User>(
+        `${config.public.apiUrl}/api/auth/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokens.value.accessToken}`,
+          },
+        }
+      )
+
+      console.log('User profile fetched:', response)
+      user.value = response
+    } catch (err: any) {
+      console.error('Failed to fetch user profile:', err)
+      console.error('Error details:', err.data || err.message)
+      // If token is invalid, clear auth state
+      logout()
+    }
+  }
+
+  async function changePassword(currentPassword: string, newPassword: string) {
+    if (!tokens.value) return false
+
+    loading.value = true
+    error.value = null
+
+    try {
+      const config = useRuntimeConfig()
+      await $fetch(`${config.public.apiUrl}/api/auth/change-password`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${tokens.value.accessToken}`,
+        },
+        body: {
+          currentPassword,
+          newPassword,
+        },
+      })
+
+      return true
+    } catch (err: any) {
+      error.value = err.data?.message || 'Password change failed'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function forgotPassword(email: string) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const config = useRuntimeConfig()
+      await $fetch(`${config.public.apiUrl}/api/auth/forgot-password`, {
+        method: 'POST',
+        body: { email },
+      })
+
+      return true
+    } catch (err: any) {
+      error.value = err.data?.message || 'Password reset request failed'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function resetPassword(email: string, code: string, newPassword: string) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const config = useRuntimeConfig()
+      await $fetch(`${config.public.apiUrl}/api/auth/reset-password`, {
+        method: 'POST',
+        body: {
+          email,
+          code,
+          newPassword,
+        },
+      })
+
+      return true
+    } catch (err: any) {
+      error.value = err.data?.message || 'Password reset failed'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function logout() {
+    if (tokens.value) {
+      try {
+        const config = useRuntimeConfig()
+        await $fetch(`${config.public.apiUrl}/api/auth/logout`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${tokens.value.accessToken}`,
+          },
+        })
+      } catch (err) {
+        console.error('Logout API call failed:', err)
+      }
+    }
+
+    // Clear local state
+    user.value = null
+    tokens.value = null
+    error.value = null
+
+    // Clear localStorage
+    if (process.client) {
+      localStorage.removeItem('auth_tokens')
+    }
+  }
+
+  async function initializeAuth() {
+    if (!process.client) return
+
+    // Try to restore auth state from localStorage
+    const storedTokens = localStorage.getItem('auth_tokens')
+    if (storedTokens) {
+      try {
+        tokens.value = JSON.parse(storedTokens)
+        await fetchUserProfile()
+      } catch (err) {
+        console.error('Failed to restore auth state:', err)
+        logout()
+      }
+    }
+  }
+
+  function getAuthHeader(): Record<string, string> {
+    if (!tokens.value) {
+      return {} as Record<string, string>
+    }
+
+    return {
+      Authorization: `Bearer ${tokens.value.accessToken}`,
+    }
+  }
+
+  return {
+    // State
+    user,
+    tokens,
+    loading,
+    error,
+
+    // Getters
+    isAuthenticated,
+    isAdmin,
+    isEditor,
+
+    // Actions
+    login,
+    logout,
+    changePassword,
+    forgotPassword,
+    resetPassword,
+    fetchUserProfile,
+    initializeAuth,
+    getAuthHeader,
+  }
+})

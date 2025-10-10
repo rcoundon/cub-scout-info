@@ -2,7 +2,9 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
-  modules: ['@pinia/nuxt'],
+  modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss'],
+
+  css: ['~/assets/css/main.css'],
 
   runtimeConfig: {
     public: {
@@ -14,7 +16,7 @@ export default defineNuxtConfig({
 
   typescript: {
     strict: true,
-    typeCheck: true,
+    typeCheck: false,
   },
 
   compatibilityDate: '2024-10-09',

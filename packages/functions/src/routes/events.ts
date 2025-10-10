@@ -48,6 +48,35 @@ app.get('/', async (c) => {
 });
 
 /**
+ * GET /api/events/admin/all - Get all events (requires authentication)
+ * IMPORTANT: This must come BEFORE /:id to avoid matching "admin" as an ID
+ */
+app.get('/admin/all', requireAuth, async (c) => {
+  try {
+    const status = c.req.query('status');
+
+    let events;
+    if (status) {
+      events = await getEventsByStatus(status as any);
+    } else {
+      // Get all events by querying each status
+      const [draft, published, cancelled, archived] = await Promise.all([
+        getEventsByStatus('draft'),
+        getEventsByStatus('published'),
+        getEventsByStatus('cancelled'),
+        getEventsByStatus('archived'),
+      ]);
+      events = [...draft, ...published, ...cancelled, ...archived];
+    }
+
+    return c.json({ events });
+  } catch (error) {
+    console.error('Error fetching all events:', error);
+    return c.json({ error: 'Failed to fetch events' }, 500);
+  }
+});
+
+/**
  * GET /api/events/:id - Get single event (public)
  */
 app.get('/:id', async (c) => {
@@ -72,34 +101,6 @@ app.get('/:id', async (c) => {
   } catch (error) {
     console.error('Error fetching event:', error);
     return c.json({ error: 'Failed to fetch event' }, 500);
-  }
-});
-
-/**
- * GET /api/events/admin/all - Get all events (requires authentication)
- */
-app.get('/admin/all', requireAuth, async (c) => {
-  try {
-    const status = c.req.query('status');
-
-    let events;
-    if (status) {
-      events = await getEventsByStatus(status as any);
-    } else {
-      // Get all events by querying each status
-      const [draft, published, cancelled, archived] = await Promise.all([
-        getEventsByStatus('draft'),
-        getEventsByStatus('published'),
-        getEventsByStatus('cancelled'),
-        getEventsByStatus('archived'),
-      ]);
-      events = [...draft, ...published, ...cancelled, ...archived];
-    }
-
-    return c.json({ events });
-  } catch (error) {
-    console.error('Error fetching all events:', error);
-    return c.json({ error: 'Failed to fetch events' }, 500);
   }
 });
 
