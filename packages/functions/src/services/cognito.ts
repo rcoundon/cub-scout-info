@@ -6,6 +6,7 @@ import {
   AdminUserGlobalSignOutCommand,
   AdminGetUserCommand,
   AdminUpdateUserAttributesCommand,
+  AdminDeleteUserCommand,
   ForgotPasswordCommand,
   ConfirmForgotPasswordCommand,
   ChangePasswordCommand,
@@ -177,6 +178,18 @@ export async function changeUserPassword(
     AccessToken: accessToken,
     PreviousPassword: previousPassword,
     ProposedPassword: proposedPassword,
+  });
+
+  await client.send(command);
+}
+
+/**
+ * Delete a user from Cognito (admin only)
+ */
+export async function deleteUserFromCognito(username: string) {
+  const command = new AdminDeleteUserCommand({
+    UserPoolId: Resource.CubsSiteAuth.id,
+    Username: username,
   });
 
   await client.send(command);

@@ -37,6 +37,14 @@ export async function getUserByEmail(email: string) {
 }
 
 /**
+ * Get all users
+ */
+export async function getAllUsers() {
+  const result = await UserEntity.scan.go();
+  return result.data;
+}
+
+/**
  * Update a user
  */
 export async function updateUser(
