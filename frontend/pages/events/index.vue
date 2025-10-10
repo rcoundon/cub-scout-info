@@ -9,6 +9,7 @@ definePageMeta({
 const eventsStore = useEventsStore()
 const searchQuery = ref('')
 const eventTypeFilter = ref<'all' | 'meeting' | 'camp' | 'trip' | 'special' | 'other'>('all')
+const viewMode = ref<'list' | 'calendar'>('list')
 
 onMounted(async () => {
   await eventsStore.fetchPublishedEvents()
@@ -94,28 +95,63 @@ const getEventTypeColor = (type: string) => {
       </p>
     </div>
 
-    <!-- Filters -->
+    <!-- Filters and View Toggle -->
     <div class="mb-8">
-      <div class="flex flex-col sm:flex-row gap-4">
-        <div class="flex-1">
-          <BaseInput
-            v-model="searchQuery"
-            type="text"
-            placeholder="Search events..."
-          />
+      <div class="flex flex-col gap-4">
+        <!-- Search and Filter Row -->
+        <div class="flex flex-col sm:flex-row gap-4">
+          <div class="flex-1">
+            <BaseInput
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search events..."
+            />
+          </div>
+          <div class="w-full sm:w-48">
+            <select
+              v-model="eventTypeFilter"
+              class="input"
+            >
+              <option value="all">All Types</option>
+              <option value="meeting">Meetings</option>
+              <option value="camp">Camps</option>
+              <option value="trip">Trips</option>
+              <option value="special">Special Events</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
         </div>
-        <div class="w-full sm:w-48">
-          <select
-            v-model="eventTypeFilter"
-            class="input"
-          >
-            <option value="all">All Types</option>
-            <option value="meeting">Meetings</option>
-            <option value="camp">Camps</option>
-            <option value="trip">Trips</option>
-            <option value="special">Special Events</option>
-            <option value="other">Other</option>
-          </select>
+
+        <!-- View Toggle -->
+        <div class="flex justify-center">
+          <div class="inline-flex rounded-lg border border-gray-200 p-1 bg-gray-50">
+            <button
+              @click="viewMode = 'list'"
+              :class="{
+                'bg-white shadow-sm': viewMode === 'list',
+                'text-gray-600 hover:text-gray-900': viewMode !== 'list',
+              }"
+              class="px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+              List View
+            </button>
+            <button
+              @click="viewMode = 'calendar'"
+              :class="{
+                'bg-white shadow-sm': viewMode === 'calendar',
+                'text-gray-600 hover:text-gray-900': viewMode !== 'calendar',
+              }"
+              class="px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              Calendar View
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -129,6 +165,11 @@ const getEventTypeColor = (type: string) => {
     <!-- Error State -->
     <div v-else-if="eventsStore.error" class="text-center py-12">
       <p class="text-red-600">{{ eventsStore.error }}</p>
+    </div>
+
+    <!-- Calendar View -->
+    <div v-else-if="viewMode === 'calendar'">
+      <EventsCalendar :events="filteredEvents" />
     </div>
 
     <!-- Events List -->
