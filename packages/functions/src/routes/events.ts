@@ -8,6 +8,7 @@ import {
   deleteEvent,
   getPublishedEvents,
   getEventsByStatus,
+  getEventsByStatusRaw,
   duplicateEvent,
 } from '../services/events';
 import { requireAuth, requireEditor, getUserContext } from '../middleware/auth';
@@ -50,6 +51,7 @@ app.get('/', async (c) => {
 /**
  * GET /api/events/admin/all - Get all events (requires authentication)
  * IMPORTANT: This must come BEFORE /:id to avoid matching "admin" as an ID
+ * Returns raw events without expanding recurring events (for admin management)
  */
 app.get('/admin/all', requireAuth, async (c) => {
   try {
@@ -57,14 +59,14 @@ app.get('/admin/all', requireAuth, async (c) => {
 
     let events;
     if (status) {
-      events = await getEventsByStatus(status as any);
+      events = await getEventsByStatusRaw(status as any);
     } else {
-      // Get all events by querying each status
+      // Get all events by querying each status (without expansion)
       const [draft, published, cancelled, archived] = await Promise.all([
-        getEventsByStatus('draft'),
-        getEventsByStatus('published'),
-        getEventsByStatus('cancelled'),
-        getEventsByStatus('archived'),
+        getEventsByStatusRaw('draft'),
+        getEventsByStatusRaw('published'),
+        getEventsByStatusRaw('cancelled'),
+        getEventsByStatusRaw('archived'),
       ]);
       events = [...draft, ...published, ...cancelled, ...archived];
     }
@@ -81,7 +83,19 @@ app.get('/admin/all', requireAuth, async (c) => {
  */
 app.get('/:id', async (c) => {
   try {
-    const id = c.req.param('id');
+    let id = c.req.param('id');
+
+    // Check if this is an expanded recurring event ID (format: originalId_YYYY-MM-DD)
+    let targetDate: string | null = null;
+    if (id.includes('_')) {
+      const parts = id.split('_');
+      if (parts.length === 2 && /^\d{4}-\d{2}-\d{2}$/.test(parts[1])) {
+        // This is an expanded occurrence, extract original ID and date
+        id = parts[0];
+        targetDate = parts[1];
+      }
+    }
+
     const event = await getEvent(id);
 
     if (!event) {
@@ -95,6 +109,29 @@ app.get('/:id', async (c) => {
       if (!authHeader) {
         return c.json({ error: 'Event not found' }, 404);
       }
+    }
+
+    // If this is a specific occurrence of a recurring event, modify the dates
+    if (targetDate && event.is_recurring) {
+      const originalStart = new Date(event.start_date);
+      const originalEnd = new Date(event.end_date);
+      const duration = originalEnd.getTime() - originalStart.getTime();
+
+      // Create the occurrence at the target date
+      const occurrenceStart = new Date(targetDate);
+      occurrenceStart.setHours(originalStart.getHours(), originalStart.getMinutes(), originalStart.getSeconds());
+
+      const occurrenceEnd = new Date(occurrenceStart.getTime() + duration);
+
+      // Return the event with the specific occurrence dates
+      return c.json({
+        event: {
+          ...event,
+          id: `${event.id}_${targetDate}`,
+          start_date: occurrenceStart.toISOString(),
+          end_date: occurrenceEnd.toISOString(),
+        },
+      });
     }
 
     return c.json({ event });

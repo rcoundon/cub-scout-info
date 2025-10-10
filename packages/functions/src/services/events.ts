@@ -6,6 +6,71 @@ import type { Event, EventStatus, EventType } from '../types/events';
  */
 
 /**
+ * Parse recurrence rule and expand recurring events into individual occurrences
+ */
+function expandRecurringEvent(event: Event): Event[] {
+  if (!event.is_recurring || !event.recurrence_rule) {
+    return [event];
+  }
+
+  const occurrences: Event[] = [];
+  const startDate = new Date(event.start_date);
+  const endDate = new Date(event.end_date);
+  const duration = endDate.getTime() - startDate.getTime();
+
+  // Parse recurrence rule (format: FREQ=WEEKLY;UNTIL=20260101)
+  const freqMatch = event.recurrence_rule.match(/FREQ=(\w+)/);
+  const untilMatch = event.recurrence_rule.match(/UNTIL=(\d{8})/);
+
+  if (!freqMatch || !untilMatch) {
+    return [event];
+  }
+
+  const frequency = freqMatch[1];
+  const untilStr = untilMatch[1];
+  const untilDate = new Date(
+    parseInt(untilStr.substring(0, 4)),
+    parseInt(untilStr.substring(4, 6)) - 1,
+    parseInt(untilStr.substring(6, 8))
+  );
+
+  let currentDate = new Date(startDate);
+  let occurrenceCount = 0;
+  const maxOccurrences = 1000; // Safety limit
+
+  while (currentDate <= untilDate && occurrenceCount < maxOccurrences) {
+    const occurrenceStart = new Date(currentDate);
+    const occurrenceEnd = new Date(occurrenceStart.getTime() + duration);
+
+    occurrences.push({
+      ...event,
+      id: `${event.id}_${occurrenceStart.toISOString().split('T')[0]}`,
+      start_date: occurrenceStart.toISOString(),
+      end_date: occurrenceEnd.toISOString(),
+    });
+
+    // Increment based on frequency
+    switch (frequency) {
+      case 'DAILY':
+        currentDate.setDate(currentDate.getDate() + 1);
+        break;
+      case 'WEEKLY':
+        currentDate.setDate(currentDate.getDate() + 7);
+        break;
+      case 'MONTHLY':
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        break;
+      default:
+        return [event];
+    }
+
+    occurrenceCount++;
+  }
+
+  return occurrences;
+}
+
+/**
  * Create a new event
  */
 export async function createEvent(
@@ -43,18 +108,54 @@ export async function deleteEvent(id: string) {
 
 /**
  * Get all published events ordered by date
+ * Expands recurring events into individual occurrences
  */
 export async function getPublishedEvents() {
   const result = await EventEntity.query.byStatus({ status: 'published' }).go();
-  return result.data;
+  const events = result.data;
+
+  // Expand recurring events
+  const expandedEvents: Event[] = [];
+  for (const event of events) {
+    expandedEvents.push(...expandRecurringEvent(event));
+  }
+
+  // Sort by start date
+  return expandedEvents.sort(
+    (a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+  );
+}
+
+/**
+ * Get events by status without expanding recurring events
+ * Used for admin views where you want to see the master recurring event
+ */
+export async function getEventsByStatusRaw(status: EventStatus) {
+  const result = await EventEntity.query.byStatus({ status }).go();
+  return result.data.sort(
+    (a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+  );
 }
 
 /**
  * Get events by status
+ * Expands recurring events into individual occurrences
+ * Used for public-facing views
  */
 export async function getEventsByStatus(status: EventStatus) {
   const result = await EventEntity.query.byStatus({ status }).go();
-  return result.data;
+  const events = result.data;
+
+  // Expand recurring events
+  const expandedEvents: Event[] = [];
+  for (const event of events) {
+    expandedEvents.push(...expandRecurringEvent(event));
+  }
+
+  // Sort by start date
+  return expandedEvents.sort(
+    (a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+  );
 }
 
 /**

@@ -27,6 +27,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!user.value && !!tokens.value)
   const isAdmin = computed(() => user.value?.role === 'admin')
   const isEditor = computed(() => user.value?.role === 'editor' || isAdmin.value)
+  const accessToken = computed(() => tokens.value?.accessToken || null)
 
   // Actions
   async function login(email: string, password: string) {
@@ -92,6 +93,45 @@ export const useAuthStore = defineStore('auth', () => {
       console.error('Error details:', err.data || err.message)
       // If token is invalid, clear auth state
       logout()
+    }
+  }
+
+  async function refreshTokens() {
+    if (!tokens.value?.refreshToken) {
+      throw new Error('No refresh token available')
+    }
+
+    try {
+      const config = useRuntimeConfig()
+      const response = await $fetch<{ success: boolean; accessToken: string; idToken: string }>(
+        `${config.public.apiUrl}/api/auth/refresh`,
+        {
+          method: 'POST',
+          body: { refreshToken: tokens.value.refreshToken },
+        }
+      )
+
+      if (response.success) {
+        tokens.value = {
+          accessToken: response.accessToken,
+          idToken: response.idToken,
+          refreshToken: tokens.value.refreshToken, // Keep existing refresh token
+        }
+
+        // Update localStorage
+        if (process.client) {
+          localStorage.setItem('auth_tokens', JSON.stringify(tokens.value))
+        }
+
+        return true
+      }
+
+      return false
+    } catch (err: any) {
+      console.error('Token refresh failed:', err)
+      // If refresh fails, logout
+      logout()
+      return false
     }
   }
 
@@ -230,10 +270,12 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     isAdmin,
     isEditor,
+    accessToken,
 
     // Actions
     login,
     logout,
+    refreshTokens,
     changePassword,
     forgotPassword,
     resetPassword,

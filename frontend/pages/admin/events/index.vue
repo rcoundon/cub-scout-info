@@ -57,6 +57,43 @@ const formatDate = (dateString: string) => {
   })
 }
 
+const getRecurrenceInfo = (event: any) => {
+  if (!event.is_recurring || !event.recurrence_rule) return null
+
+  const freqMatch = event.recurrence_rule.match(/FREQ=(\w+)/)
+  const untilMatch = event.recurrence_rule.match(/UNTIL=(\d{8})/)
+
+  if (!freqMatch || !untilMatch) return null
+
+  const frequency = freqMatch[1].toLowerCase()
+  const untilStr = untilMatch[1]
+  const untilDate = new Date(
+    parseInt(untilStr.substring(0, 4)),
+    parseInt(untilStr.substring(4, 6)) - 1,
+    parseInt(untilStr.substring(6, 8))
+  )
+
+  // Calculate approximate number of occurrences
+  const startDate = new Date(event.start_date)
+  const diffTime = untilDate.getTime() - startDate.getTime()
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+  let occurrences = 0
+  if (frequency === 'daily') {
+    occurrences = diffDays
+  } else if (frequency === 'weekly') {
+    occurrences = Math.floor(diffDays / 7)
+  } else if (frequency === 'monthly') {
+    occurrences = Math.floor(diffDays / 30)
+  }
+
+  return {
+    frequency,
+    until: untilDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
+    occurrences,
+  }
+}
+
 const deleteEvent = async (id: string, title: string) => {
   if (confirm(`Are you sure you want to delete "${title}"?`)) {
     const success = await eventsStore.deleteEvent(id)
@@ -119,7 +156,7 @@ const deleteEvent = async (id: string, title: string) => {
       <BaseCard v-for="event in filteredEvents" :key="event.id" :hover="true">
         <div class="flex items-start justify-between">
           <div class="flex-1">
-            <div class="flex items-center gap-3 mb-2">
+            <div class="flex items-center gap-3 mb-2 flex-wrap">
               <h3 class="text-lg font-semibold text-gray-900">{{ event.title }}</h3>
               <BaseBadge variant="primary">
                 {{ event.event_type }}
@@ -127,9 +164,21 @@ const deleteEvent = async (id: string, title: string) => {
               <BaseBadge :variant="getStatusBadgeVariant(event.status)">
                 {{ event.status }}
               </BaseBadge>
+              <span v-if="event.is_recurring" class="px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 flex items-center gap-1">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Recurring
+              </span>
             </div>
 
             <p class="text-gray-600 mb-3">{{ event.description }}</p>
+
+            <div v-if="event.is_recurring && getRecurrenceInfo(event)" class="mb-3 text-sm text-indigo-700 bg-indigo-50 rounded-lg p-2 inline-block">
+              <span class="font-medium">Repeats {{ getRecurrenceInfo(event)?.frequency }}</span>
+              · ~{{ getRecurrenceInfo(event)?.occurrences }} occurrences
+              · Until {{ getRecurrenceInfo(event)?.until }}
+            </div>
 
             <div class="flex flex-wrap gap-4 text-sm text-gray-500">
               <div class="flex items-center gap-1">

@@ -9,6 +9,7 @@ import {
   changeUserPassword,
   createCognitoUser,
   setUserPassword,
+  refreshUserTokens,
 } from '../services/cognito';
 import { createUser, getUser, getUserByEmail, updateLastLogin } from '../services/users';
 import { requireAuth, requireAdmin, getUserContext } from '../middleware/auth';
@@ -55,6 +56,41 @@ app.post('/login', async (c) => {
     );
   }
 });
+
+/**
+ * Refresh token endpoint
+ */
+app.post(
+  '/refresh',
+  zValidator(
+    'json',
+    z.object({
+      refreshToken: z.string(),
+    })
+  ),
+  async (c) => {
+    try {
+      const { refreshToken } = c.req.valid('json');
+
+      // Refresh tokens with Cognito
+      const tokens = await refreshUserTokens(refreshToken);
+
+      return c.json({
+        success: true,
+        ...tokens,
+      });
+    } catch (error) {
+      console.error('Token refresh error:', error);
+      return c.json(
+        {
+          error: 'Token refresh failed',
+          message: error instanceof Error ? error.message : 'Invalid refresh token',
+        },
+        401
+      );
+    }
+  }
+);
 
 /**
  * Logout endpoint (requires authentication)

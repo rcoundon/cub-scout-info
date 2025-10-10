@@ -6,6 +6,7 @@ import eventsRoutes from './routes/events';
 import announcementsRoutes from './routes/announcements';
 import attachmentsRoutes from './routes/attachments';
 import adminUsersRoutes from './routes/admin-users';
+import contactRoutes from './routes/contact';
 
 const app = new Hono();
 
@@ -50,6 +51,9 @@ app.route('/api', attachmentsRoutes);
 
 // Admin user management routes
 app.route('/api/admin/users', adminUsersRoutes);
+
+// Contact routes
+app.route('/api/contact', contactRoutes);
 
 // 404 handler
 app.notFound((c) => {

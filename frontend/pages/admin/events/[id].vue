@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useEventsStore, type Event } from '~/stores/events'
 import { useRouter, useRoute } from 'vue-router'
 
@@ -31,10 +31,59 @@ const form = ref({
   organizer_name: '',
   organizer_contact: '',
   status: 'draft' as 'draft' | 'published' | 'cancelled' | 'archived',
+  is_recurring: false,
+  recurrence_frequency: 'WEEKLY' as 'WEEKLY' | 'DAILY' | 'MONTHLY',
+  recurrence_end_date: '',
 })
 
 const errors = ref<Record<string, string>>({})
 const submitting = ref(false)
+
+// Watch for recurring checkbox changes
+watch(() => form.value.is_recurring, (isRecurring) => {
+  if (isRecurring && form.value.start_date) {
+    // Always set end date to match start date when enabling recurring
+    form.value.end_date = form.value.start_date
+  }
+})
+
+// Watch for start date changes when recurring is enabled
+watch(() => form.value.start_date, (newStartDate) => {
+  if (form.value.is_recurring && newStartDate) {
+    // Auto-update end date to match start date for recurring events
+    form.value.end_date = newStartDate
+  }
+})
+
+// Computed default recurrence end date (2 years from start date)
+const defaultRecurrenceEndDate = computed(() => {
+  if (!form.value.start_date) return ''
+  const startDate = new Date(form.value.start_date)
+  const endDate = new Date(startDate)
+  endDate.setFullYear(endDate.getFullYear() + 2)
+  return endDate.toISOString().split('T')[0]
+})
+
+// Parse recurrence rule
+const parseRecurrenceRule = (rule: string) => {
+  if (!rule) return { frequency: 'WEEKLY', endDate: '' }
+
+  const freqMatch = rule.match(/FREQ=(\w+)/)
+  const untilMatch = rule.match(/UNTIL=(\d{8})/)
+
+  const frequency = freqMatch ? freqMatch[1] : 'WEEKLY'
+  let endDate = ''
+
+  if (untilMatch) {
+    const dateStr = untilMatch[1]
+    const year = dateStr.substring(0, 4)
+    const month = dateStr.substring(4, 6)
+    const day = dateStr.substring(6, 8)
+    endDate = `${year}-${month}-${day}`
+  }
+
+  return { frequency, endDate }
+}
 
 onMounted(async () => {
   if (!isNew.value) {
@@ -42,6 +91,8 @@ onMounted(async () => {
     if (event) {
       const startDate = new Date(event.start_date)
       const endDate = new Date(event.end_date)
+
+      const recurrence = event.recurrence_rule ? parseRecurrenceRule(event.recurrence_rule) : { frequency: 'WEEKLY', endDate: '' }
 
       form.value = {
         title: event.title,
@@ -58,6 +109,9 @@ onMounted(async () => {
         organizer_name: event.organizer_name || '',
         organizer_contact: event.organizer_contact || '',
         status: event.status,
+        is_recurring: event.is_recurring || false,
+        recurrence_frequency: recurrence.frequency as 'WEEKLY' | 'DAILY' | 'MONTHLY',
+        recurrence_end_date: recurrence.endDate,
       }
     } else {
       router.push('/admin/events')
@@ -110,17 +164,48 @@ const validate = () => {
     }
   }
 
+  // Validate recurrence
+  if (form.value.is_recurring) {
+    if (!form.value.recurrence_end_date) {
+      // Use default if not provided
+      form.value.recurrence_end_date = defaultRecurrenceEndDate.value
+    }
+
+    const recEndDate = new Date(form.value.recurrence_end_date)
+    const startDate = new Date(form.value.start_date)
+
+    if (recEndDate < startDate) {
+      errors.value.recurrence_end_date = 'Recurrence end date must be after start date'
+      isValid = false
+    }
+  }
+
   return isValid
 }
 
+// Build recurrence rule in RFC 5545 format
+const buildRecurrenceRule = () => {
+  if (!form.value.is_recurring) return undefined
+
+  const endDate = form.value.recurrence_end_date || defaultRecurrenceEndDate.value
+  const until = endDate.replace(/-/g, '') // Convert YYYY-MM-DD to YYYYMMDD
+
+  return `FREQ=${form.value.recurrence_frequency};UNTIL=${until}`
+}
+
 const handleSubmit = async () => {
-  if (!validate()) return
+  if (!validate()) {
+    console.log('Validation failed:', errors.value)
+    return
+  }
 
   submitting.value = true
 
   try {
     const startDateTime = new Date(`${form.value.start_date}T${form.value.start_time}`).toISOString()
     const endDateTime = new Date(`${form.value.end_date}T${form.value.end_time}`).toISOString()
+
+    const recurrenceRule = buildRecurrenceRule()
 
     const eventData = {
       title: form.value.title,
@@ -134,9 +219,12 @@ const handleSubmit = async () => {
       rsvp_deadline: form.value.rsvp_deadline ? new Date(form.value.rsvp_deadline).toISOString() : undefined,
       organizer_name: form.value.organizer_name || undefined,
       organizer_contact: form.value.organizer_contact || undefined,
-      is_recurring: false,
+      is_recurring: form.value.is_recurring,
+      recurrence_rule: recurrenceRule,
       status: form.value.status,
     }
+
+    console.log('Submitting event data:', eventData)
 
     let success
     if (isNew.value) {
@@ -145,9 +233,17 @@ const handleSubmit = async () => {
       success = await eventsStore.updateEvent(route.params.id as string, eventData)
     }
 
+    console.log('Event creation result:', success)
+
     if (success) {
       router.push('/admin/events')
+    } else {
+      console.error('Event creation failed - store returned', success)
+      errors.value.submit = eventsStore.error || 'Failed to create event'
     }
+  } catch (error) {
+    console.error('Error in handleSubmit:', error)
+    errors.value.submit = 'An unexpected error occurred'
   } finally {
     submitting.value = false
   }
@@ -231,16 +327,83 @@ const handleCancel = () => {
           <BaseInput
             v-model="form.end_date"
             type="date"
-            label="End Date"
+            :label="form.is_recurring ? 'Event Duration - End Date' : 'End Date'"
             :error="errors.end_date"
             :required="true"
+            :hint="form.is_recurring ? 'For single occurrence (usually same day)' : undefined"
           />
           <BaseInput
             v-model="form.end_time"
             type="time"
-            label="End Time"
+            :label="form.is_recurring ? 'Event Duration - End Time' : 'End Time'"
             :required="true"
           />
+        </div>
+
+        <!-- Recurring Event -->
+        <div class="border-t border-gray-200 pt-6">
+          <div class="flex items-center mb-4">
+            <input
+              id="is_recurring"
+              v-model="form.is_recurring"
+              type="checkbox"
+              class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+            />
+            <label for="is_recurring" class="ml-2 block text-sm font-medium text-gray-700">
+              Recurring Event
+            </label>
+          </div>
+
+          <div v-if="form.is_recurring" class="ml-6 space-y-4 bg-indigo-50 border-2 border-indigo-200 p-4 rounded-lg">
+            <div class="mb-4">
+              <p class="text-sm text-indigo-900 font-medium mb-2">📅 Recurrence Schedule</p>
+              <p class="text-sm text-indigo-700">
+                The event times above apply to each occurrence. Here you set how often it repeats and when to stop.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Frequency -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Repeat Every
+                </label>
+                <select v-model="form.recurrence_frequency" class="input">
+                  <option value="DAILY">Day</option>
+                  <option value="WEEKLY">Week (Standard)</option>
+                  <option value="MONTHLY">Month</option>
+                </select>
+                <p class="mt-1 text-sm text-gray-500">How often the event repeats</p>
+              </div>
+
+              <!-- Recurrence End Date -->
+              <BaseInput
+                v-model="form.recurrence_end_date"
+                type="date"
+                label="Stop Repeating On"
+                :error="errors.recurrence_end_date"
+                :hint="`Optional (Default: ${defaultRecurrenceEndDate})`"
+              />
+            </div>
+
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div class="flex">
+                <svg class="w-5 h-5 text-blue-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div class="text-sm text-blue-800">
+                  <p class="font-medium">Summary:</p>
+                  <p class="mt-1">
+                    This event will repeat
+                    {{ form.recurrence_frequency === 'WEEKLY' ? 'every week on the same day' :
+                       form.recurrence_frequency === 'DAILY' ? 'every day' :
+                       'every month on the same date' }}
+                    until {{ form.recurrence_end_date || defaultRecurrenceEndDate }}.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Location -->
@@ -314,6 +477,14 @@ const handleCancel = () => {
             <option value="cancelled">Cancelled</option>
             <option value="archived">Archived</option>
           </select>
+        </div>
+
+        <!-- Submit Error -->
+        <div
+          v-if="errors.submit"
+          class="p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600"
+        >
+          {{ errors.submit }}
         </div>
 
         <!-- Actions -->

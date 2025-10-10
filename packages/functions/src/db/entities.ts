@@ -455,6 +455,89 @@ export const AuditEntity = new Entity(
 );
 
 /**
+ * Contact Message Entity
+ */
+export const ContactMessageEntity = new Entity(
+  {
+    model: {
+      entity: 'ContactMessage',
+      version: '1',
+      service: 'cubs-site',
+    },
+    attributes: {
+      id: {
+        type: 'string',
+        required: true,
+        readOnly: true,
+        default: () => crypto.randomUUID(),
+      },
+      name: {
+        type: 'string',
+        required: true,
+      },
+      email: {
+        type: 'string',
+        required: true,
+      },
+      subject: {
+        type: 'string',
+        required: true,
+      },
+      message: {
+        type: 'string',
+        required: true,
+      },
+      status: {
+        type: ['new', 'read', 'replied', 'archived'] as const,
+        required: true,
+        default: 'new',
+      },
+      created_at: {
+        type: 'string',
+        required: true,
+        readOnly: true,
+        default: () => new Date().toISOString(),
+      },
+      updated_at: {
+        type: 'string',
+        required: false,
+        readOnly: true,
+        watch: '*',
+        set: () => new Date().toISOString(),
+      },
+    },
+    indexes: {
+      primary: {
+        pk: {
+          field: 'PK',
+          composite: ['id'],
+          template: 'CONTACT#${id}',
+        },
+        sk: {
+          field: 'SK',
+          composite: [],
+          template: 'METADATA',
+        },
+      },
+      byStatus: {
+        index: 'GSI1',
+        pk: {
+          field: 'GSI1PK',
+          composite: ['status'],
+          template: 'CONTACT_STATUS#${status}',
+        },
+        sk: {
+          field: 'GSI1SK',
+          composite: ['created_at'],
+          template: '${created_at}',
+        },
+      },
+    },
+  },
+  { client, table: tableName }
+);
+
+/**
  * Create a Service to access all entities
  * This allows for transactions and batch operations
  */
@@ -465,6 +548,7 @@ export const CubsService = new Service(
     announcement: AnnouncementEntity,
     attachment: AttachmentEntity,
     audit: AuditEntity,
+    contactMessage: ContactMessageEntity,
   },
   { client, table: tableName }
 );

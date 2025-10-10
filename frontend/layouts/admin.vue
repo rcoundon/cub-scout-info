@@ -84,6 +84,11 @@ const navItems = [
     icon: 'svg',
   },
   {
+    label: 'Contact Messages',
+    path: '/admin/contact',
+    icon: 'svg',
+  },
+  {
     label: 'Users',
     path: '/admin/users',
     icon: 'svg',

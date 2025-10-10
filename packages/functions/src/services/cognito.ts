@@ -91,6 +91,32 @@ export async function authenticateUser(email: string, password: string) {
 }
 
 /**
+ * Refresh access and ID tokens using a refresh token
+ */
+export async function refreshUserTokens(refreshToken: string) {
+  const command = new AdminInitiateAuthCommand({
+    UserPoolId: Resource.CubsSiteAuth.id,
+    ClientId: process.env.USER_POOL_CLIENT_ID || '',
+    AuthFlow: 'REFRESH_TOKEN_AUTH' as AuthFlowType,
+    AuthParameters: {
+      REFRESH_TOKEN: refreshToken,
+    },
+  });
+
+  const response = await client.send(command);
+
+  if (!response.AuthenticationResult) {
+    throw new Error('Token refresh failed: No tokens returned');
+  }
+
+  return {
+    accessToken: response.AuthenticationResult.AccessToken,
+    idToken: response.AuthenticationResult.IdToken,
+    expiresIn: response.AuthenticationResult.ExpiresIn,
+  };
+}
+
+/**
  * Sign out a user globally (invalidates all tokens)
  */
 export async function signOutUser(username: string) {

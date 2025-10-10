@@ -187,9 +187,15 @@ const getEventTypeColor = (type: string) => {
             <BaseCard hover class="h-full flex flex-col">
               <div class="flex-1">
                 <!-- Event Type Badge -->
-                <div class="mb-3">
+                <div class="mb-3 flex items-center gap-2 flex-wrap">
                   <span :class="getEventTypeColor(event.event_type)" class="px-3 py-1 rounded-full text-xs font-medium">
                     {{ getEventTypeLabel(event.event_type) }}
+                  </span>
+                  <span v-if="event.is_recurring" class="px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Recurring
                   </span>
                 </div>
 
@@ -254,9 +260,15 @@ const getEventTypeColor = (type: string) => {
             <BaseCard hover class="h-full flex flex-col opacity-75">
               <div class="flex-1">
                 <!-- Event Type Badge -->
-                <div class="mb-3">
+                <div class="mb-3 flex items-center gap-2 flex-wrap">
                   <span :class="getEventTypeColor(event.event_type)" class="px-3 py-1 rounded-full text-xs font-medium">
                     {{ getEventTypeLabel(event.event_type) }}
+                  </span>
+                  <span v-if="event.is_recurring" class="px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Recurring
                   </span>
                 </div>
 
