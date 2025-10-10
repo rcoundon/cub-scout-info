@@ -1,0 +1,10 @@
+packages:
+  - frontend
+  - packages/*
+
+onlyBuiltDependencies:
+  - '@biomejs/biome'
+  - '@parcel/watcher'
+  - aws-sdk
+  - esbuild
+  - vue-demi

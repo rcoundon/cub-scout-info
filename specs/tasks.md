@@ -3,55 +3,55 @@
 ## Phase 1: Project Setup and Infrastructure (Week 1-2)
 
 ### 1.1 Project Initialization
-- [ ] Set up Git repository
-- [ ] Create project structure
-- [ ] Initialize frontend (Nuxt 3/Vue.js 3)
-- [ ] Initialize backend (Node.js/Express)
-- [ ] Set up environment configuration (.env files)
-- [ ] Configure ESLint and Prettier
-- [ ] Set up TypeScript (recommended for both frontend and backend)
+- [x] Set up Git repository
+- [x] Create project structure
+- [x] Initialize frontend (Nuxt 3/Vue.js 3)
+- [x] Initialize backend (Hono for AWS Lambda)
+- [x] Set up environment configuration (.env files)
+- [x] Configure Biome (linting, formatting, import sorting)
+- [x] Set up TypeScript (recommended for both frontend and backend)
 
 ### 1.2 AWS Account and Infrastructure Setup
-- [ ] Create/configure AWS account
-- [ ] Set up AWS CLI and credentials
-- [ ] Configure AWS CDK or Terraform for IaC
-- [ ] Set up development, staging, and production environments
-- [ ] Register domain name (if not already owned)
-- [ ] Request SSL certificate in AWS Certificate Manager
-- [ ] Configure Route 53 for DNS
+- [x] Create/configure AWS account
+- [x] Set up AWS CLI and credentials
+- [x] Initialize SST v3 project for infrastructure
+- [x] Set up development, staging, and production stages
+- [x] Document domain name registration process (see specs/domain-setup.md)
+- [x] Document SSL certificate setup (see specs/domain-setup.md)
+- [x] Document Route 53 configuration (see specs/domain-setup.md)
 
 ### 1.3 Development Environment
-- [ ] Install required dependencies
-- [ ] Set up local DynamoDB (using DynamoDB Local or NoSQL Workbench)
-- [ ] Configure local development server (Nuxt dev server)
-- [ ] Set up API mocking/testing tools
-- [ ] Configure hot reload for development (built-in with Nuxt)
+- [x] Install required dependencies
+- [x] ~~Set up local DynamoDB~~ (Not needed - SST dev mode uses live AWS DynamoDB)
+- [x] Configure local development server (Nuxt dev server)
+- [x] ~~Set up API mocking/testing tools~~ (Not needed - SST dev provides live AWS resources)
+- [x] Configure hot reload for development (built-in with Nuxt)
 
 ## Phase 2: Backend Development (Week 3-5)
 
 ### 2.1 DynamoDB Setup
-- [ ] Design and finalize DynamoDB table schema (single-table design)
-- [ ] Define access patterns and GSI requirements
-- [ ] Set up AWS SDK for DynamoDB in backend
-- [ ] Create DynamoDB table utilities and helpers
-- [ ] Create seed data scripts for development/testing
-- [ ] Configure point-in-time recovery and backups
+- [x] Design and finalize DynamoDB table schema (single-table design)
+- [x] Define access patterns and GSI requirements
+- [x] Set up AWS SDK for DynamoDB in backend (using ElectroDB)
+- [x] Create DynamoDB table utilities and helpers (ElectroDB entities)
+- [x] Create seed data scripts for development/testing
+- [x] Configure point-in-time recovery and backups
 
 ### 2.2 Authentication System
-- [ ] Set up AWS Cognito User Pool
-- [ ] Configure user authentication flow
-- [ ] Implement JWT validation
-- [ ] Create user registration endpoint (admin only)
-- [ ] Implement password reset functionality
-- [ ] Set up role-based access control (RBAC)
-- [ ] Create authentication middleware
+- [x] Set up AWS Cognito User Pool
+- [x] Configure user authentication flow
+- [x] Implement JWT validation
+- [x] Create user registration endpoint (admin only)
+- [x] Implement password reset functionality
+- [x] Set up role-based access control (RBAC)
+- [x] Create authentication middleware
 
 ### 2.3 API Development - Core Endpoints
-- [ ] Set up Express.js with serverless-http
-- [ ] Configure API routing
+- [ ] Set up Hono with AWS Lambda adapter
+- [ ] Configure API routing with Hono
 - [ ] Implement error handling middleware
-- [ ] Set up request validation (using Joi or Yup)
-- [ ] Implement logging (Winston or similar)
+- [ ] Set up request validation (using Zod or Hono validator)
+- [ ] Implement logging middleware
 
 ### 2.4 Events API
 - [ ] Create event model and repository
@@ -218,18 +218,17 @@
 ## Phase 5: AWS Deployment Setup (Week 11)
 
 ### 5.1 Infrastructure Provisioning
-- [ ] Write IaC scripts (CDK/Terraform)
-- [ ] Create DynamoDB table with GSIs
+- [ ] Define SST v3 resources in sst.config.ts
+- [ ] Create DynamoDB table with GSIs using SST
 - [ ] Configure DynamoDB on-demand capacity mode
 - [ ] Enable point-in-time recovery on DynamoDB
-- [ ] Create S3 buckets (frontend, file uploads)
-- [ ] Set up CloudFront distribution
-- [ ] Configure API Gateway
-- [ ] Create Lambda functions
+- [ ] Create S3 buckets (frontend via StaticSite, file uploads)
+- [ ] Set up CloudFront distribution (automatic with StaticSite)
+- [ ] Configure Hono API with SST Function
 - [ ] Set up Lambda layers (if needed)
-- [ ] Configure Cognito User Pool
-- [ ] Set up CloudWatch logs and metrics
-- [ ] Configure Systems Manager Parameter Store (for config)
+- [ ] Configure Cognito User Pool with SST
+- [ ] Set up CloudWatch logs and metrics (automatic)
+- [ ] Use SST Config or Parameter Store for secrets
 
 ### 5.2 CI/CD Pipeline
 - [ ] Set up GitHub Actions or AWS CodePipeline

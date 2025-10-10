@@ -50,7 +50,13 @@
 
 ### Backend
 - **Runtime**: Node.js 20.x on AWS Lambda
-- **API Framework**: Express.js with Serverless HTTP
+- **API Framework**: Hono (ultrafast web framework)
+  - Built-in AWS Lambda adapter (no extra dependencies)
+  - ~2x faster than Express with smaller bundle size
+  - TypeScript-first with excellent type inference
+  - Middleware support (CORS, auth, logging)
+  - Zero dependencies for core functionality
+  - Native Request/Response objects (Web Standards API)
 - **Authentication**: AWS Cognito
   - Managed user pools
   - Built-in security features
@@ -435,11 +441,15 @@ Workflow:
 ```
 
 ### Infrastructure as Code
-**Use AWS CDK or Terraform**
+**Use SST v3 (Serverless Stack)**
+- TypeScript-first infrastructure definitions
+- Live development environment (sst dev)
+- Automatic resource linking and type safety
+- Built-in support for Nuxt, Hono, and serverless patterns
 - Version controlled infrastructure
 - Reproducible deployments
 - Easy rollback
-- Environment parity
+- Multi-stage deployments (dev, staging, production)
 
 ### Deployment Steps
 1. **Initial Setup** (one-time)
