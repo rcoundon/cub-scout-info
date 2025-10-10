@@ -25,11 +25,11 @@ const filteredAnnouncements = computed(() => {
     )
   }
 
-  // Sort by priority (higher first), then by date (newer first)
+  // Sort by priority (high > medium > low) then by date (newer first)
+  const priorityOrder = { high: 3, medium: 2, low: 1 }
   return announcements.sort((a, b) => {
-    if (b.priority !== a.priority) {
-      return b.priority - a.priority
-    }
+    const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority]
+    if (priorityDiff !== 0) return priorityDiff
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   })
 })
@@ -52,16 +52,22 @@ const formatDateTime = (dateString: string) => {
   })
 }
 
-const getPriorityLabel = (priority: number) => {
-  if (priority >= 80) return 'Urgent'
-  if (priority >= 50) return 'Important'
-  return 'Normal'
+const getPriorityLabel = (priority: string) => {
+  const labels: Record<string, string> = {
+    high: 'High',
+    medium: 'Medium',
+    low: 'Low',
+  }
+  return labels[priority] || priority
 }
 
-const getPriorityColor = (priority: number) => {
-  if (priority >= 80) return 'bg-red-100 text-red-800'
-  if (priority >= 50) return 'bg-yellow-100 text-yellow-800'
-  return 'bg-blue-100 text-blue-800'
+const getPriorityColor = (priority: string) => {
+  const colors: Record<string, string> = {
+    high: 'bg-red-100 text-red-800',
+    medium: 'bg-yellow-100 text-yellow-800',
+    low: 'bg-blue-100 text-blue-800',
+  }
+  return colors[priority] || 'bg-gray-100 text-gray-800'
 }
 
 const isExpiringSoon = (expiresAt?: string) => {
@@ -129,10 +135,10 @@ const getExpiryText = (expiresAt?: string) => {
                   :class="getPriorityColor(announcement.priority)"
                   class="w-12 h-12 rounded-full flex items-center justify-center"
                 >
-                  <svg v-if="announcement.priority >= 80" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg v-if="announcement.priority === 'high'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
-                  <svg v-else-if="announcement.priority >= 50" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg v-else-if="announcement.priority === 'medium'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

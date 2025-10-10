@@ -32,11 +32,11 @@ const filteredAnnouncements = computed(() => {
     )
   }
 
-  // Sort by priority (highest first), then by created date
+  // Sort by priority (high > medium > low) then by date (newer first)
+  const priorityOrder = { high: 3, medium: 2, low: 1 }
   return announcements.sort((a, b) => {
-    if (b.priority !== a.priority) {
-      return b.priority - a.priority
-    }
+    const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority]
+    if (priorityDiff !== 0) return priorityDiff
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   })
 })
@@ -52,10 +52,22 @@ const getStatusBadgeVariant = (status: string) => {
   }
 }
 
-const getPriorityBadgeVariant = (priority: number) => {
-  if (priority >= 8) return 'danger'
-  if (priority >= 5) return 'warning'
-  return 'primary'
+const getPriorityBadgeVariant = (priority: string) => {
+  const variants: Record<string, string> = {
+    high: 'danger',
+    medium: 'warning',
+    low: 'primary',
+  }
+  return variants[priority] || 'primary'
+}
+
+const getPriorityLabel = (priority: string) => {
+  const labels: Record<string, string> = {
+    high: 'High',
+    medium: 'Medium',
+    low: 'Low',
+  }
+  return labels[priority] || priority
 }
 
 const formatDate = (dateString: string) => {
@@ -143,7 +155,7 @@ const deleteAnnouncement = async (id: string, title: string) => {
                 {{ announcement.status }}
               </BaseBadge>
               <BaseBadge :variant="getPriorityBadgeVariant(announcement.priority)">
-                Priority {{ announcement.priority }}
+                Priority {{ getPriorityLabel(announcement.priority) }}
               </BaseBadge>
             </div>
 

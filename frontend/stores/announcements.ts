@@ -6,7 +6,7 @@ export interface Announcement {
   id: string
   title: string
   content: string
-  priority: number
+  priority: 'low' | 'medium' | 'high'
   status: 'draft' | 'published' | 'expired'
   expires_at?: string
   attachment_url?: string

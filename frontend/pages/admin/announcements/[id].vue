@@ -19,7 +19,7 @@ const pageTitle = computed(() => isNew.value ? 'Create Announcement' : 'Edit Ann
 const form = ref({
   title: '',
   content: '',
-  priority: 5,
+  priority: 'medium' as 'low' | 'medium' | 'high',
   status: 'draft' as 'draft' | 'published' | 'expired',
   expires_at: '',
   attachment: null as File | null,
@@ -59,11 +59,6 @@ const validate = () => {
 
   if (!form.value.content.trim()) {
     errors.value.content = 'Content is required'
-    isValid = false
-  }
-
-  if (form.value.priority < 0 || form.value.priority > 10) {
-    errors.value.priority = 'Priority must be between 0 and 10'
     isValid = false
   }
 
@@ -151,17 +146,19 @@ const handleCancel = () => {
 
         <!-- Priority & Status Row -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <BaseInput
-            v-model.number="form.priority"
-            type="number"
-            label="Priority"
-            placeholder="5"
-            :error="errors.priority"
-            :required="true"
-            hint="0-10, where 10 is highest priority"
-            min="0"
-            max="10"
-          />
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Priority <span class="text-red-500">*</span>
+            </label>
+            <select v-model="form.priority" class="input">
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+            <p class="mt-1 text-sm text-gray-500">
+              High priority announcements appear at the top
+            </p>
+          </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">

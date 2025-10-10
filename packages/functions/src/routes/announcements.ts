@@ -18,7 +18,7 @@ const app = new Hono();
 const announcementSchema = z.object({
   title: z.string().min(1).max(200),
   content: z.string().min(1),
-  priority: z.number().int().min(0).max(10).default(0),
+  priority: z.enum(['low', 'medium', 'high']).default('medium'),
   expires_at: z.string().datetime().optional(),
   status: z.enum(['draft', 'published', 'expired']).default('draft'),
 });

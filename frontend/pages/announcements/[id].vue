@@ -47,22 +47,22 @@ const formatDateTime = (dateString: string) => {
   })
 }
 
-const getPriorityLabel = (priority: number) => {
-  if (priority >= 80) return 'Urgent'
-  if (priority >= 50) return 'Important'
-  return 'Normal'
+const getPriorityLabel = (priority: string) => {
+  const labels: Record<string, string> = {
+    high: 'High',
+    medium: 'Medium',
+    low: 'Low',
+  }
+  return labels[priority] || priority
 }
 
-const getPriorityColor = (priority: number) => {
-  if (priority >= 80) return 'bg-red-100 text-red-800 border-red-200'
-  if (priority >= 50) return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-  return 'bg-blue-100 text-blue-800 border-blue-200'
-}
-
-const getPriorityIcon = (priority: number) => {
-  if (priority >= 80) return 'warning'
-  if (priority >= 50) return 'info'
-  return 'message'
+const getPriorityColor = (priority: string) => {
+  const colors: Record<string, string> = {
+    high: 'bg-red-100 text-red-800 border-red-200',
+    medium: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    low: 'bg-blue-100 text-blue-800 border-blue-200',
+  }
+  return colors[priority] || 'bg-gray-100 text-gray-800 border-gray-200'
 }
 
 const isExpired = computed(() => {
@@ -133,10 +133,10 @@ const goBack = () => {
       <div :class="getPriorityColor(announcement.priority)" class="border-l-4 p-4 mb-6 rounded-r-lg">
         <div class="flex items-center gap-3">
           <div class="flex-shrink-0">
-            <svg v-if="announcement.priority >= 80" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg v-if="announcement.priority === 'high'" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <svg v-else-if="announcement.priority >= 50" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg v-else-if="announcement.priority === 'medium'" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <svg v-else class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,7 +144,7 @@ const goBack = () => {
             </svg>
           </div>
           <div>
-            <p class="font-semibold">{{ getPriorityLabel(announcement.priority) }} Announcement</p>
+            <p class="font-semibold">{{ getPriorityLabel(announcement.priority) }} Priority Announcement</p>
             <p class="text-sm">Posted on {{ formatDate(announcement.created_at) }}</p>
           </div>
         </div>

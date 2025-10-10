@@ -64,13 +64,21 @@ export async function deleteAnnouncement(id: string) {
 export async function getPublishedAnnouncements() {
   const result = await AnnouncementEntity.query
     .byStatus({ status: 'published' })
-    .go({ order: 'desc' }); // Descending order for priority
+    .go();
 
   const now = new Date().toISOString();
 
   // Filter out expired announcements
-  return result.data.filter((announcement: Announcement) => {
+  const active = result.data.filter((announcement: Announcement) => {
     return !announcement.expires_at || announcement.expires_at > now;
+  });
+
+  // Sort by priority (high > medium > low) then by date (newest first)
+  const priorityOrder = { high: 3, medium: 2, low: 1 };
+  return active.sort((a, b) => {
+    const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
+    if (priorityDiff !== 0) return priorityDiff;
+    return b.created_at.localeCompare(a.created_at);
   });
 }
 
@@ -80,8 +88,15 @@ export async function getPublishedAnnouncements() {
 export async function getAnnouncementsByStatus(status: AnnouncementStatus) {
   const result = await AnnouncementEntity.query
     .byStatus({ status })
-    .go({ order: 'desc' });
-  return result.data;
+    .go();
+
+  // Sort by priority (high > medium > low) then by date (newest first)
+  const priorityOrder = { high: 3, medium: 2, low: 1 };
+  return result.data.sort((a, b) => {
+    const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
+    if (priorityDiff !== 0) return priorityDiff;
+    return b.created_at.localeCompare(a.created_at);
+  });
 }
 
 /**

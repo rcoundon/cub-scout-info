@@ -250,9 +250,9 @@ export const AnnouncementEntity = new Entity(
         required: true,
       },
       priority: {
-        type: 'number',
+        type: ['low', 'medium', 'high'] as const,
         required: true,
-        default: 0,
+        default: 'medium',
       },
       expires_at: {
         type: 'string',

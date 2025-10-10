@@ -3,12 +3,13 @@
  */
 
 export type AnnouncementStatus = 'draft' | 'published' | 'expired';
+export type AnnouncementPriority = 'low' | 'medium' | 'high';
 
 export interface Announcement {
   id: string;
   title: string;
   content: string;
-  priority: number; // Higher number = higher priority
+  priority: AnnouncementPriority;
   expires_at?: string; // ISO 8601 format
   status: AnnouncementStatus;
   created_by: string; // Cognito user ID
