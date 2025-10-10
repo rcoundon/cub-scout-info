@@ -5,6 +5,7 @@ import { logger } from 'hono/logger';
 import authRoutes from './routes/auth';
 import eventsRoutes from './routes/events';
 import announcementsRoutes from './routes/announcements';
+import attachmentsRoutes from './routes/attachments';
 
 const app = new Hono();
 
@@ -50,6 +51,9 @@ app.route('/api/events', eventsRoutes);
 
 // Announcements routes
 app.route('/api/announcements', announcementsRoutes);
+
+// Attachments routes
+app.route('/api', attachmentsRoutes);
 
 // 404 handler
 app.notFound((c) => {
