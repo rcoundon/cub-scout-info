@@ -1,41 +1,40 @@
 <template>
   <header class="bg-white shadow-sm sticky top-0 z-50">
     <nav class="container mx-auto px-4">
-      <div class="flex items-center justify-between h-16">
+      <div class="flex items-center justify-between h-24">
         <!-- Logo -->
         <NuxtLink to="/" class="flex items-center space-x-2">
-          <div class="font-display font-semibold text-xl text-gray-900 hidden sm:block">
-            1st Holmer Green 
-          </div>
-          <div>
-            <img src="https://www.scouts.org.uk/img/logos/scouts-black.svg"></img>
-          </div>
+          <img
+            src="/assets/logo-purple.png"
+            alt="Cubs Site Logo"
+            class="h-20 w-auto"
+          />
         </NuxtLink>
 
         <!-- Desktop Navigation - Hidden on mobile, shown on md and up -->
-        <div class="hidden md:flex items-center space-x-6">
+        <div class="hidden md:flex items-center space-x-8">
           <NuxtLink
             v-for="item in navigationItems"
             :key="item.path"
             :to="item.path"
-            class="text-gray-700 hover:text-primary-600 transition-colors font-medium"
+            class="text-gray-700 hover:text-primary-600 transition-colors font-medium text-lg"
           >
             {{ item.label }}
           </NuxtLink>
 
           <!-- Auth Actions -->
           <div v-if="isAuthenticated" class="flex items-center space-x-4">
-            <span class="text-sm text-gray-600">{{ userName }}</span>
+            <span class="text-base text-gray-600">{{ userName }}</span>
             <NuxtLink v-if="canAccessAdmin" to="/admin">
-              <BaseButton variant="secondary" size="sm">
+              <BaseButton variant="secondary">
                 Admin
               </BaseButton>
             </NuxtLink>
-            <BaseButton variant="outline" size="sm" @click="handleLogout">
+            <BaseButton variant="outline" @click="handleLogout">
               Logout
             </BaseButton>
           </div>
-          <BaseButton v-else variant="primary" size="sm" @click="handleLogin">
+          <BaseButton v-else variant="primary" @click="handleLogin">
             Login
           </BaseButton>
         </div>
@@ -79,27 +78,27 @@
             v-for="item in navigationItems"
             :key="item.path"
             :to="item.path"
-            class="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2"
+            class="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2 text-lg"
             @click="closeMobileMenu"
           >
             {{ item.label }}
           </NuxtLink>
 
           <div v-if="isAuthenticated" class="pt-3 border-t border-gray-200">
-            <p class="text-sm font-medium text-gray-900 mb-1">{{ userName }}</p>
-            <p class="text-xs text-gray-600 mb-2">{{ userEmail }}</p>
+            <p class="text-base font-medium text-gray-900 mb-1">{{ userName }}</p>
+            <p class="text-sm text-gray-600 mb-2">{{ userEmail }}</p>
             <div class="space-y-2">
               <NuxtLink v-if="canAccessAdmin" to="/admin" @click="closeMobileMenu">
-                <BaseButton variant="secondary" size="sm" class="w-full">
+                <BaseButton variant="secondary" class="w-full">
                   Admin Dashboard
                 </BaseButton>
               </NuxtLink>
-              <BaseButton variant="outline" size="sm" @click="handleLogout" class="w-full">
+              <BaseButton variant="outline" @click="handleLogout" class="w-full">
                 Logout
               </BaseButton>
             </div>
           </div>
-          <BaseButton v-else variant="primary" size="sm" @click="handleLogin">
+          <BaseButton v-else variant="primary" @click="handleLogin">
             Login
           </BaseButton>
         </div>

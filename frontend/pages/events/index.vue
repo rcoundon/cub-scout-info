@@ -36,6 +36,69 @@ onMounted(async () => {
   await eventsStore.fetchPublishedEvents()
 })
 
+// Helper function to expand recurring events for calendar view
+const expandRecurringEvent = (event: any) => {
+  if (!event.is_recurring || !event.recurrence_rule) {
+    return [event]
+  }
+
+  const occurrences = []
+  const startDate = new Date(event.start_date)
+  const endDate = new Date(event.end_date)
+  const duration = endDate.getTime() - startDate.getTime()
+
+  // Parse recurrence rule (format: FREQ=WEEKLY;UNTIL=20260101)
+  const freqMatch = event.recurrence_rule.match(/FREQ=(\w+)/)
+  const untilMatch = event.recurrence_rule.match(/UNTIL=(\d{8})/)
+
+  if (!freqMatch || !untilMatch) {
+    return [event]
+  }
+
+  const frequency = freqMatch[1]
+  const untilStr = untilMatch[1]
+  const untilDate = new Date(
+    parseInt(untilStr.substring(0, 4)),
+    parseInt(untilStr.substring(4, 6)) - 1,
+    parseInt(untilStr.substring(6, 8))
+  )
+
+  let currentDate = new Date(startDate)
+  let occurrenceCount = 0
+  const maxOccurrences = 1000 // Safety limit
+
+  while (currentDate <= untilDate && occurrenceCount < maxOccurrences) {
+    const occurrenceStart = new Date(currentDate)
+    const occurrenceEnd = new Date(occurrenceStart.getTime() + duration)
+
+    occurrences.push({
+      ...event,
+      id: `${event.id}_${occurrenceStart.toISOString().split('T')[0]}`,
+      start_date: occurrenceStart.toISOString(),
+      end_date: occurrenceEnd.toISOString(),
+    })
+
+    // Increment based on frequency
+    switch (frequency) {
+      case 'DAILY':
+        currentDate.setDate(currentDate.getDate() + 1)
+        break
+      case 'WEEKLY':
+        currentDate.setDate(currentDate.getDate() + 7)
+        break
+      case 'MONTHLY':
+        currentDate.setMonth(currentDate.getMonth() + 1)
+        break
+      default:
+        return [event]
+    }
+
+    occurrenceCount++
+  }
+
+  return occurrences
+}
+
 const filteredEvents = computed(() => {
   let events = eventsStore.events
 
@@ -55,6 +118,15 @@ const filteredEvents = computed(() => {
   }
 
   return events.sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime())
+})
+
+// Expanded events for calendar view (with recurring events expanded)
+const expandedEventsForCalendar = computed(() => {
+  const expanded: any[] = []
+  for (const event of filteredEvents.value) {
+    expanded.push(...expandRecurringEvent(event))
+  }
+  return expanded.sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime())
 })
 
 const upcomingEvents = computed(() => {
@@ -128,7 +200,7 @@ const getEventTypeColor = (type: string) => {
         </button>
         <button
           @click="subscribeToCalendar"
-          class="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium shadow-sm text-sm sm:text-base"
+          class="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-secondary-100 border-2 border-secondary-600 text-secondary-900 rounded-lg hover:bg-secondary-200 transition-colors font-medium shadow-sm text-sm sm:text-base"
         >
           <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -321,7 +393,7 @@ const getEventTypeColor = (type: string) => {
 
     <!-- Calendar View -->
     <div v-else-if="viewMode === 'calendar'">
-      <EventsCalendar :events="filteredEvents" />
+      <EventsCalendar :events="expandedEventsForCalendar" />
     </div>
 
     <!-- Events List -->
