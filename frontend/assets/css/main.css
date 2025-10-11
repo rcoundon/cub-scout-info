@@ -44,11 +44,38 @@
 
   /* Card styles */
   .card {
-    @apply bg-white rounded-lg shadow-card overflow-hidden;
+    @apply bg-white rounded-lg shadow-card overflow-hidden relative;
   }
 
   .card-hover {
-    @apply card transition-shadow duration-200 hover:shadow-card-hover;
+    @apply card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1;
+  }
+
+  /* Stacked card effect - creates layered appearance */
+  .card-stacked {
+    @apply card shadow-card-stacked;
+  }
+
+  .card-stacked::before,
+  .card-stacked::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    height: 100%;
+    background: white;
+    border-radius: 0.5rem;
+    z-index: -1;
+  }
+
+  .card-stacked::before {
+    top: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-stacked::after {
+    top: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   }
 
   /* Input styles */

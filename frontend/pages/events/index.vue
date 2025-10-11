@@ -336,7 +336,8 @@ const getEventTypeColor = (type: string) => {
             :to="`/events/${event.id}`"
             class="block"
           >
-            <BaseCard hover class="h-full flex flex-col">
+            <div :class="{ 'stacked-card': event.is_recurring }">
+              <BaseCard hover class="h-full flex flex-col relative z-10">
               <div class="flex-1">
                 <!-- Event Type Badge -->
                 <div class="mb-3 flex items-center gap-2 flex-wrap">
@@ -394,7 +395,8 @@ const getEventTypeColor = (type: string) => {
                   View details →
                 </span>
               </div>
-            </BaseCard>
+              </BaseCard>
+            </div>
           </NuxtLink>
         </div>
       </div>
@@ -409,7 +411,8 @@ const getEventTypeColor = (type: string) => {
             :to="`/events/${event.id}`"
             class="block"
           >
-            <BaseCard hover class="h-full flex flex-col opacity-75">
+            <div :class="{ 'stacked-card': event.is_recurring }">
+              <BaseCard hover class="h-full flex flex-col opacity-75 relative z-10">
               <div class="flex-1">
                 <!-- Event Type Badge -->
                 <div class="mb-3 flex items-center gap-2 flex-wrap">
@@ -447,7 +450,8 @@ const getEventTypeColor = (type: string) => {
                 <!-- Description -->
                 <p class="text-gray-600 line-clamp-2">{{ event.description }}</p>
               </div>
-            </BaseCard>
+              </BaseCard>
+            </div>
           </NuxtLink>
         </div>
       </div>
@@ -463,3 +467,47 @@ const getEventTypeColor = (type: string) => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.stacked-card {
+  position: relative;
+  padding-bottom: 8px;
+}
+
+/* First card behind */
+.stacked-card::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: -4px;
+  bottom: 4px;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+/* Second card behind */
+.stacked-card::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: -8px;
+  bottom: 0;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  z-index: 0;
+}
+
+/* Adjust hover effect for stacked cards */
+.stacked-card:hover::before {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+.stacked-card:hover::after {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+</style>

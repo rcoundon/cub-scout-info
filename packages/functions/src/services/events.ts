@@ -107,10 +107,21 @@ export async function deleteEvent(id: string) {
 }
 
 /**
- * Get all published events ordered by date
- * Expands recurring events into individual occurrences
+ * Get all published events ordered by date (without expanding recurring)
+ * Returns master records for display in lists
  */
 export async function getPublishedEvents() {
+  const result = await EventEntity.query.byStatus({ status: 'published' }).go();
+  return result.data.sort(
+    (a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+  );
+}
+
+/**
+ * Get all published events with recurring events expanded
+ * Used for calendar feeds where we need all individual occurrences
+ */
+export async function getPublishedEventsExpanded() {
   const result = await EventEntity.query.byStatus({ status: 'published' }).go();
   const events = result.data;
 

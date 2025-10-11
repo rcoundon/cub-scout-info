@@ -20,14 +20,17 @@ import { computed } from 'vue'
 interface Props {
   hover?: boolean
   padding?: boolean
+  stacked?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   hover: false,
   padding: true,
+  stacked: false,
 })
 
 const cardClasses = computed(() => {
+  if (props.stacked) return 'card-stacked'
   return props.hover ? 'card-hover' : 'card'
 })
 

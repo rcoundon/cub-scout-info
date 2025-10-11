@@ -7,6 +7,7 @@ import {
   updateEvent,
   deleteEvent,
   getPublishedEvents,
+  getPublishedEventsExpanded,
   getEventsByStatus,
   getEventsByStatusRaw,
   duplicateEvent,
@@ -55,7 +56,8 @@ app.get('/', async (c) => {
  */
 app.get('/calendar.ics', async (c) => {
   try {
-    const events = await getPublishedEvents();
+    // Use expanded version for calendar feeds to include all recurring occurrences
+    const events = await getPublishedEventsExpanded();
 
     // Filter to only include upcoming and recent events (last 30 days, future events)
     const thirtyDaysAgo = new Date();

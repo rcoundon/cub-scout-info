@@ -16,8 +16,7 @@
     "console": "sst console",
     "typecheck": "pnpm -r typecheck",
     "lint": "biome check .",
-    "format": "biome format --write .",
-    "prepare": "pnpm typecheck"
+    "format": "biome format --write ."
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

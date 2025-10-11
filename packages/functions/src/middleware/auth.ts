@@ -44,7 +44,7 @@ export const authMiddleware = createMiddleware(async (c, next) => {
 
     c.set('user', userContext);
 
-    await next();
+    return await next();
   } catch (error) {
     console.error('Authentication error:', error);
     return c.json(
@@ -80,7 +80,7 @@ export function requireRole(minimumRole: UserRole) {
       );
     }
 
-    await next();
+    return await next();
   });
 }
 
@@ -132,7 +132,7 @@ function createAuthAndRoleMiddleware(minimumRole: UserRole) {
 
       c.set('user', userContext);
 
-      await next();
+      return await next();
     } catch (error) {
       console.error('Authentication error:', error);
       return c.json(
