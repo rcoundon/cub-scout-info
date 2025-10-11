@@ -13,6 +13,26 @@ const viewMode = ref<'list' | 'calendar'>('list')
 const config = useRuntimeConfig()
 const showCalendarInstructions = ref(false)
 
+// Age group filter with localStorage persistence
+const selectedAgeGroups = ref<string[]>([])
+
+// Load saved age group preferences from localStorage on mount
+onMounted(async () => {
+  const saved = localStorage.getItem('selectedAgeGroups')
+  if (saved) {
+    selectedAgeGroups.value = JSON.parse(saved)
+  } else {
+    // Default to all groups if no preference saved
+    selectedAgeGroups.value = ['beavers', 'cubs', 'scouts']
+  }
+  await eventsStore.fetchPublishedEvents()
+})
+
+// Save age group preferences to localStorage whenever they change
+watch(selectedAgeGroups, (newGroups) => {
+  localStorage.setItem('selectedAgeGroups', JSON.stringify(newGroups))
+}, { deep: true })
+
 const subscribeToCalendar = () => {
   const feedUrl = `${config.public.apiUrl}/api/events/calendar.ics`
   window.open(feedUrl, '_blank')
@@ -31,10 +51,6 @@ const copyFeedUrl = async () => {
     alert(`Calendar feed URL: ${url}`)
   }
 }
-
-onMounted(async () => {
-  await eventsStore.fetchPublishedEvents()
-})
 
 // Helper function to expand recurring events for calendar view
 const expandRecurringEvent = (event: any) => {
@@ -102,6 +118,11 @@ const expandRecurringEvent = (event: any) => {
 const filteredEvents = computed(() => {
   let events = eventsStore.events
 
+  // Filter by age group
+  if (selectedAgeGroups.value.length > 0) {
+    events = events.filter(e => selectedAgeGroups.value.includes(e.age_group))
+  }
+
   // Filter by event type
   if (eventTypeFilter.value !== 'all') {
     events = events.filter(e => e.event_type === eventTypeFilter.value)
@@ -166,15 +187,35 @@ const getEventTypeLabel = (type: string) => {
   return labels[type] || type
 }
 
-const getEventTypeColor = (type: string) => {
+// Age group colors (used for card backgrounds/borders)
+const getAgeGroupColor = (ageGroup: string) => {
   const colors: Record<string, string> = {
-    meeting: 'bg-blue-100 text-blue-800',
-    camp: 'bg-green-100 text-green-800',
-    trip: 'bg-purple-100 text-purple-800',
-    special: 'bg-yellow-100 text-yellow-800',
-    other: 'bg-gray-100 text-gray-800',
+    beavers: 'bg-primary-500 border-primary-600',
+    cubs: 'bg-green-700 border-green-800',
+    scouts: 'bg-teal-600 border-teal-700',
   }
-  return colors[type] || colors.other
+  return colors[ageGroup] || colors.cubs
+}
+
+const getAgeGroupLabel = (ageGroup: string) => {
+  const labels: Record<string, string> = {
+    beavers: 'Beavers',
+    cubs: 'Cubs',
+    scouts: 'Scouts',
+  }
+  return labels[ageGroup] || ageGroup
+}
+
+// Event type icons (SVG paths)
+const getEventTypeIcon = (type: string) => {
+  const icons: Record<string, string> = {
+    meeting: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z', // Users/meeting icon
+    camp: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', // Home/tent icon
+    trip: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', // Map/location icon
+    special: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z', // Star icon
+    other: 'M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z', // Chat/other icon
+  }
+  return icons[type] || icons.other
 }
 </script>
 
@@ -322,6 +363,39 @@ const getEventTypeColor = (type: string) => {
     <!-- Filters and View Toggle -->
     <div class="mb-8">
       <div class="flex flex-col gap-4">
+        <!-- Age Group Filter -->
+        <div class="bg-white rounded-lg border border-gray-200 p-4">
+          <label class="block text-sm font-semibold text-gray-700 mb-3">Show Events For:</label>
+          <div class="flex flex-wrap gap-3">
+            <label
+              v-for="group in ['beavers', 'cubs', 'scouts']"
+              :key="group"
+              class="flex items-center gap-2 px-4 py-2 rounded-lg border-2 cursor-pointer transition-all"
+              :class="
+                selectedAgeGroups.includes(group)
+                  ? getAgeGroupColor(group) + ' text-white border-transparent'
+                  : 'bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-300'
+              "
+            >
+              <input
+                type="checkbox"
+                :value="group"
+                v-model="selectedAgeGroups"
+                class="w-4 h-4 rounded"
+                :class="
+                  selectedAgeGroups.includes(group)
+                    ? 'text-white bg-white/30 border-white/50'
+                    : 'text-primary-600 border-gray-300'
+                "
+              />
+              <span class="font-medium">{{ getAgeGroupLabel(group) }}</span>
+              <span class="text-xs opacity-80">
+                {{ group === 'beavers' ? '(6-8)' : group === 'cubs' ? '(8-10½)' : '(10½-14)' }}
+              </span>
+            </label>
+          </div>
+        </div>
+
         <!-- Search and Filter Row -->
         <div class="flex flex-col sm:flex-row gap-4">
           <div class="flex-1">
@@ -415,11 +489,20 @@ const getEventTypeColor = (type: string) => {
                 Event Cancelled
               </div>
               <div class="flex-1" :class="{ 'mt-7': event.status === 'cancelled' }">
-                <!-- Event Type Badge -->
+                <!-- Age Group and Event Type Badges -->
                 <div class="mb-3 flex items-center gap-2 flex-wrap">
-                  <span :class="getEventTypeColor(event.event_type)" class="px-3 py-1 rounded-full text-xs font-medium">
-                    {{ getEventTypeLabel(event.event_type) }}
+                  <!-- Age Group Badge (Primary) -->
+                  <span :class="getAgeGroupColor(event.age_group)" class="px-3 py-1 rounded-full text-xs font-medium text-white">
+                    {{ getAgeGroupLabel(event.age_group) }}
                   </span>
+                  <!-- Event Type with Icon -->
+                  <div class="flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="getEventTypeIcon(event.event_type)" />
+                    </svg>
+                    <span>{{ getEventTypeLabel(event.event_type) }}</span>
+                  </div>
+                  <!-- Recurring Badge -->
                   <span v-if="event.is_recurring" class="px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 flex items-center gap-1">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -494,11 +577,20 @@ const getEventTypeColor = (type: string) => {
                 Event Cancelled
               </div>
               <div class="flex-1" :class="{ 'mt-7': event.status === 'cancelled' }">
-                <!-- Event Type Badge -->
+                <!-- Age Group and Event Type Badges -->
                 <div class="mb-3 flex items-center gap-2 flex-wrap">
-                  <span :class="getEventTypeColor(event.event_type)" class="px-3 py-1 rounded-full text-xs font-medium">
-                    {{ getEventTypeLabel(event.event_type) }}
+                  <!-- Age Group Badge (Primary) -->
+                  <span :class="getAgeGroupColor(event.age_group)" class="px-3 py-1 rounded-full text-xs font-medium text-white">
+                    {{ getAgeGroupLabel(event.age_group) }}
                   </span>
+                  <!-- Event Type with Icon -->
+                  <div class="flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="getEventTypeIcon(event.event_type)" />
+                    </svg>
+                    <span>{{ getEventTypeLabel(event.event_type) }}</span>
+                  </div>
+                  <!-- Recurring Badge -->
                   <span v-if="event.is_recurring" class="px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 flex items-center gap-1">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />

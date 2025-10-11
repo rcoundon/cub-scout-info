@@ -22,6 +22,7 @@ const app = new Hono();
 const eventSchema = z.object({
   title: z.string().min(1).max(200),
   event_type: z.enum(['meeting', 'camp', 'trip', 'special', 'other']),
+  age_group: z.enum(['beavers', 'cubs', 'scouts']),
   start_date: z.string().datetime(),
   end_date: z.string().datetime(),
   location: z.string().min(1).max(500),

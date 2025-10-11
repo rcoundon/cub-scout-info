@@ -6,10 +6,13 @@ export type EventType = 'meeting' | 'camp' | 'trip' | 'special' | 'other';
 
 export type EventStatus = 'draft' | 'published' | 'cancelled' | 'archived';
 
+export type AgeGroup = 'beavers' | 'cubs' | 'scouts';
+
 export interface Event {
   id: string;
   title: string;
   event_type: EventType;
+  age_group: AgeGroup;
   start_date: string; // ISO 8601 format
   end_date: string; // ISO 8601 format
   location: string;

@@ -19,6 +19,7 @@ const pageTitle = computed(() => isNew.value ? 'Create Event' : 'Edit Event')
 const form = ref({
   title: '',
   event_type: 'meeting' as 'meeting' | 'camp' | 'trip' | 'special' | 'other',
+  age_group: 'cubs' as 'beavers' | 'cubs' | 'scouts',
   start_date: '',
   start_time: '09:00',
   end_date: '',
@@ -98,6 +99,7 @@ onMounted(async () => {
       form.value = {
         title: event.title,
         event_type: event.event_type,
+        age_group: event.age_group,
         start_date: startDate.toISOString().split('T')[0],
         start_time: startDate.toTimeString().slice(0, 5),
         end_date: endDate.toISOString().split('T')[0],
@@ -212,6 +214,7 @@ const handleSubmit = async () => {
     const eventData = {
       title: form.value.title,
       event_type: form.value.event_type,
+      age_group: form.value.age_group,
       start_date: startDateTime,
       end_date: endDateTime,
       location: form.value.location,
@@ -277,18 +280,33 @@ const handleCancel = () => {
           :required="true"
         />
 
-        <!-- Event Type -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Event Type <span class="text-red-500">*</span>
-          </label>
-          <select v-model="form.event_type" class="input">
-            <option value="meeting">Meeting</option>
-            <option value="camp">Camp</option>
-            <option value="trip">Trip</option>
-            <option value="special">Special Event</option>
-            <option value="other">Other</option>
-          </select>
+        <!-- Event Type & Age Group Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Event Type -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Event Type <span class="text-red-500">*</span>
+            </label>
+            <select v-model="form.event_type" class="input">
+              <option value="meeting">Meeting</option>
+              <option value="camp">Camp</option>
+              <option value="trip">Trip</option>
+              <option value="special">Special Event</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <!-- Age Group -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Age Group <span class="text-red-500">*</span>
+            </label>
+            <select v-model="form.age_group" class="input">
+              <option value="beavers">Beavers (6-8 years)</option>
+              <option value="cubs">Cubs (8-10½ years)</option>
+              <option value="scouts">Scouts (10½-14 years)</option>
+            </select>
+          </div>
         </div>
 
         <!-- Description -->

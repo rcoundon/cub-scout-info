@@ -5,28 +5,21 @@ definePageMeta({
 
 const leaders = [
   {
-    name: 'Akela',
+    name: 'Baloo - Jarrod',
     role: 'Cub Scout Leader',
-    description: 'Lead Cub Scout Leader with over 10 years of experience',
+    description: '',
   },
   {
-    name: 'Baloo',
-    role: 'Assistant Cub Scout Leader',
-    description: 'Specialises in outdoor activities and camping',
+    name: 'Raksha - Danielle',
+    role: 'Cub Scout Leader',
+    description: '',
   },
   {
-    name: 'Bagheera',
-    role: 'Assistant Cub Scout Leader',
-    description: 'Focuses on badge work and skill development',
+    name: 'Rikki - Nick',
+    role: 'Cub Scout Leader',
+    description: '',
   },
 ]
-
-const meetingInfo = {
-  day: 'Tuesday',
-  time: '6:30 PM - 8:00 PM',
-  location: 'Scout Hall, Main Street',
-  ageRange: '8-10½ years',
-}
 </script>
 
 <template>
@@ -50,10 +43,10 @@ const meetingInfo = {
           <div class="prose prose-lg max-w-none">
             <h2 class="text-3xl font-display font-bold text-gray-900 mb-4">Who We Are</h2>
             <p class="text-gray-700 mb-4">
-              Our Cub Scout pack is a vibrant community where young people aged {{ meetingInfo.ageRange }}
-              come together to learn new skills, make friends, and have amazing adventures. We're part of
-              the Scouts movement, helping to develop well-rounded young people who are prepared to make
-              a positive impact in their communities.
+              Our Scout group is a vibrant community where young people from Beavers (6-8 years),
+              Cubs (8-10½ years), and Scouts (10½-14 years) come together to learn new skills, make friends,
+              and have amazing adventures. We're part of the Scouts movement, helping to develop well-rounded
+              young people who are prepared to make a positive impact in their communities.
             </p>
             <p class="text-gray-700 mb-4">
               Through a balanced program of indoor and outdoor activities, games, and challenges, our Cubs
@@ -66,59 +59,6 @@ const meetingInfo = {
               exciting. From traditional scouting skills to modern challenges, we ensure every Cub has
               the chance to try new things and discover their potential.
             </p>
-          </div>
-        </BaseCard>
-      </div>
-
-      <!-- Meeting Information -->
-      <div class="max-w-4xl mx-auto mb-16">
-        <h2 class="text-3xl font-display font-bold text-gray-900 mb-6 text-center">When We Meet</h2>
-        <BaseCard class="bg-primary-50 border-primary-200">
-          <div class="grid md:grid-cols-2 gap-8">
-            <div>
-              <div class="flex items-start gap-3 mb-4">
-                <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 class="font-semibold text-gray-900 mb-1">Day & Time</h3>
-                  <p class="text-gray-700">{{ meetingInfo.day }}s</p>
-                  <p class="text-gray-700">{{ meetingInfo.time }}</p>
-                </div>
-              </div>
-
-              <div class="flex items-start gap-3">
-                <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 class="font-semibold text-gray-900 mb-1">Location</h3>
-                  <p class="text-gray-700">{{ meetingInfo.location }}</p>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div class="flex items-start gap-3">
-                <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 class="font-semibold text-gray-900 mb-1">Age Range</h3>
-                  <p class="text-gray-700">{{ meetingInfo.ageRange }}</p>
-                  <p class="text-sm text-gray-600 mt-2">
-                    Cubs typically attend for 2-3 years before moving up to Scouts
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </BaseCard>
       </div>

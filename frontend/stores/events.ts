@@ -6,6 +6,7 @@ export interface Event {
   id: string
   title: string
   event_type: 'meeting' | 'camp' | 'trip' | 'special' | 'other'
+  age_group: 'beavers' | 'cubs' | 'scouts'
   start_date: string
   end_date: string
   location: string

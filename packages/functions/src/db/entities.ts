@@ -118,6 +118,10 @@ export const EventEntity = new Entity(
         type: ['meeting', 'camp', 'trip', 'special', 'other'] as const,
         required: true,
       },
+      age_group: {
+        type: ['beavers', 'cubs', 'scouts'] as const,
+        required: true,
+      },
       start_date: {
         type: 'string',
         required: true,
