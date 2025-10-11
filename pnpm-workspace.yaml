@@ -5,6 +5,7 @@ packages:
 onlyBuiltDependencies:
   - '@biomejs/biome'
   - '@parcel/watcher'
+  - '@tailwindcss/oxide'
   - aws-sdk
   - esbuild
   - vue-demi

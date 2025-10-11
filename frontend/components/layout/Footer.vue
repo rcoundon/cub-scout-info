@@ -118,7 +118,7 @@
         <div class="mt-2 space-x-4">
           <NuxtLink to="/privacy" class="hover:text-primary-400 transition-colors">
             Privacy Policy
-          </NuxtLink>C
+          </NuxtLink>
         </div>
       </div>
     </div>

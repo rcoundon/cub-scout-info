@@ -35,7 +35,7 @@ export default defineNuxtConfig({
       },
     },
     css: {
-      devSourcemap: true,
+      devSourcemap: false,
     },
   },
 

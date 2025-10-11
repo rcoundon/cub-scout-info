@@ -81,16 +81,32 @@ const goToToday = () => {
   currentDate.value = new Date()
 }
 
-const getEventTypeColor = (type: string) => {
+const getAgeGroupColor = (ageGroup: string) => {
   const colors: Record<string, string> = {
-    meeting: 'bg-blue-500',
-    camp: 'bg-green-500',
-    trip: 'bg-purple-500',
-    special: 'bg-yellow-500',
-    fundraising: 'bg-pink-500',
-    other: 'bg-gray-500',
+    beavers: 'bg-primary-500',
+    cubs: 'bg-green-700',
+    scouts: 'bg-teal-600',
   }
-  return colors[type] || colors.other
+  return colors[ageGroup] || colors.cubs
+}
+
+const getEventTypeIcon = (type: string) => {
+  const icons: Record<string, string> = {
+    meeting: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
+    camp: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
+    trip: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
+    special: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
+    fundraising: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+    other: 'M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z',
+  }
+  return icons[type] || icons.other
+}
+
+const formatTime = (dateString: string) => {
+  return new Date(dateString).toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
 </script>
 
@@ -172,11 +188,17 @@ const getEventTypeColor = (type: string) => {
               class="block"
             >
               <div
-                :class="getEventTypeColor(event.event_type)"
-                class="text-white text-xs px-2 py-1 rounded truncate hover:opacity-80 transition-opacity"
-                :title="event.title"
+                :class="getAgeGroupColor(event.age_group)"
+                class="text-white text-xs px-2 py-1 rounded hover:opacity-80 transition-opacity"
+                :title="`${event.title} - ${formatTime(event.start_date)} - ${formatTime(event.end_date)}`"
               >
-                {{ event.title }}
+                <div class="flex items-center gap-1">
+                  <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="getEventTypeIcon(event.event_type)" />
+                  </svg>
+                  <div class="font-medium truncate flex-1">{{ event.title }}</div>
+                </div>
+                <div class="text-[10px] opacity-90 mt-0.5 ml-4">{{ formatTime(event.start_date) }} - {{ formatTime(event.end_date) }}</div>
               </div>
             </NuxtLink>
             <div
@@ -192,31 +214,61 @@ const getEventTypeColor = (type: string) => {
 
     <!-- Legend -->
     <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
-      <div class="flex flex-wrap items-center gap-4 text-sm">
-        <span class="text-gray-600 font-medium">Event Types:</span>
-        <div class="flex items-center gap-2">
-          <span class="w-3 h-3 bg-blue-500 rounded"></span>
-          <span class="text-gray-700">Meeting</span>
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Age Groups -->
+        <div>
+          <span class="text-gray-600 font-medium text-sm block mb-2">Age Groups:</span>
+          <div class="flex flex-wrap items-center gap-3 text-sm">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 bg-primary-500 rounded"></span>
+              <span class="text-gray-700">Beavers</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 bg-green-700 rounded"></span>
+              <span class="text-gray-700">Cubs</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 bg-teal-600 rounded"></span>
+              <span class="text-gray-700">Scouts</span>
+            </div>
+          </div>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="w-3 h-3 bg-green-500 rounded"></span>
-          <span class="text-gray-700">Camp</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="w-3 h-3 bg-purple-500 rounded"></span>
-          <span class="text-gray-700">Trip</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="w-3 h-3 bg-yellow-500 rounded"></span>
-          <span class="text-gray-700">Special</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="w-3 h-3 bg-pink-500 rounded"></span>
-          <span class="text-gray-700">Fundraising</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="w-3 h-3 bg-gray-500 rounded"></span>
-          <span class="text-gray-700">Other</span>
+
+        <!-- Event Type Icons -->
+        <div>
+          <span class="text-gray-600 font-medium text-sm block mb-2">Event Type Icons:</span>
+          <div class="flex flex-wrap items-center gap-3 text-sm">
+            <div class="flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="getEventTypeIcon('meeting')" />
+              </svg>
+              <span class="text-gray-700">Meeting</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="getEventTypeIcon('camp')" />
+              </svg>
+              <span class="text-gray-700">Camp</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="getEventTypeIcon('trip')" />
+              </svg>
+              <span class="text-gray-700">Trip</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="getEventTypeIcon('special')" />
+              </svg>
+              <span class="text-gray-700">Special</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="getEventTypeIcon('fundraising')" />
+              </svg>
+              <span class="text-gray-700">Fundraising</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -510,12 +510,14 @@ const getEventTypeIcon = (type: string) => {
             class="block"
           >
             <div :class="{ 'stacked-card': event.is_recurring }">
-              <BaseCard hover :class="{ 'opacity-75 border-2 border-red-300': event.status === 'cancelled' }" class="h-full flex flex-col relative z-10">
-              <!-- Cancelled Banner -->
-              <div v-if="event.status === 'cancelled'" class="absolute top-0 left-0 right-0 bg-red-600 text-white text-center py-1 text-xs font-bold uppercase tracking-wide z-20">
-                Event Cancelled
-              </div>
-              <div class="flex-1" :class="{ 'mt-7': event.status === 'cancelled' }">
+              <div :class="{ 'ring-2 ring-red-300 ring-offset-0 rounded-lg': event.status === 'cancelled' }">
+                <!-- Cancelled Banner or Spacer -->
+                <div v-if="event.status === 'cancelled'" class="bg-red-600 text-white text-center py-1 text-xs font-bold uppercase tracking-wide rounded-t-lg">
+                  Event Cancelled
+                </div>
+                <div v-else class="h-[28px]"></div>
+                <BaseCard hover :class="{ 'opacity-75': event.status === 'cancelled' }" class="h-full flex flex-col relative z-10 rounded-t-none">
+              <div class="flex-1">
                 <!-- Age Group and Event Type Badges -->
                 <div class="mb-3 flex items-center gap-2 flex-wrap">
                   <!-- Age Group Badge (Primary) -->
@@ -582,6 +584,7 @@ const getEventTypeIcon = (type: string) => {
                 </span>
               </div>
               </BaseCard>
+              </div>
             </div>
           </NuxtLink>
         </div>
@@ -598,12 +601,14 @@ const getEventTypeIcon = (type: string) => {
             class="block"
           >
             <div :class="{ 'stacked-card': event.is_recurring }">
-              <BaseCard hover :class="{ 'border-2 border-red-300': event.status === 'cancelled' }" class="h-full flex flex-col opacity-75 relative z-10">
-              <!-- Cancelled Banner -->
-              <div v-if="event.status === 'cancelled'" class="absolute top-0 left-0 right-0 bg-red-600 text-white text-center py-1 text-xs font-bold uppercase tracking-wide z-20">
-                Event Cancelled
-              </div>
-              <div class="flex-1" :class="{ 'mt-7': event.status === 'cancelled' }">
+              <div :class="{ 'ring-2 ring-red-300 ring-offset-0 rounded-lg': event.status === 'cancelled' }">
+                <!-- Cancelled Banner or Spacer -->
+                <div v-if="event.status === 'cancelled'" class="bg-red-600 text-white text-center py-1 text-xs font-bold uppercase tracking-wide rounded-t-lg">
+                  Event Cancelled
+                </div>
+                <div v-else class="h-[28px]"></div>
+                <BaseCard hover class="h-full flex flex-col opacity-75 relative z-10 rounded-t-none">
+              <div class="flex-1">
                 <!-- Age Group and Event Type Badges -->
                 <div class="mb-3 flex items-center gap-2 flex-wrap">
                   <!-- Age Group Badge (Primary) -->
@@ -650,6 +655,7 @@ const getEventTypeIcon = (type: string) => {
                 <p class="text-gray-600 line-clamp-2">{{ event.description }}</p>
               </div>
               </BaseCard>
+              </div>
             </div>
           </NuxtLink>
         </div>
@@ -677,7 +683,7 @@ const getEventTypeIcon = (type: string) => {
 .stacked-card::before {
   content: '';
   position: absolute;
-  top: 4px;
+  top: 32px;
   left: 4px;
   right: -4px;
   bottom: 4px;
@@ -691,7 +697,7 @@ const getEventTypeIcon = (type: string) => {
 .stacked-card::after {
   content: '';
   position: absolute;
-  top: 8px;
+  top: 36px;
   left: 8px;
   right: -8px;
   bottom: 0;
