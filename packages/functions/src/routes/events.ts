@@ -50,6 +50,35 @@ app.get('/', async (c) => {
 });
 
 /**
+ * GET /api/events/calendar.ics - Export all published events as iCalendar feed
+ * IMPORTANT: This must come BEFORE /:id to avoid matching "calendar" as an ID
+ */
+app.get('/calendar.ics', async (c) => {
+  try {
+    const events = await getPublishedEvents();
+
+    // Filter to only include upcoming and recent events (last 30 days, future events)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const relevantEvents = events.filter((event) => {
+      const eventDate = new Date(event.end_date);
+      return eventDate >= thirtyDaysAgo;
+    });
+
+    const icalContent = generateICalFeed(relevantEvents);
+
+    return c.body(icalContent, 200, {
+      'Content-Type': 'text/calendar; charset=utf-8',
+      'Content-Disposition': 'attachment; filename="cubs-events-calendar.ics"',
+    });
+  } catch (error) {
+    console.error('Error exporting calendar:', error);
+    return c.json({ error: 'Failed to export calendar' }, 500);
+  }
+});
+
+/**
  * GET /api/events/admin/all - Get all events (requires authentication)
  * IMPORTANT: This must come BEFORE /:id to avoid matching "admin" as an ID
  * Returns raw events without expanding recurring events (for admin management)
@@ -315,34 +344,6 @@ app.get('/:id/export.ics', async (c) => {
   } catch (error) {
     console.error('Error exporting event:', error);
     return c.json({ error: 'Failed to export event' }, 500);
-  }
-});
-
-/**
- * GET /api/events/calendar.ics - Export all published events as iCalendar feed
- */
-app.get('/calendar.ics', async (c) => {
-  try {
-    const events = await getPublishedEvents();
-
-    // Filter to only include upcoming and recent events (last 30 days, future events)
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const relevantEvents = events.filter((event) => {
-      const eventDate = new Date(event.end_date);
-      return eventDate >= thirtyDaysAgo;
-    });
-
-    const icalContent = generateICalFeed(relevantEvents);
-
-    return c.body(icalContent, 200, {
-      'Content-Type': 'text/calendar; charset=utf-8',
-      'Content-Disposition': 'attachment; filename="cubs-events-calendar.ics"',
-    });
-  } catch (error) {
-    console.error('Error exporting calendar:', error);
-    return c.json({ error: 'Failed to export calendar' }, 500);
   }
 });
 

@@ -118,31 +118,66 @@ const getEventTypeColor = (type: string) => {
       <!-- Subscribe to Calendar Buttons -->
       <div class="flex justify-center gap-3 flex-wrap">
         <button
-          @click="subscribeToCalendar"
+          @click="showCalendarInstructions = !showCalendarInstructions"
           class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium shadow-sm"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Subscribe for Live Updates
+        </button>
+        <button
+          @click="subscribeToCalendar"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium shadow-sm"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          Download Calendar Feed
-        </button>
-        <button
-          @click="showCalendarInstructions = !showCalendarInstructions"
-          class="inline-flex items-center gap-2 px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium shadow-sm"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          How to Subscribe
+          Download One-Time Snapshot
         </button>
       </div>
-      <p class="text-xs text-gray-500 mt-3">
-        Stay up-to-date with all Cubs events in your preferred calendar app
+      <p class="text-sm text-gray-600 mt-3 max-w-2xl mx-auto">
+        <span class="font-medium text-primary-700">📅 Subscribe for automatic updates</span> - New events appear automatically in your calendar
+      </p>
+      <p class="text-xs text-gray-500 mt-1">
+        Or download a one-time snapshot that won't update when events change
+      </p>
+      <p class="text-xs text-gray-600 mt-2 max-w-2xl mx-auto flex items-center justify-center gap-1">
+        <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>You can also click on any event below to add it individually to Google Calendar or download as .ics</span>
       </p>
 
       <!-- Calendar Instructions -->
       <div v-if="showCalendarInstructions" class="mt-6 max-w-2xl mx-auto">
         <BaseCard class="bg-blue-50 border-blue-200">
+          <div class="mb-4 p-3 bg-green-100 border border-green-300 rounded-lg">
+            <p class="text-sm text-green-800 font-medium flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Subscribe once and get automatic updates forever!
+            </p>
+            <p class="text-xs text-green-700 mt-1 ml-7">
+              When we add, update, or cancel events, they'll automatically sync to your calendar (usually within 24 hours).
+            </p>
+          </div>
+
+          <div class="mb-4 p-3 bg-blue-100 border border-blue-200 rounded-lg">
+            <p class="text-sm text-blue-800 font-medium mb-2">Two ways to add events:</p>
+            <ul class="text-xs text-blue-700 space-y-1 ml-4">
+              <li class="flex items-start gap-2">
+                <span class="font-bold mt-0.5">1.</span>
+                <span><strong>Subscribe to all events</strong> (recommended) - Follow the instructions below to get automatic updates for all Cubs events</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="font-bold mt-0.5">2.</span>
+                <span><strong>Add individual events</strong> - Click on any event card below and use the "Add to Calendar" buttons on the event detail page</span>
+              </li>
+            </ul>
+          </div>
+
           <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

@@ -308,7 +308,10 @@ const goBack = () => {
 
             <!-- Add to Calendar Buttons -->
             <BaseCard v-if="isUpcoming">
-              <h4 class="font-semibold text-gray-900 mb-3">Add to Calendar</h4>
+              <h4 class="font-semibold text-gray-900 mb-2">Add This Event</h4>
+              <p class="text-xs text-gray-600 mb-3">
+                Add this single event to your calendar
+              </p>
 
               <!-- Google Calendar Button -->
               <button
@@ -332,10 +335,10 @@ const goBack = () => {
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                Other Calendars
+                Other Calendars (.ics)
               </button>
-              <p class="text-xs text-gray-500 text-center mt-2">
-                Download .ics file for Apple Calendar, Outlook, etc.
+              <p class="text-xs text-gray-500 text-center mt-3">
+                💡 Want all events to auto-update? <NuxtLink to="/events" class="text-primary-600 hover:text-primary-700 underline">Subscribe to the calendar feed</NuxtLink>
               </p>
             </BaseCard>
 
