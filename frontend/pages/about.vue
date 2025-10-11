@@ -12,7 +12,7 @@ const leaders = [
   {
     name: 'Baloo',
     role: 'Assistant Cub Scout Leader',
-    description: 'Specializes in outdoor activities and camping',
+    description: 'Specialises in outdoor activities and camping',
   },
   {
     name: 'Bagheera',
@@ -202,6 +202,126 @@ const meetingInfo = {
             </div>
           </BaseCard>
         </div>
+      </div>
+
+      <!-- Useful Resources Section -->
+      <div class="max-w-4xl mx-auto mb-16">
+        <h2 class="text-3xl font-display font-bold text-gray-900 mb-6 text-center">Useful Resources</h2>
+        <BaseCard>
+          <div class="space-y-6">
+            <p class="text-gray-700 text-center mb-8">
+              Quick links to important resources for parents and Cubs
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-6">
+              <!-- Official Scout Group -->
+              <a
+                href="https://www.scouts.org.uk/groups/10014446?loc=hp16%200nt&slug=1st-Holmer-Green"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="block group"
+              >
+                <div class="flex items-start gap-4 p-4 rounded-lg border-2 border-gray-200 hover:border-primary-400 transition-all hover:shadow-md">
+                  <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-primary-200 transition-colors">
+                    <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                      Official Scout Group Page
+                      <svg class="w-4 h-4 text-gray-400 group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </h3>
+                    <p class="text-gray-600 text-sm">
+                      Visit our official page on Scouts.org.uk for group information, policies, and national resources
+                    </p>
+                  </div>
+                </div>
+              </a>
+
+              <!-- Online Scout Manager -->
+              <a
+                href="https://www.onlinescoutmanager.co.uk/login.php"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="block group"
+              >
+                <div class="flex items-start gap-4 p-4 rounded-lg border-2 border-gray-200 hover:border-primary-400 transition-all hover:shadow-md">
+                  <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                      Online Scout Manager
+                      <svg class="w-4 h-4 text-gray-400 group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </h3>
+                    <p class="text-gray-600 text-sm">
+                      Login to OSM for attendance tracking, badge progress, event bookings, and parent communications
+                    </p>
+                  </div>
+                </div>
+              </a>
+
+              <!-- Scouts.org.uk -->
+              <a
+                href="https://www.scouts.org.uk"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="block group"
+              >
+                <div class="flex items-start gap-4 p-4 rounded-lg border-2 border-gray-200 hover:border-primary-400 transition-all hover:shadow-md">
+                  <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-green-200 transition-colors">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                      Scouts UK Homepage
+                      <svg class="w-4 h-4 text-gray-400 group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </h3>
+                    <p class="text-gray-600 text-sm">
+                      Explore national Scouts resources, badge requirements, activity ideas, and safety information
+                    </p>
+                  </div>
+                </div>
+              </a>
+
+              <!-- Privacy Policy -->
+              <NuxtLink
+                to="/privacy"
+                class="block group"
+              >
+                <div class="flex items-start gap-4 p-4 rounded-lg border-2 border-gray-200 hover:border-primary-400 transition-all hover:shadow-md">
+                  <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-gray-200 transition-colors">
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                      Privacy Policy
+                      <svg class="w-4 h-4 text-gray-400 group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </h3>
+                    <p class="text-gray-600 text-sm">
+                      Information about how we collect, use, and protect your data in compliance with GDPR
+                    </p>
+                  </div>
+                </div>
+              </NuxtLink>
+            </div>
+          </div>
+        </BaseCard>
       </div>
 
       <!-- Join Us CTA -->

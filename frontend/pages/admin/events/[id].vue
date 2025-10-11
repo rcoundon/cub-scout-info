@@ -449,18 +449,18 @@ const handleCancel = () => {
           <p class="mt-1 text-sm text-gray-500">Optional</p>
         </div>
 
-        <!-- Organizer Info -->
+        <!-- Organiser Info -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <BaseInput
             v-model="form.organizer_name"
-            label="Organizer Name"
+            label="Organiser Name"
             placeholder="e.g., Akela"
             hint="Optional"
           />
 
           <BaseInput
             v-model="form.organizer_contact"
-            label="Organizer Contact"
+            label="Organiser Contact"
             placeholder="e.g., akela@example.com"
             hint="Optional"
           />

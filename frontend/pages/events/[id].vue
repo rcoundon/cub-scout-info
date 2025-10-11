@@ -57,7 +57,7 @@ const addToGoogleCalendar = () => {
     description += `\n\nWhat to bring: ${event.value.what_to_bring}`
   }
   if (event.value.organizer_name) {
-    description += `\n\nOrganizer: ${event.value.organizer_name}`
+    description += `\n\nOrganiser: ${event.value.organizer_name}`
     if (event.value.organizer_contact) {
       description += ` (${event.value.organizer_contact})`
     }
@@ -202,7 +202,7 @@ const goBack = () => {
             </div>
           </BaseCard>
 
-          <!-- Organizer Info -->
+          <!-- Organiser Info -->
           <BaseCard v-if="event.organizer_name || event.organizer_contact">
             <h2 class="text-2xl font-semibold text-gray-900 mb-4">Contact Information</h2>
             <div class="space-y-2">
@@ -210,7 +210,7 @@ const goBack = () => {
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
-                <span><strong>Organizer:</strong> {{ event.organizer_name }}</span>
+                <span><strong>Organiser:</strong> {{ event.organizer_name }}</span>
               </div>
               <div v-if="event.organizer_contact" class="flex items-center gap-2 text-gray-700">
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -350,7 +350,7 @@ const goBack = () => {
                 </svg>
                 <h4 class="font-semibold text-gray-900 mb-2">Interested in Attending?</h4>
                 <p class="text-sm text-gray-700">
-                  Please contact the organizer to confirm your attendance.
+                  Please contact the organiser to confirm your attendance.
                 </p>
               </div>
             </BaseCard>

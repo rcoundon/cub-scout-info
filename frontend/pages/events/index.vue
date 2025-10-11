@@ -109,45 +109,47 @@ const getEventTypeColor = (type: string) => {
 <template>
   <div class="container mx-auto px-4 py-12">
     <!-- Header -->
-    <div class="text-center mb-12">
-      <h1 class="text-4xl font-display font-bold text-primary-900 mb-4">Upcoming Events</h1>
-      <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-6">
+    <div class="text-center mb-8 sm:mb-12 px-4">
+      <h1 class="text-3xl sm:text-4xl font-display font-bold text-primary-900 mb-3 sm:mb-4">Upcoming Events</h1>
+      <p class="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto mb-4 sm:mb-6">
         Join us for exciting Cubs activities, camps, trips, and special events throughout the year.
       </p>
 
       <!-- Subscribe to Calendar Buttons -->
-      <div class="flex justify-center gap-3 flex-wrap">
+      <div class="flex flex-col sm:flex-row justify-center gap-3 px-4 max-w-2xl mx-auto">
         <button
           @click="showCalendarInstructions = !showCalendarInstructions"
-          class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium shadow-sm"
+          class="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium shadow-sm text-sm sm:text-base"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
-          Subscribe for Live Updates
+          <span class="whitespace-nowrap">Subscribe for Live Updates</span>
         </button>
         <button
           @click="subscribeToCalendar"
-          class="inline-flex items-center gap-2 px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium shadow-sm"
+          class="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium shadow-sm text-sm sm:text-base"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          Download One-Time Snapshot
+          <span class="whitespace-nowrap">Download One-Time Snapshot</span>
         </button>
       </div>
-      <p class="text-sm text-gray-600 mt-3 max-w-2xl mx-auto">
-        <span class="font-medium text-primary-700">📅 Subscribe for automatic updates</span> - New events appear automatically in your calendar
-      </p>
-      <p class="text-xs text-gray-500 mt-1">
-        Or download a one-time snapshot that won't update when events change
-      </p>
-      <p class="text-xs text-gray-600 mt-2 max-w-2xl mx-auto flex items-center justify-center gap-1">
-        <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span>You can also click on any event below to add it individually to Google Calendar or download as .ics</span>
-      </p>
+      <div class="px-4 max-w-2xl mx-auto">
+        <p class="text-xs sm:text-sm text-gray-600 mt-3 text-center">
+          <span class="font-medium text-primary-700">📅 Subscribe for automatic updates</span> - New events appear automatically in your calendar
+        </p>
+        <p class="text-xs text-gray-500 mt-1 text-center">
+          Or download a one-time snapshot that won't update when events change
+        </p>
+        <p class="text-xs text-gray-600 mt-2 flex items-start sm:items-center justify-center gap-1">
+          <svg class="w-4 h-4 text-primary-600 flex-shrink-0 mt-0.5 sm:mt-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>You can also click on any event below to add it individually to Google Calendar or download as .ics</span>
+        </p>
+      </div>
 
       <!-- Calendar Instructions -->
       <div v-if="showCalendarInstructions" class="mt-6 max-w-2xl mx-auto">

@@ -4,15 +4,15 @@
       <div class="flex items-center justify-between h-16">
         <!-- Logo -->
         <NuxtLink to="/" class="flex items-center space-x-2">
-          <div class="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
-            <span class="text-white font-bold text-xl">CS</span>
+          <div class="font-display font-semibold text-xl text-gray-900 hidden sm:block">
+            1st Holmer Green 
           </div>
-          <span class="font-display font-semibold text-xl text-gray-900 hidden sm:block">
-            Cub Scouts
-          </span>
+          <div>
+            <img src="https://www.scouts.org.uk/img/logos/scouts-black.svg"></img>
+          </div>
         </NuxtLink>
 
-        <!-- Desktop Navigation -->
+        <!-- Desktop Navigation - Hidden on mobile, shown on md and up -->
         <div class="hidden md:flex items-center space-x-6">
           <NuxtLink
             v-for="item in navigationItems"

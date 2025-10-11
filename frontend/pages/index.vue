@@ -68,17 +68,7 @@ definePageMeta({
             </p>
           </div>
         </NuxtLink>
-      </div>
-
-      <!-- Status Badges Demo -->
-      <div class="mt-16 text-center">
-        <h2 class="text-3xl font-display font-semibold mb-6">Design System Preview</h2>
-        <div class="flex gap-3 justify-center flex-wrap">
-          <span class="badge-primary">Primary Badge</span>
-          <span class="badge-secondary">Secondary Badge</span>
-          <span class="badge-accent">Accent Badge</span>
-        </div>
-      </div>
+      </div>      
     </div>
   </div>
 </template>
