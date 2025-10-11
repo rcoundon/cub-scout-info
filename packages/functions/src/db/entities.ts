@@ -162,6 +162,9 @@ export const EventEntity = new Entity(
         required: true,
         default: 'draft',
       },
+      cancellation_reason: {
+        type: 'string',
+      },
       created_by: {
         type: 'string',
         required: true,

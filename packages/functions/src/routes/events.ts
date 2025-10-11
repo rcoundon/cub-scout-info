@@ -7,6 +7,7 @@ import {
   updateEvent,
   deleteEvent,
   getPublishedEvents,
+  getPublicEvents,
   getPublishedEventsExpanded,
   getEventsByStatus,
   getEventsByStatusRaw,
@@ -33,16 +34,17 @@ const eventSchema = z.object({
   is_recurring: z.boolean().default(false),
   recurrence_rule: z.string().optional(),
   status: z.enum(['draft', 'published', 'cancelled', 'archived']).default('draft'),
+  cancellation_reason: z.string().max(500).optional(),
 });
 
 const eventUpdateSchema = eventSchema.partial();
 
 /**
- * GET /api/events - List all published events (public)
+ * GET /api/events - List all public events (published + cancelled) (public)
  */
 app.get('/', async (c) => {
   try {
-    const events = await getPublishedEvents();
+    const events = await getPublicEvents();
     return c.json({ events });
   } catch (error) {
     console.error('Error fetching events:', error);
@@ -134,9 +136,9 @@ app.get('/:id', async (c) => {
       return c.json({ error: 'Event not found' }, 404);
     }
 
-    // Only show published events to public
-    // Authenticated users can see drafts if they're editors
-    if (event.status !== 'published') {
+    // Show published and cancelled events to public
+    // Authenticated users can see drafts and archived if they're editors
+    if (event.status !== 'published' && event.status !== 'cancelled') {
       const authHeader = c.req.header('Authorization');
       if (!authHeader) {
         return c.json({ error: 'Event not found' }, 404);
@@ -331,8 +333,8 @@ app.get('/:id/export.ics', async (c) => {
       return c.json({ error: 'Event not found' }, 404);
     }
 
-    // Only export published events
-    if (event.status !== 'published') {
+    // Only export published and cancelled events
+    if (event.status !== 'published' && event.status !== 'cancelled') {
       return c.json({ error: 'Event not found' }, 404);
     }
 

@@ -18,6 +18,7 @@ export interface Event {
   is_recurring: boolean
   recurrence_rule?: string
   status: 'draft' | 'published' | 'cancelled' | 'archived'
+  cancellation_reason?: string
   created_by: string
   created_at: string
   updated_at: string

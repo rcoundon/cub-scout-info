@@ -22,6 +22,7 @@ export interface Event {
   is_recurring: boolean;
   recurrence_rule?: string; // iCal RRULE format
   status: EventStatus;
+  cancellation_reason?: string; // Reason for cancellation if status is 'cancelled'
   created_by: string; // Cognito user ID
   created_at: string; // ISO 8601 timestamp
   updated_at: string; // ISO 8601 timestamp

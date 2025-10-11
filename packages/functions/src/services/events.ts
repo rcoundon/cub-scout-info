@@ -118,6 +118,22 @@ export async function getPublishedEvents() {
 }
 
 /**
+ * Get all public events (published + cancelled) ordered by date
+ * Cancelled events are shown with visual indicators
+ * Returns master records for display in lists
+ */
+export async function getPublicEvents() {
+  const [published, cancelled] = await Promise.all([
+    EventEntity.query.byStatus({ status: 'published' }).go(),
+    EventEntity.query.byStatus({ status: 'cancelled' }).go(),
+  ]);
+
+  return [...published.data, ...cancelled.data].sort(
+    (a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+  );
+}
+
+/**
  * Get all published events with recurring events expanded
  * Used for calendar feeds where we need all individual occurrences
  */

@@ -18,7 +18,7 @@ onMounted(async () => {
   const eventId = route.params.id as string
   const event = await eventsStore.fetchEventById(eventId)
 
-  if (!event || event.status !== 'published') {
+  if (!event || (event.status !== 'published' && event.status !== 'cancelled')) {
     notFound.value = true
   }
 
@@ -170,13 +170,36 @@ const goBack = () => {
         </button>
       </div>
 
+      <!-- Cancellation Notice -->
+      <BaseCard v-if="event.status === 'cancelled'" class="mb-8 bg-red-50 border-2 border-red-300">
+        <div class="flex items-start gap-4">
+          <div class="flex-shrink-0">
+            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-lg font-bold text-red-900 mb-2">⚠️ This Event Has Been Cancelled</h3>
+            <p v-if="event.cancellation_reason" class="text-red-800">
+              <strong>Reason:</strong> {{ event.cancellation_reason }}
+            </p>
+            <p v-else class="text-red-800">
+              This event will not be taking place as scheduled. Please contact the organiser for more information.
+            </p>
+          </div>
+        </div>
+      </BaseCard>
+
       <!-- Header -->
       <div class="mb-8">
         <div class="flex items-start gap-4 mb-4">
           <span :class="getEventTypeColor(event.event_type)" class="px-4 py-2 rounded-full text-sm font-medium">
             {{ getEventTypeLabel(event.event_type) }}
           </span>
-          <span v-if="!isUpcoming" class="px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+          <span v-if="event.status === 'cancelled'" class="px-4 py-2 rounded-full text-sm font-medium bg-red-100 text-red-800 font-bold">
+            ❌ Cancelled
+          </span>
+          <span v-else-if="!isUpcoming" class="px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
             Past Event
           </span>
         </div>
@@ -307,7 +330,7 @@ const goBack = () => {
             </BaseCard>
 
             <!-- Add to Calendar Buttons -->
-            <BaseCard v-if="isUpcoming">
+            <BaseCard v-if="isUpcoming && event.status !== 'cancelled'">
               <h4 class="font-semibold text-gray-900 mb-2">Add This Event</h4>
               <p class="text-xs text-gray-600 mb-3">
                 Add this single event to your calendar
@@ -343,7 +366,7 @@ const goBack = () => {
             </BaseCard>
 
             <!-- RSVP Notice -->
-            <BaseCard v-if="isUpcoming" class="bg-primary-50 border-primary-200">
+            <BaseCard v-if="isUpcoming && event.status !== 'cancelled'" class="bg-primary-50 border-primary-200">
               <div class="text-center">
                 <svg class="w-12 h-12 mx-auto text-primary-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

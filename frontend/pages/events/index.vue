@@ -337,8 +337,12 @@ const getEventTypeColor = (type: string) => {
             class="block"
           >
             <div :class="{ 'stacked-card': event.is_recurring }">
-              <BaseCard hover class="h-full flex flex-col relative z-10">
-              <div class="flex-1">
+              <BaseCard hover :class="{ 'opacity-75 border-2 border-red-300': event.status === 'cancelled' }" class="h-full flex flex-col relative z-10">
+              <!-- Cancelled Banner -->
+              <div v-if="event.status === 'cancelled'" class="absolute top-0 left-0 right-0 bg-red-600 text-white text-center py-1 text-xs font-bold uppercase tracking-wide z-20">
+                Event Cancelled
+              </div>
+              <div class="flex-1" :class="{ 'mt-7': event.status === 'cancelled' }">
                 <!-- Event Type Badge -->
                 <div class="mb-3 flex items-center gap-2 flex-wrap">
                   <span :class="getEventTypeColor(event.event_type)" class="px-3 py-1 rounded-full text-xs font-medium">
@@ -412,8 +416,12 @@ const getEventTypeColor = (type: string) => {
             class="block"
           >
             <div :class="{ 'stacked-card': event.is_recurring }">
-              <BaseCard hover class="h-full flex flex-col opacity-75 relative z-10">
-              <div class="flex-1">
+              <BaseCard hover :class="{ 'border-2 border-red-300': event.status === 'cancelled' }" class="h-full flex flex-col opacity-75 relative z-10">
+              <!-- Cancelled Banner -->
+              <div v-if="event.status === 'cancelled'" class="absolute top-0 left-0 right-0 bg-red-600 text-white text-center py-1 text-xs font-bold uppercase tracking-wide z-20">
+                Event Cancelled
+              </div>
+              <div class="flex-1" :class="{ 'mt-7': event.status === 'cancelled' }">
                 <!-- Event Type Badge -->
                 <div class="mb-3 flex items-center gap-2 flex-wrap">
                   <span :class="getEventTypeColor(event.event_type)" class="px-3 py-1 rounded-full text-xs font-medium">

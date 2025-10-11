@@ -31,6 +31,7 @@ const form = ref({
   organizer_name: '',
   organizer_contact: '',
   status: 'draft' as 'draft' | 'published' | 'cancelled' | 'archived',
+  cancellation_reason: '',
   is_recurring: false,
   recurrence_frequency: 'WEEKLY' as 'WEEKLY' | 'DAILY' | 'MONTHLY',
   recurrence_end_date: '',
@@ -109,6 +110,7 @@ onMounted(async () => {
         organizer_name: event.organizer_name || '',
         organizer_contact: event.organizer_contact || '',
         status: event.status,
+        cancellation_reason: event.cancellation_reason || '',
         is_recurring: event.is_recurring || false,
         recurrence_frequency: recurrence.frequency as 'WEEKLY' | 'DAILY' | 'MONTHLY',
         recurrence_end_date: recurrence.endDate,
@@ -222,6 +224,7 @@ const handleSubmit = async () => {
       is_recurring: form.value.is_recurring,
       recurrence_rule: recurrenceRule,
       status: form.value.status,
+      cancellation_reason: form.value.cancellation_reason || undefined,
     }
 
     console.log('Submitting event data:', eventData)
@@ -477,6 +480,23 @@ const handleCancel = () => {
             <option value="cancelled">Cancelled</option>
             <option value="archived">Archived</option>
           </select>
+        </div>
+
+        <!-- Cancellation Reason (shown when status is cancelled) -->
+        <div v-if="form.status === 'cancelled'" class="bg-red-50 border-2 border-red-200 rounded-lg p-4">
+          <label class="block text-sm font-medium text-red-900 mb-2">
+            Cancellation Reason
+            <span class="text-xs font-normal text-red-700 ml-2">(Will be displayed to the public)</span>
+          </label>
+          <textarea
+            v-model="form.cancellation_reason"
+            rows="3"
+            class="input"
+            placeholder="Explain why this event has been cancelled..."
+          />
+          <p class="mt-2 text-sm text-red-700">
+            ℹ️ This event will remain visible to the public with a prominent cancellation notice.
+          </p>
         </div>
 
         <!-- Submit Error -->
