@@ -18,7 +18,7 @@ const pageTitle = computed(() => isNew.value ? 'Create Event' : 'Edit Event')
 // Form data
 const form = ref({
   title: '',
-  event_type: 'meeting' as 'meeting' | 'camp' | 'trip' | 'special' | 'other',
+  event_type: 'meeting' as 'meeting' | 'camp' | 'trip' | 'special' | 'fundraising' | 'other',
   age_group: 'cubs' as 'beavers' | 'cubs' | 'scouts',
   start_date: '',
   start_time: '09:00',
@@ -292,6 +292,7 @@ const handleCancel = () => {
               <option value="camp">Camp</option>
               <option value="trip">Trip</option>
               <option value="special">Special Event</option>
+              <option value="fundraising">Fundraising</option>
               <option value="other">Other</option>
             </select>
           </div>

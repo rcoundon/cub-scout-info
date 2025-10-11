@@ -36,6 +36,11 @@
                 Contact
               </NuxtLink>
             </li>
+            <li>
+              <a href="https://gofundme.com/placeholder" target="_blank" rel="noopener noreferrer" class="hover:text-primary-400 transition-colors">
+                Fundraising
+              </a>
+            </li>
           </ul>
         </div>
 
@@ -109,11 +114,11 @@
 
       <!-- Copyright -->
       <div class="border-t border-gray-800 mt-8 pt-8 text-sm text-center">
-        <p>&copy; {{ currentYear }} Cub Scout Division. All rights reserved.</p>
+        <p>&copy; {{ currentYear }} 1st Holmer Green Scout Group. All rights reserved.</p>
         <div class="mt-2 space-x-4">
           <NuxtLink to="/privacy" class="hover:text-primary-400 transition-colors">
             Privacy Policy
-          </NuxtLink>
+          </NuxtLink>C
         </div>
       </div>
     </div>

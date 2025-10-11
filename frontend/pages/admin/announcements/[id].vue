@@ -20,12 +20,11 @@ const form = ref({
   title: '',
   content: '',
   priority: 'medium' as 'low' | 'medium' | 'high',
+  category: 'general' as 'general' | 'event' | 'fundraising' | 'urgent' | 'achievement' | undefined,
   status: 'draft' as 'draft' | 'published' | 'expired',
   expires_at: '',
-  attachment: null as File | null,
 })
 
-const existingAttachmentUrl = ref<string | null>(null)
 const errors = ref<Record<string, string>>({})
 const submitting = ref(false)
 
@@ -37,11 +36,10 @@ onMounted(async () => {
         title: announcement.title,
         content: announcement.content,
         priority: announcement.priority,
+        category: announcement.category || 'general',
         status: announcement.status,
         expires_at: announcement.expires_at ? new Date(announcement.expires_at).toISOString().slice(0, 16) : '',
-        attachment: null,
       }
-      existingAttachmentUrl.value = announcement.attachment_url || null
     } else {
       router.push('/admin/announcements')
     }
@@ -65,13 +63,6 @@ const validate = () => {
   return isValid
 }
 
-const handleFileChange = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  if (target.files && target.files[0]) {
-    form.value.attachment = target.files[0]
-  }
-}
-
 const handleSubmit = async () => {
   if (!validate()) return
 
@@ -82,9 +73,9 @@ const handleSubmit = async () => {
       title: form.value.title,
       content: form.value.content,
       priority: form.value.priority,
+      category: form.value.category,
       status: form.value.status,
       expires_at: form.value.expires_at ? new Date(form.value.expires_at).toISOString() : undefined,
-      attachment: form.value.attachment,
     }
 
     let success
@@ -144,8 +135,8 @@ const handleCancel = () => {
           </p>
         </div>
 
-        <!-- Priority & Status Row -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Priority, Category & Status Row -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">
               Priority <span class="text-red-500">*</span>
@@ -157,6 +148,22 @@ const handleCancel = () => {
             </select>
             <p class="mt-1 text-sm text-gray-500">
               High priority announcements appear at the top
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Category
+            </label>
+            <select v-model="form.category" class="input">
+              <option value="general">General</option>
+              <option value="event">Event</option>
+              <option value="fundraising">Fundraising</option>
+              <option value="urgent">Urgent</option>
+              <option value="achievement">Achievement</option>
+            </select>
+            <p class="mt-1 text-sm text-gray-500">
+              Helps organize announcements
             </p>
           </div>
 
@@ -178,27 +185,6 @@ const handleCancel = () => {
           label="Expiry Date & Time"
           hint="Leave empty if announcement doesn't expire"
         />
-
-        <!-- Attachment -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Attachment
-          </label>
-          <input
-            type="file"
-            @change="handleFileChange"
-            class="input"
-            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-          />
-          <p class="mt-1 text-sm text-gray-500">
-            Optional. Supported formats: PDF, DOC, DOCX, JPG, PNG (max 5MB)
-          </p>
-          <div v-if="existingAttachmentUrl" class="mt-2">
-            <a :href="existingAttachmentUrl" target="_blank" class="text-sm text-primary-600 hover:text-primary-700 underline">
-              View current attachment
-            </a>
-          </div>
-        </div>
 
         <!-- Actions -->
         <div class="flex gap-4 pt-4">

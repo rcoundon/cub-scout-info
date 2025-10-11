@@ -149,30 +149,14 @@ const handleSubmit = async () => {
                   <div>
                     <h3 class="font-semibold text-gray-900 mb-1">Address</h3>
                     <p class="text-gray-700">
-                      Scout Hall<br>
-                      Main Street<br>
-                      Townsville
+                      Scout Hut <br>
+                      Parish Piece<br>
+                      HP15 6SP
                     </p>
                   </div>
                 </div>
               </BaseCard>
 
-              <BaseCard>
-                <div class="flex items-start gap-4">
-                  <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-gray-900 mb-1">Meeting Times</h3>
-                    <p class="text-gray-700">
-                      Tuesdays<br>
-                      6:30 PM - 8:00 PM
-                    </p>
-                  </div>
-                </div>
-              </BaseCard>
             </div>
           </div>
 

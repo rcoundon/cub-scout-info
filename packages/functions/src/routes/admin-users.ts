@@ -4,11 +4,13 @@ import { z } from 'zod';
 import {
   getAllUsers,
   getUser,
+  getUserByEmail,
+  createUser,
   updateUser,
   deleteUser,
   updateUserRole,
 } from '../services/users';
-import { deleteUserFromCognito } from '../services/cognito';
+import { createCognitoUser, deleteUserFromCognito } from '../services/cognito';
 import { requireAdmin, getUserContext } from '../middleware/auth';
 
 const app = new Hono();
@@ -40,6 +42,107 @@ app.get('/', requireAdmin, async (c) => {
     return c.json({ error: 'Failed to fetch users' }, 500);
   }
 });
+
+/**
+ * POST /api/admin/users - Create new user
+ * Creates user in both Cognito and DynamoDB
+ */
+app.post(
+  '/',
+  requireAdmin,
+  zValidator(
+    'json',
+    z.object({
+      email: z.string().email(),
+      password: z.string().min(8),
+      first_name: z.string().min(1),
+      last_name: z.string().min(1),
+      role: z.enum(['admin', 'editor', 'viewer']),
+    })
+  ),
+  async (c) => {
+    try {
+      const userData = c.req.valid('json');
+
+      // Check if user already exists
+      const existingUser = await getUserByEmail(userData.email);
+      if (existingUser) {
+        return c.json(
+          {
+            error: 'User already exists',
+            message: 'A user with this email already exists',
+          },
+          400
+        );
+      }
+
+      // Create user in Cognito first
+      let cognitoUserId: string;
+      try {
+        cognitoUserId = await createCognitoUser(userData.email, userData.password);
+      } catch (cognitoError) {
+        console.error('Error creating Cognito user:', cognitoError);
+        return c.json(
+          {
+            error: 'Failed to create user in authentication system',
+            message: cognitoError instanceof Error ? cognitoError.message : 'Unknown error',
+          },
+          500
+        );
+      }
+
+      // Create user in DynamoDB
+      try {
+        const newUser = await createUser({
+          id: cognitoUserId,
+          email: userData.email,
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+          role: userData.role,
+        });
+
+        return c.json(
+          {
+            success: true,
+            user: {
+              id: newUser.id,
+              email: newUser.email,
+              role: newUser.role,
+              first_name: newUser.first_name,
+              last_name: newUser.last_name,
+              created_at: newUser.created_at,
+            },
+          },
+          201
+        );
+      } catch (dbError) {
+        // If DynamoDB creation fails, try to clean up Cognito user
+        console.error('Error creating user in database:', dbError);
+        try {
+          await deleteUserFromCognito(cognitoUserId);
+        } catch (cleanupError) {
+          console.error('Error cleaning up Cognito user:', cleanupError);
+        }
+        return c.json(
+          {
+            error: 'Failed to create user',
+            message: dbError instanceof Error ? dbError.message : 'Unknown error',
+          },
+          500
+        );
+      }
+    } catch (error) {
+      console.error('Error creating user:', error);
+      return c.json(
+        {
+          error: 'Failed to create user',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        },
+        500
+      );
+    }
+  }
+);
 
 /**
  * GET /api/admin/users/:id - Get single user by ID

@@ -21,7 +21,7 @@ const app = new Hono();
 // Validation schemas
 const eventSchema = z.object({
   title: z.string().min(1).max(200),
-  event_type: z.enum(['meeting', 'camp', 'trip', 'special', 'other']),
+  event_type: z.enum(['meeting', 'camp', 'trip', 'special', 'fundraising', 'other']),
   age_group: z.enum(['beavers', 'cubs', 'scouts']),
   start_date: z.string().datetime(),
   end_date: z.string().datetime(),
@@ -56,11 +56,18 @@ app.get('/', async (c) => {
 /**
  * GET /api/events/calendar.ics - Export all published events as iCalendar feed
  * IMPORTANT: This must come BEFORE /:id to avoid matching "calendar" as an ID
+ * Query params: age_group (can be multiple, e.g., ?age_group=beavers&age_group=cubs)
  */
 app.get('/calendar.ics', async (c) => {
   try {
     // Use expanded version for calendar feeds to include all recurring occurrences
-    const events = await getPublishedEventsExpanded();
+    let events = await getPublishedEventsExpanded();
+
+    // Filter by age groups if specified
+    const ageGroupParams = c.req.queries('age_group');
+    if (ageGroupParams && ageGroupParams.length > 0) {
+      events = events.filter((event) => ageGroupParams.includes(event.age_group));
+    }
 
     // Filter to only include upcoming and recent events (last 30 days, future events)
     const thirtyDaysAgo = new Date();

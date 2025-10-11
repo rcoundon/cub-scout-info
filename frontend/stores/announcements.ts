@@ -7,6 +7,7 @@ export interface Announcement {
   title: string
   content: string
   priority: 'low' | 'medium' | 'high'
+  category?: 'general' | 'event' | 'fundraising' | 'urgent' | 'achievement'
   status: 'draft' | 'published' | 'expired'
   expires_at?: string
   attachment_url?: string
@@ -94,37 +95,24 @@ export const useAnnouncementsStore = defineStore('announcements', () => {
     try {
       const config = useRuntimeConfig()
 
-      // Create FormData if there's an attachment
-      let body: any
-      let headers: any = authStore.getAuthHeader()
-
-      if (announcementData.attachment) {
-        const formData = new FormData()
-        formData.append('title', announcementData.title)
-        formData.append('content', announcementData.content)
-        formData.append('priority', announcementData.priority.toString())
-        formData.append('status', announcementData.status)
-        if (announcementData.expires_at) {
-          formData.append('expires_at', announcementData.expires_at)
-        }
-        formData.append('attachment', announcementData.attachment)
-        body = formData
-        // Don't set Content-Type header for FormData - browser will set it with boundary
-      } else {
-        body = {
-          title: announcementData.title,
-          content: announcementData.content,
-          priority: announcementData.priority,
-          status: announcementData.status,
-          expires_at: announcementData.expires_at,
-        }
+      // For now, we only support JSON (attachment support can be added later)
+      const body = {
+        title: announcementData.title,
+        content: announcementData.content,
+        priority: announcementData.priority,
+        category: announcementData.category,
+        status: announcementData.status,
+        expires_at: announcementData.expires_at,
       }
 
       const response = await $fetch<{ announcement: Announcement }>(
         `${config.public.apiUrl}/api/announcements`,
         {
           method: 'POST',
-          headers,
+          headers: {
+            ...authStore.getAuthHeader(),
+            'Content-Type': 'application/json',
+          },
           body,
         }
       )
@@ -147,37 +135,24 @@ export const useAnnouncementsStore = defineStore('announcements', () => {
     try {
       const config = useRuntimeConfig()
 
-      // Create FormData if there's an attachment
-      let body: any
-      let headers: any = authStore.getAuthHeader()
-
-      if (updates.attachment) {
-        const formData = new FormData()
-        formData.append('title', updates.title)
-        formData.append('content', updates.content)
-        formData.append('priority', updates.priority.toString())
-        formData.append('status', updates.status)
-        if (updates.expires_at) {
-          formData.append('expires_at', updates.expires_at)
-        }
-        formData.append('attachment', updates.attachment)
-        body = formData
-        // Don't set Content-Type header for FormData - browser will set it with boundary
-      } else {
-        body = {
-          title: updates.title,
-          content: updates.content,
-          priority: updates.priority,
-          status: updates.status,
-          expires_at: updates.expires_at,
-        }
+      // For now, we only support JSON (attachment support can be added later)
+      const body = {
+        title: updates.title,
+        content: updates.content,
+        priority: updates.priority,
+        category: updates.category,
+        status: updates.status,
+        expires_at: updates.expires_at,
       }
 
       const response = await $fetch<{ announcement: Announcement }>(
         `${config.public.apiUrl}/api/announcements/${id}`,
         {
           method: 'PUT',
-          headers,
+          headers: {
+            ...authStore.getAuthHeader(),
+            'Content-Type': 'application/json',
+          },
           body,
         }
       )

@@ -2,7 +2,7 @@
  * Event entity types
  */
 
-export type EventType = 'meeting' | 'camp' | 'trip' | 'special' | 'other';
+export type EventType = 'meeting' | 'camp' | 'trip' | 'special' | 'fundraising' | 'other';
 
 export type EventStatus = 'draft' | 'published' | 'cancelled' | 'archived';
 

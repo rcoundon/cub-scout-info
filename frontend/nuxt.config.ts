@@ -6,6 +6,14 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  app: {
+    head: {
+      link: [
+        { rel: 'icon', type: 'image/jpeg', href: '/assets/scout-logo.jpg' }
+      ]
+    }
+  },
+
   runtimeConfig: {
     public: {
       apiUrl: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:3001',

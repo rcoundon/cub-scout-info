@@ -19,6 +19,7 @@ const announcementSchema = z.object({
   title: z.string().min(1).max(200),
   content: z.string().min(1),
   priority: z.enum(['low', 'medium', 'high']).default('medium'),
+  category: z.enum(['general', 'event', 'fundraising', 'urgent', 'achievement']).optional(),
   expires_at: z.string().datetime().optional(),
   status: z.enum(['draft', 'published', 'expired']).default('draft'),
 });

@@ -80,6 +80,7 @@ const getEventTypeIcon = (type: string) => {
     camp: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
     trip: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
     special: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
+    fundraising: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
     other: 'M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z',
   }
   return icons[type] || icons.other
@@ -91,6 +92,7 @@ const getEventTypeLabel = (type: string) => {
     camp: 'Camp',
     trip: 'Trip',
     special: 'Special Event',
+    fundraising: 'Fundraising',
     other: 'Other',
   }
   return labels[type] || type
@@ -103,10 +105,10 @@ const getEventTypeLabel = (type: string) => {
     <div class="container mx-auto px-4 py-16">
       <div class="text-center mb-12">
         <h1 class="text-5xl md:text-6xl font-display font-bold text-primary-900 mb-4">
-          Cub Scout Division
+          1st Holmer Green Cub Scout Group
         </h1>
         <p class="text-xl text-gray-700 mb-8">
-          Welcome to the Cub Scout events and information portal
+          Welcome to our events and information portal
         </p>
         <div class="flex gap-4 justify-center">
           <NuxtLink to="/events">

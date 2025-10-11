@@ -107,6 +107,7 @@ const getEventTypeLabel = (type: string) => {
     camp: 'Camp',
     trip: 'Trip',
     special: 'Special Event',
+    fundraising: 'Fundraising',
     other: 'Other',
   }
   return labels[type] || type
@@ -118,6 +119,7 @@ const getEventTypeColor = (type: string) => {
     camp: 'bg-green-100 text-green-800',
     trip: 'bg-purple-100 text-purple-800',
     special: 'bg-yellow-100 text-yellow-800',
+    fundraising: 'bg-pink-100 text-pink-800',
     other: 'bg-gray-100 text-gray-800',
   }
   return colors[type] || colors.other

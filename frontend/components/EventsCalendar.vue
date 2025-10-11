@@ -87,6 +87,7 @@ const getEventTypeColor = (type: string) => {
     camp: 'bg-green-500',
     trip: 'bg-purple-500',
     special: 'bg-yellow-500',
+    fundraising: 'bg-pink-500',
     other: 'bg-gray-500',
   }
   return colors[type] || colors.other
@@ -208,6 +209,10 @@ const getEventTypeColor = (type: string) => {
         <div class="flex items-center gap-2">
           <span class="w-3 h-3 bg-yellow-500 rounded"></span>
           <span class="text-gray-700">Special</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 bg-pink-500 rounded"></span>
+          <span class="text-gray-700">Fundraising</span>
         </div>
         <div class="flex items-center gap-2">
           <span class="w-3 h-3 bg-gray-500 rounded"></span>

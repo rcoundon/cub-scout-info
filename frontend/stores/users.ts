@@ -29,7 +29,7 @@ export const useUsersStore = defineStore('users', () => {
     try {
       const config = useRuntimeConfig()
       const response = await $fetch<{ users: User[] }>(
-        `${config.public.apiUrl}/api/users`,
+        `${config.public.apiUrl}/api/admin/users`,
         {
           headers: authStore.getAuthHeader(),
         }
@@ -51,7 +51,7 @@ export const useUsersStore = defineStore('users', () => {
     try {
       const config = useRuntimeConfig()
       const response = await $fetch<{ user: User }>(
-        `${config.public.apiUrl}/api/users/${id}`,
+        `${config.public.apiUrl}/api/admin/users/${id}`,
         {
           headers: authStore.getAuthHeader(),
         }
@@ -81,7 +81,7 @@ export const useUsersStore = defineStore('users', () => {
     try {
       const config = useRuntimeConfig()
       const response = await $fetch<{ user: User }>(
-        `${config.public.apiUrl}/api/users`,
+        `${config.public.apiUrl}/api/admin/users`,
         {
           method: 'POST',
           headers: authStore.getAuthHeader(),
@@ -114,7 +114,7 @@ export const useUsersStore = defineStore('users', () => {
     try {
       const config = useRuntimeConfig()
       const response = await $fetch<{ user: User }>(
-        `${config.public.apiUrl}/api/users/${id}`,
+        `${config.public.apiUrl}/api/admin/users/${id}`,
         {
           method: 'PUT',
           headers: authStore.getAuthHeader(),
@@ -147,7 +147,7 @@ export const useUsersStore = defineStore('users', () => {
 
     try {
       const config = useRuntimeConfig()
-      await $fetch(`${config.public.apiUrl}/api/users/${id}`, {
+      await $fetch(`${config.public.apiUrl}/api/admin/users/${id}`, {
         method: 'DELETE',
         headers: authStore.getAuthHeader(),
       })
