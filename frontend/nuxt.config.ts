@@ -19,5 +19,17 @@ export default defineNuxtConfig({
     typeCheck: false,
   },
 
+  vite: {
+    server: {
+      hmr: {
+        protocol: 'ws',
+        host: 'localhost',
+      },
+    },
+    css: {
+      devSourcemap: true,
+    },
+  },
+
   compatibilityDate: '2024-10-09',
 });
