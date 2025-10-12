@@ -87,6 +87,12 @@ export default $config({
         NODE_ENV: $app.stage === 'production' ? 'production' : 'development',
         USER_POOL_CLIENT_ID: authClient.id,
       },
+      permissions: [
+        {
+          actions: ['ses:SendEmail', 'ses:SendRawEmail'],
+          resources: ['*'],
+        },
+      ],
     });
 
     // Nuxt Frontend

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useEventsStore } from '~/stores/events'
 
 definePageMeta({
@@ -7,6 +7,9 @@ definePageMeta({
 })
 
 const eventsStore = useEventsStore()
+
+// Fetch events on server and client for proper hydration
+await eventsStore.fetchPublishedEvents()
 
 const meetingInfo = [
   {
@@ -48,10 +51,6 @@ const meetingInfo = [
   },
 ]
 
-onMounted(async () => {
-  await eventsStore.fetchPublishedEvents()
-})
-
 // Get 2 upcoming events for each age group
 const eventsByAgeGroup = computed(() => {
   const now = new Date()
@@ -67,11 +66,11 @@ const eventsByAgeGroup = computed(() => {
 })
 
 const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('en-GB', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-  })
+  const date = new Date(dateString)
+  const weekday = date.toLocaleDateString('en-GB', { weekday: 'short' })
+  const day = date.getDate()
+  const month = date.toLocaleDateString('en-GB', { month: 'short' })
+  return `${weekday}, ${day} ${month}`
 }
 
 const getEventTypeIcon = (type: string) => {

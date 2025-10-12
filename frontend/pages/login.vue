@@ -17,6 +17,15 @@ const emailError = ref('')
 const passwordError = ref('')
 const formError = ref('')
 
+// Password change challenge state
+const requiresPasswordChange = ref(false)
+const challengeSession = ref('')
+const challengeUsername = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
+const newPasswordError = ref('')
+const confirmPasswordError = ref('')
+
 // Form validation
 const validateEmail = () => {
   if (!email.value) {
@@ -44,6 +53,32 @@ const validatePassword = () => {
   return true
 }
 
+const validateNewPassword = () => {
+  if (!newPassword.value) {
+    newPasswordError.value = 'New password is required'
+    return false
+  }
+  if (newPassword.value.length < 8) {
+    newPasswordError.value = 'Password must be at least 8 characters'
+    return false
+  }
+  newPasswordError.value = ''
+  return true
+}
+
+const validateConfirmPassword = () => {
+  if (!confirmPassword.value) {
+    confirmPasswordError.value = 'Please confirm your password'
+    return false
+  }
+  if (confirmPassword.value !== newPassword.value) {
+    confirmPasswordError.value = 'Passwords do not match'
+    return false
+  }
+  confirmPasswordError.value = ''
+  return true
+}
+
 const handleSubmit = async () => {
   // Clear previous errors
   formError.value = ''
@@ -59,13 +94,47 @@ const handleSubmit = async () => {
   }
 
   // Attempt login
-  const success = await authStore.login(email.value, password.value)
+  const result = await authStore.login(email.value, password.value)
 
-  if (success) {
-    // Redirect to home or intended page
+  if (typeof result === 'object' && result.requiresPasswordChange) {
+    // Show password change form
+    requiresPasswordChange.value = true
+    challengeSession.value = result.session || ''
+    challengeUsername.value = result.username || email.value
+  } else if (typeof result === 'object' && !result.requiresPasswordChange && !result.error) {
+    // Login successful
     router.push('/')
   } else {
     formError.value = authStore.error || 'Login failed. Please check your credentials.'
+  }
+}
+
+const handlePasswordChange = async () => {
+  // Clear previous errors
+  formError.value = ''
+  newPasswordError.value = ''
+  confirmPasswordError.value = ''
+
+  // Validate new password
+  const isNewPasswordValid = validateNewPassword()
+  const isConfirmPasswordValid = validateConfirmPassword()
+
+  if (!isNewPasswordValid || !isConfirmPasswordValid) {
+    return
+  }
+
+  // Complete password change
+  const success = await authStore.completeNewPassword(
+    challengeUsername.value,
+    newPassword.value,
+    challengeSession.value
+  )
+
+  if (success) {
+    // Redirect to home
+    router.push('/')
+  } else {
+    formError.value = authStore.error || 'Failed to set new password. Please try again.'
   }
 }
 </script>
@@ -80,15 +149,16 @@ const handleSubmit = async () => {
               <span class="text-white font-bold text-2xl">CS</span>
             </div>
             <h2 class="text-2xl font-display font-bold text-gray-900">
-              Sign In
+              {{ requiresPasswordChange ? 'Change Your Password' : 'Sign In' }}
             </h2>
             <p class="text-gray-600 mt-2">
-              Access the Cubs Scout portal
+              {{ requiresPasswordChange ? 'Please set a new password to continue' : 'Access the Cubs Scout portal' }}
             </p>
           </div>
         </template>
 
-        <form @submit.prevent="handleSubmit" class="space-y-6">
+        <!-- Initial Login Form -->
+        <form v-if="!requiresPasswordChange" @submit.prevent="handleSubmit" class="space-y-6">
           <!-- General Error Message -->
           <div
             v-if="formError"
@@ -138,6 +208,57 @@ const handleSubmit = async () => {
             class="w-full"
           >
             {{ authStore.loading ? 'Signing in...' : 'Sign In' }}
+          </BaseButton>
+        </form>
+
+        <!-- Password Change Form -->
+        <form v-else @submit.prevent="handlePasswordChange" class="space-y-6">
+          <!-- Info Message -->
+          <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p class="text-sm text-blue-800">
+              This is your first login. Please set a new password to continue.
+            </p>
+          </div>
+
+          <!-- General Error Message -->
+          <div
+            v-if="formError"
+            class="p-4 bg-red-50 border border-red-200 rounded-lg"
+          >
+            <p class="text-sm text-red-800">{{ formError }}</p>
+          </div>
+
+          <!-- New Password Field -->
+          <BaseInput
+            v-model="newPassword"
+            type="password"
+            label="New Password"
+            placeholder="Enter new password (min 8 characters)"
+            :error="newPasswordError"
+            :required="true"
+            @blur="validateNewPassword"
+          />
+
+          <!-- Confirm Password Field -->
+          <BaseInput
+            v-model="confirmPassword"
+            type="password"
+            label="Confirm New Password"
+            placeholder="Re-enter new password"
+            :error="confirmPasswordError"
+            :required="true"
+            @blur="validateConfirmPassword"
+          />
+
+          <!-- Submit Button -->
+          <BaseButton
+            type="submit"
+            variant="primary"
+            size="lg"
+            :loading="authStore.loading"
+            class="w-full"
+          >
+            {{ authStore.loading ? 'Setting Password...' : 'Set New Password' }}
           </BaseButton>
         </form>
 

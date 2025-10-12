@@ -61,6 +61,20 @@ export const UserEntity = new Entity(
       last_login: {
         type: 'string',
       },
+      invitation_token: {
+        type: 'string',
+      },
+      invitation_token_expires: {
+        type: 'string',
+      },
+      invitation_status: {
+        type: ['invited', 'active', 'expired'] as const,
+        required: true,
+        default: 'invited',
+      },
+      invited_at: {
+        type: 'string',
+      },
     },
     indexes: {
       primary: {

@@ -37,6 +37,11 @@
               </NuxtLink>
             </li>
             <li>
+              <NuxtLink to="/help" class="hover:text-primary-400 transition-colors">
+                Help
+              </NuxtLink>
+            </li>
+            <li>
               <a href="https://gofundme.com/placeholder" target="_blank" rel="noopener noreferrer" class="hover:text-primary-400 transition-colors">
                 Fundraising
               </a>

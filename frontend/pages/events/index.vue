@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useEventsStore } from '~/stores/events'
 
 definePageMeta({
@@ -14,23 +14,27 @@ const config = useRuntimeConfig()
 const showCalendarInstructions = ref(false)
 
 // Age group filter with localStorage persistence
-const selectedAgeGroups = ref<string[]>([])
+// Default to all groups for SSR
+const selectedAgeGroups = ref<string[]>(['beavers', 'cubs', 'scouts'])
 
-// Load saved age group preferences from localStorage on mount
-onMounted(async () => {
-  const saved = localStorage.getItem('selectedAgeGroups')
-  if (saved) {
-    selectedAgeGroups.value = JSON.parse(saved)
-  } else {
-    // Default to all groups if no preference saved
-    selectedAgeGroups.value = ['beavers', 'cubs', 'scouts']
+// Fetch events on server and client for proper hydration
+await eventsStore.fetchPublishedEvents()
+
+// Load saved age group preferences from localStorage on client mount
+onMounted(() => {
+  if (process.client) {
+    const saved = localStorage.getItem('selectedAgeGroups')
+    if (saved) {
+      selectedAgeGroups.value = JSON.parse(saved)
+    }
   }
-  await eventsStore.fetchPublishedEvents()
 })
 
-// Save age group preferences to localStorage whenever they change
+// Save age group preferences to localStorage whenever they change (client only)
 watch(selectedAgeGroups, (newGroups) => {
-  localStorage.setItem('selectedAgeGroups', JSON.stringify(newGroups))
+  if (process.client) {
+    localStorage.setItem('selectedAgeGroups', JSON.stringify(newGroups))
+  }
 }, { deep: true })
 
 const subscribeToCalendar = () => {

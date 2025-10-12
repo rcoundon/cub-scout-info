@@ -77,3 +77,15 @@ export async function updateLastLogin(userId: string) {
 export async function updateUserRole(userId: string, role: UserRole) {
   return updateUser(userId, { role });
 }
+
+/**
+ * Find user by invitation token
+ */
+export async function getUserByInvitationToken(token: string) {
+  // Since we don't have a direct index on invitation_token,
+  // we need to scan the users table
+  // In a production system, you might want to add a GSI for this
+  const result = await UserEntity.scan.go();
+  const user = result.data.find(u => u.invitation_token === token);
+  return user || null;
+}

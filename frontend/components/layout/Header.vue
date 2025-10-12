@@ -3,7 +3,7 @@
     <nav class="container mx-auto px-4">
       <div class="flex items-center justify-between h-24">
         <!-- Logo -->
-        <NuxtLink to="/" class="flex items-center space-x-2">
+        <NuxtLink to="/" class="flex items-center space-x-2" active-class="" exact-active-class="">
           <img
             src="/assets/logo-purple.png"
             alt="Cubs Site Logo"
@@ -22,21 +22,26 @@
             {{ item.label }}
           </NuxtLink>
 
-          <!-- Auth Actions -->
-          <div v-if="isAuthenticated" class="flex items-center space-x-4">
-            <span class="text-base text-gray-600">{{ userName }}</span>
-            <NuxtLink v-if="canAccessAdmin" to="/admin">
-              <BaseButton variant="secondary">
-                Admin
+          <!-- Auth Actions - Wrap in ClientOnly to prevent hydration mismatch -->
+          <ClientOnly>
+            <div v-if="isAuthenticated" class="flex items-center space-x-4">
+              <span class="text-base text-gray-600">{{ userName }}</span>
+              <NuxtLink v-if="canAccessAdmin" to="/admin">
+                <BaseButton variant="secondary">
+                  Admin
+                </BaseButton>
+              </NuxtLink>
+              <BaseButton variant="outline" @click="handleLogout">
+                Logout
               </BaseButton>
-            </NuxtLink>
-            <BaseButton variant="outline" @click="handleLogout">
-              Logout
+            </div>
+            <BaseButton v-else variant="primary" @click="handleLogin">
+              Login
             </BaseButton>
-          </div>
-          <BaseButton v-else variant="primary" @click="handleLogin">
-            Login
-          </BaseButton>
+            <template #fallback>
+              <div class="w-20 h-10"></div>
+            </template>
+          </ClientOnly>
         </div>
 
         <!-- Mobile Menu Button -->
@@ -84,23 +89,26 @@
             {{ item.label }}
           </NuxtLink>
 
-          <div v-if="isAuthenticated" class="pt-3 border-t border-gray-200">
-            <p class="text-base font-medium text-gray-900 mb-1">{{ userName }}</p>
-            <p class="text-sm text-gray-600 mb-2">{{ userEmail }}</p>
-            <div class="space-y-2">
-              <NuxtLink v-if="canAccessAdmin" to="/admin" @click="closeMobileMenu">
-                <BaseButton variant="secondary" class="w-full">
-                  Admin Dashboard
+          <!-- Auth Actions - Wrap in ClientOnly to prevent hydration mismatch -->
+          <ClientOnly>
+            <div v-if="isAuthenticated" class="pt-3 border-t border-gray-200">
+              <p class="text-base font-medium text-gray-900 mb-1">{{ userName }}</p>
+              <p class="text-sm text-gray-600 mb-2">{{ userEmail }}</p>
+              <div class="space-y-2">
+                <NuxtLink v-if="canAccessAdmin" to="/admin" @click="closeMobileMenu">
+                  <BaseButton variant="secondary" class="w-full">
+                    Admin Dashboard
+                  </BaseButton>
+                </NuxtLink>
+                <BaseButton variant="outline" @click="handleLogout" class="w-full">
+                  Logout
                 </BaseButton>
-              </NuxtLink>
-              <BaseButton variant="outline" @click="handleLogout" class="w-full">
-                Logout
-              </BaseButton>
+              </div>
             </div>
-          </div>
-          <BaseButton v-else variant="primary" @click="handleLogin">
-            Login
-          </BaseButton>
+            <BaseButton v-else variant="primary" @click="handleLogin">
+              Login
+            </BaseButton>
+          </ClientOnly>
         </div>
       </div>
     </nav>
@@ -131,6 +139,7 @@ const navigationItems = [
   { label: 'Announcements', path: '/announcements' },
   { label: 'About', path: '/about' },
   { label: 'Contact', path: '/contact' },
+  { label: 'Help', path: '/help' },
 ]
 
 const toggleMobileMenu = () => {

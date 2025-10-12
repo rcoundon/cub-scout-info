@@ -12,6 +12,7 @@ const usersStore = useUsersStore()
 const authStore = useAuthStore()
 const searchQuery = ref('')
 const roleFilter = ref<'all' | 'admin' | 'editor' | 'viewer'>('all')
+const statusFilter = ref<'all' | 'invited' | 'active' | 'expired'>('all')
 
 onMounted(async () => {
   await usersStore.fetchAllUsers()
@@ -23,6 +24,11 @@ const filteredUsers = computed(() => {
   // Filter by role
   if (roleFilter.value !== 'all') {
     users = users.filter(u => u.role === roleFilter.value)
+  }
+
+  // Filter by invitation status
+  if (statusFilter.value !== 'all') {
+    users = users.filter(u => (u.invitation_status || 'active') === statusFilter.value)
   }
 
   // Filter by search query
@@ -56,6 +62,19 @@ const getRoleBadgeVariant = (role: string) => {
       return 'primary'
     default:
       return 'primary'
+  }
+}
+
+const getInvitationStatusBadge = (status: string | undefined) => {
+  switch (status) {
+    case 'invited':
+      return { variant: 'warning' as const, text: 'Pending Invitation' }
+    case 'active':
+      return { variant: 'success' as const, text: 'Active' }
+    case 'expired':
+      return { variant: 'danger' as const, text: 'Invitation Expired' }
+    default:
+      return { variant: 'success' as const, text: 'Active' }
   }
 }
 
@@ -100,7 +119,7 @@ const deleteUser = async (id: string, email: string) => {
       </div>
       <NuxtLink to="/admin/users/new">
         <BaseButton variant="primary">
-          Create User
+          Invite User
         </BaseButton>
       </NuxtLink>
     </div>
@@ -126,6 +145,17 @@ const deleteUser = async (id: string, email: string) => {
             <option value="viewer">Viewer</option>
           </select>
         </div>
+        <div class="w-full sm:w-48">
+          <select
+            v-model="statusFilter"
+            class="input"
+          >
+            <option value="all">All Statuses</option>
+            <option value="invited">Pending Invitation</option>
+            <option value="active">Active</option>
+            <option value="expired">Expired</option>
+          </select>
+        </div>
       </div>
     </BaseCard>
 
@@ -148,6 +178,11 @@ const deleteUser = async (id: string, email: string) => {
               </h3>
               <BaseBadge :variant="getRoleBadgeVariant(user.role)">
                 {{ user.role }}
+              </BaseBadge>
+              <BaseBadge
+                :variant="getInvitationStatusBadge(user.invitation_status).variant"
+              >
+                {{ getInvitationStatusBadge(user.invitation_status).text }}
               </BaseBadge>
               <BaseBadge v-if="authStore.user?.id === user.id" variant="primary">
                 You

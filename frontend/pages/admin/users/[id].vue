@@ -16,13 +16,11 @@ const route = useRoute()
 
 const isNew = computed(() => route.params.id === 'new')
 const isEditingSelf = computed(() => !isNew.value && route.params.id === authStore.user?.id)
-const pageTitle = computed(() => isNew.value ? 'Create User' : 'Edit User')
+const pageTitle = computed(() => isNew.value ? 'Invite User' : 'Edit User')
 
 // Form data
 const form = ref({
   email: '',
-  password: '',
-  confirmPassword: '',
   first_name: '',
   last_name: '',
   role: 'viewer' as 'admin' | 'editor' | 'viewer',
@@ -37,8 +35,6 @@ onMounted(async () => {
     if (user) {
       form.value = {
         email: user.email,
-        password: '',
-        confirmPassword: '',
         first_name: user.first_name,
         last_name: user.last_name,
         role: user.role,
@@ -60,31 +56,6 @@ const validate = () => {
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.email)) {
     errors.value.email = 'Invalid email format'
     isValid = false
-  }
-
-  // Password validation (only for new users or when changing password)
-  if (isNew.value) {
-    if (!form.value.password) {
-      errors.value.password = 'Password is required'
-      isValid = false
-    } else if (form.value.password.length < 8) {
-      errors.value.password = 'Password must be at least 8 characters'
-      isValid = false
-    } else if (!/[A-Z]/.test(form.value.password)) {
-      errors.value.password = 'Password must contain at least one uppercase letter'
-      isValid = false
-    } else if (!/[a-z]/.test(form.value.password)) {
-      errors.value.password = 'Password must contain at least one lowercase letter'
-      isValid = false
-    } else if (!/[0-9]/.test(form.value.password)) {
-      errors.value.password = 'Password must contain at least one number'
-      isValid = false
-    }
-
-    if (form.value.password !== form.value.confirmPassword) {
-      errors.value.confirmPassword = 'Passwords do not match'
-      isValid = false
-    }
   }
 
   // Name validation
@@ -117,7 +88,6 @@ const handleSubmit = async () => {
     if (isNew.value) {
       success = await usersStore.createUser({
         email: form.value.email,
-        password: form.value.password,
         first_name: form.value.first_name,
         last_name: form.value.last_name,
         role: form.value.role,
@@ -153,7 +123,12 @@ const handleCancel = () => {
     <!-- Header -->
     <div class="mb-6">
       <h1 class="text-3xl font-display font-bold text-gray-900">{{ pageTitle }}</h1>
-      <p class="text-gray-600 mt-1">{{ isNew ? 'Create a new user account' : 'Update user details and permissions' }}</p>
+      <p class="text-gray-600 mt-1">{{ isNew ? 'Send an invitation to create a new user account' : 'Update user details and permissions' }}</p>
+      <div v-if="isNew" class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <p class="text-sm text-blue-800">
+          ℹ️ The user will receive an email invitation to set up their own password and activate their account.
+        </p>
+      </div>
       <div v-if="isEditingSelf" class="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
         <p class="text-sm text-yellow-800">
           ⚠️ You are editing your own account. You cannot change your own role.
@@ -178,31 +153,8 @@ const handleCancel = () => {
           :error="errors.email"
           :required="true"
           :disabled="!isNew"
-          :hint="!isNew ? 'Email cannot be changed after account creation' : ''"
+          :hint="!isNew ? 'Email cannot be changed after account creation' : 'An invitation will be sent to this email address'"
         />
-
-        <!-- Password (only for new users) -->
-        <div v-if="isNew">
-          <BaseInput
-            v-model="form.password"
-            type="password"
-            label="Password"
-            placeholder="Enter password"
-            :error="errors.password"
-            :required="true"
-            hint="At least 8 characters with uppercase, lowercase, and number"
-          />
-
-          <BaseInput
-            v-model="form.confirmPassword"
-            type="password"
-            label="Confirm Password"
-            placeholder="Confirm password"
-            :error="errors.confirmPassword"
-            :required="true"
-            class="mt-4"
-          />
-        </div>
 
         <!-- Name Row -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -253,7 +205,7 @@ const handleCancel = () => {
             variant="primary"
             :loading="submitting"
           >
-            {{ submitting ? 'Saving...' : (isNew ? 'Create User' : 'Update User') }}
+            {{ submitting ? 'Saving...' : (isNew ? 'Send Invitation' : 'Update User') }}
           </BaseButton>
           <BaseButton
             type="button"

@@ -16,6 +16,12 @@ interface AuthTokens {
   idToken: string
 }
 
+interface NewPasswordChallenge {
+  challengeName: 'NEW_PASSWORD_REQUIRED'
+  session: string
+  username: string
+}
+
 export const useAuthStore = defineStore('auth', () => {
   // State
   const user = ref<User | null>(null)
@@ -36,11 +42,60 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       const config = useRuntimeConfig()
+      const response = await $fetch<
+        ({ success: boolean } & AuthTokens) | NewPasswordChallenge
+      >(`${config.public.apiUrl}/api/auth/login`, {
+        method: 'POST',
+        body: { email, password },
+      })
+
+      // Check if password change is required
+      if ('challengeName' in response && response.challengeName === 'NEW_PASSWORD_REQUIRED') {
+        return {
+          requiresPasswordChange: true,
+          session: response.session,
+          username: response.username,
+        }
+      }
+
+      if ('success' in response && response.success) {
+        tokens.value = {
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+          idToken: response.idToken,
+        }
+
+        // Store tokens in localStorage
+        if (process.client) {
+          localStorage.setItem('auth_tokens', JSON.stringify(tokens.value))
+        }
+
+        // Fetch user profile
+        await fetchUserProfile()
+
+        return { requiresPasswordChange: false }
+      }
+
+      return { requiresPasswordChange: false, error: 'Login failed' }
+    } catch (err: any) {
+      error.value = err.data?.message || 'Login failed'
+      return { requiresPasswordChange: false, error: err.data?.message || 'Login failed' }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function completeNewPassword(username: string, newPassword: string, session: string) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const config = useRuntimeConfig()
       const response = await $fetch<{ success: boolean } & AuthTokens>(
-        `${config.public.apiUrl}/api/auth/login`,
+        `${config.public.apiUrl}/api/auth/complete-new-password`,
         {
           method: 'POST',
-          body: { email, password },
+          body: { username, newPassword, session },
         }
       )
 
@@ -64,7 +119,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       return false
     } catch (err: any) {
-      error.value = err.data?.message || 'Login failed'
+      error.value = err.data?.message || 'Password change failed'
       return false
     } finally {
       loading.value = false
@@ -85,8 +140,6 @@ export const useAuthStore = defineStore('auth', () => {
           },
         }
       )
-
-      console.log('User profile fetched:', response)
       user.value = response
     } catch (err: any) {
       console.error('Failed to fetch user profile:', err)
@@ -274,6 +327,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     // Actions
     login,
+    completeNewPassword,
     logout,
     refreshTokens,
     changePassword,

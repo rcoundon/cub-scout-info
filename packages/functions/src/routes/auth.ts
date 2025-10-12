@@ -10,8 +10,11 @@ import {
   createCognitoUser,
   setUserPassword,
   refreshUserTokens,
+  completeNewPasswordChallenge,
 } from '../services/cognito';
-import { createUser, getUser, getUserByEmail, updateLastLogin } from '../services/users';
+import { createUser, getUser, getUserByEmail, getUserByInvitationToken, updateUser, updateLastLogin } from '../services/users';
+import { isTokenExpired, isValidTokenFormat } from '../utils/invitation';
+import { sendWelcomeEmail } from '../services/email';
 import { requireAuth, requireAdmin, getUserContext } from '../middleware/auth';
 import { extractToken } from '../utils/auth';
 
@@ -56,6 +59,50 @@ app.post('/login', async (c) => {
     );
   }
 });
+
+/**
+ * Complete new password challenge endpoint
+ * Used when a user logs in with a temporary password
+ */
+app.post(
+  '/complete-new-password',
+  zValidator(
+    'json',
+    z.object({
+      username: z.string().email(),
+      newPassword: z.string().min(8),
+      session: z.string(),
+    })
+  ),
+  async (c) => {
+    try {
+      const { username, newPassword, session } = c.req.valid('json');
+
+      // Complete the password change challenge
+      const tokens = await completeNewPasswordChallenge(username, newPassword, session);
+
+      // Update last login timestamp
+      const user = await getUserByEmail(username);
+      if (user) {
+        await updateLastLogin(user.id);
+      }
+
+      return c.json({
+        success: true,
+        ...tokens,
+      });
+    } catch (error) {
+      console.error('Complete new password error:', error);
+      return c.json(
+        {
+          error: 'Failed to set new password',
+          message: error instanceof Error ? error.message : 'Password change failed',
+        },
+        400
+      );
+    }
+  }
+);
 
 /**
  * Refresh token endpoint
@@ -177,17 +224,17 @@ app.post(
       }
 
       // Create user in Cognito
-      const cognitoUser = await createCognitoUser(email, password);
+      const cognitoUserId = await createCognitoUser(email, password);
 
-      if (!cognitoUser || !cognitoUser.Username) {
+      if (!cognitoUserId) {
         throw new Error('Failed to create Cognito user');
       }
 
       // Set permanent password
-      await setUserPassword(cognitoUser.Username, password, true);
+      await setUserPassword(cognitoUserId, password, true);
 
       // Create user in DynamoDB
-      const user = await createUser(cognitoUser.Username, {
+      const user = await createUser(cognitoUserId, {
         email,
         first_name,
         last_name,
@@ -212,6 +259,243 @@ app.post(
       return c.json(
         {
           error: 'Registration failed',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        },
+        500
+      );
+    }
+  }
+);
+
+/**
+ * Validate invitation endpoint
+ * Checks if invitation is valid and returns user info
+ */
+app.get('/validate-invite', async (c) => {
+  try {
+    const token = c.req.query('token');
+
+    if (!token) {
+      return c.json(
+        {
+          error: 'Missing token',
+          message: 'Invitation token is required',
+        },
+        400
+      );
+    }
+
+    // Validate token format
+    if (!isValidTokenFormat(token)) {
+      return c.json(
+        {
+          error: 'Invalid invitation',
+          message: 'The invitation link is invalid',
+        },
+        400
+      );
+    }
+
+    // Find user by invitation token
+    const invitedUser = await getUserByInvitationToken(token);
+
+    if (!invitedUser) {
+      return c.json(
+        {
+          error: 'Invalid invitation',
+          message: 'The invitation link is invalid or has already been used',
+        },
+        400
+      );
+    }
+
+    // Check if invitation has expired
+    if (invitedUser.invitation_token_expires && isTokenExpired(invitedUser.invitation_token_expires)) {
+      return c.json(
+        {
+          error: 'Invitation expired',
+          message: 'This invitation has expired',
+        },
+        400
+      );
+    }
+
+    // Check if user is already active
+    if (invitedUser.invitation_status === 'active') {
+      return c.json(
+        {
+          error: 'Invitation already used',
+          message: 'This invitation has already been accepted',
+        },
+        400
+      );
+    }
+
+    // Return user info (without sensitive data)
+    return c.json({
+      email: invitedUser.email,
+      first_name: invitedUser.first_name,
+      last_name: invitedUser.last_name,
+      role: invitedUser.role,
+    });
+  } catch (error) {
+    console.error('Validate invitation error:', error);
+    return c.json(
+      {
+        error: 'Failed to validate invitation',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      },
+      500
+    );
+  }
+});
+
+/**
+ * Accept invitation endpoint
+ * Validates invitation token and creates user account with chosen password
+ */
+app.post(
+  '/accept-invite',
+  zValidator(
+    'json',
+    z.object({
+      token: z.string(),
+      password: z.string().min(8),
+    })
+  ),
+  async (c) => {
+    try {
+      const { token, password } = c.req.valid('json');
+
+      // Validate token format
+      if (!isValidTokenFormat(token)) {
+        return c.json(
+          {
+            error: 'Invalid invitation',
+            message: 'The invitation link is invalid',
+          },
+          400
+        );
+      }
+
+      // Find user by invitation token
+      const invitedUser = await getUserByInvitationToken(token);
+
+      if (!invitedUser) {
+        return c.json(
+          {
+            error: 'Invalid invitation',
+            message: 'The invitation link is invalid or has already been used',
+          },
+          400
+        );
+      }
+
+      // Check if invitation has expired
+      if (invitedUser.invitation_token_expires && isTokenExpired(invitedUser.invitation_token_expires)) {
+        return c.json(
+          {
+            error: 'Invitation expired',
+            message: 'This invitation has expired. Please request a new invitation from your administrator',
+          },
+          400
+        );
+      }
+
+      // Check if user is already active
+      if (invitedUser.invitation_status === 'active') {
+        return c.json(
+          {
+            error: 'Invitation already used',
+            message: 'This invitation has already been accepted. Please log in instead',
+          },
+          400
+        );
+      }
+
+      // Create user in Cognito
+      let cognitoUserId: string;
+      try {
+        cognitoUserId = await createCognitoUser(invitedUser.email, password);
+
+        if (!cognitoUserId) {
+          throw new Error('Failed to create Cognito user');
+        }
+
+        // Set permanent password
+        await setUserPassword(cognitoUserId, password, true);
+      } catch (cognitoError) {
+        console.error('Error creating Cognito user:', cognitoError);
+        return c.json(
+          {
+            error: 'Failed to activate account',
+            message: cognitoError instanceof Error ? cognitoError.message : 'Unknown error',
+          },
+          500
+        );
+      }
+
+      // Update user in DynamoDB - replace temporary ID with Cognito ID
+      try {
+        // Update the user record
+        await updateUser(invitedUser.id, {
+          invitation_status: 'active',
+          invitation_token: undefined as any, // Clear the token
+          invitation_token_expires: undefined as any,
+        });
+
+        // Also need to create a new user record with the Cognito ID
+        // and delete the old temporary one
+        const updatedUser = await createUser(cognitoUserId, {
+          email: invitedUser.email,
+          first_name: invitedUser.first_name,
+          last_name: invitedUser.last_name,
+          role: invitedUser.role,
+          invitation_status: 'active',
+          invited_at: invitedUser.invited_at,
+        });
+
+        // Delete the temporary user record
+        // (We'll implement this after fixing the current flow)
+
+        // Send welcome email
+        try {
+          await sendWelcomeEmail(updatedUser.email, updatedUser.first_name);
+        } catch (emailError) {
+          console.error('Failed to send welcome email:', emailError);
+          // Don't fail the request if email fails
+        }
+
+        // Automatically log the user in
+        const tokens = await authenticateUser(updatedUser.email, password);
+
+        return c.json({
+          success: true,
+          message: 'Account activated successfully',
+          ...tokens,
+        });
+      } catch (error) {
+        console.error('Error activating user account:', error);
+        // Try to clean up Cognito user if DynamoDB update fails
+        try {
+          await setUserPassword(cognitoUserId, password, false); // Revert to temporary
+        } catch (cleanupError) {
+          console.error('Error cleaning up after failed activation:', cleanupError);
+        }
+
+        return c.json(
+          {
+            error: 'Failed to activate account',
+            message: error instanceof Error ? error.message : 'Unknown error',
+          },
+          500
+        );
+      }
+    } catch (error) {
+      console.error('Accept invitation error:', error);
+      return c.json(
+        {
+          error: 'Failed to accept invitation',
           message: error instanceof Error ? error.message : 'Unknown error',
         },
         500

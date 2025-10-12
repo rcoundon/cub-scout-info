@@ -93,6 +93,11 @@ const navItems = [
     path: '/admin/users',
     icon: 'svg',
   },
+  {
+    label: 'Help',
+    path: '/admin/help',
+    icon: 'svg',
+  },
 ]
 
 const isActivePath = (path: string) => {

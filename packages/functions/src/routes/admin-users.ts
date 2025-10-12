@@ -10,8 +10,14 @@ import {
   deleteUser,
   updateUserRole,
 } from '../services/users';
-import { createCognitoUser, deleteUserFromCognito } from '../services/cognito';
+import { deleteUserFromCognito } from '../services/cognito';
 import { requireAdmin, getUserContext } from '../middleware/auth';
+import {
+  generateInvitationToken,
+  calculateTokenExpiration,
+  generateTemporaryUserId
+} from '../utils/invitation';
+import { sendInvitationEmail } from '../services/email';
 
 const app = new Hono();
 
@@ -44,8 +50,8 @@ app.get('/', requireAdmin, async (c) => {
 });
 
 /**
- * POST /api/admin/users - Create new user
- * Creates user in both Cognito and DynamoDB
+ * POST /api/admin/users - Invite new user
+ * Creates user invitation and sends invitation email
  */
 app.post(
   '/',
@@ -54,7 +60,6 @@ app.post(
     'json',
     z.object({
       email: z.string().email(),
-      password: z.string().min(8),
       first_name: z.string().min(1),
       last_name: z.string().min(1),
       role: z.enum(['admin', 'editor', 'viewer']),
@@ -63,6 +68,7 @@ app.post(
   async (c) => {
     try {
       const userData = c.req.valid('json');
+      const currentUser = getUserContext(c);
 
       // Check if user already exists
       const existingUser = await getUserByEmail(userData.email);
@@ -76,30 +82,43 @@ app.post(
         );
       }
 
-      // Create user in Cognito first
-      let cognitoUserId: string;
-      try {
-        cognitoUserId = await createCognitoUser(userData.email, userData.password);
-      } catch (cognitoError) {
-        console.error('Error creating Cognito user:', cognitoError);
-        return c.json(
-          {
-            error: 'Failed to create user in authentication system',
-            message: cognitoError instanceof Error ? cognitoError.message : 'Unknown error',
-          },
-          500
-        );
-      }
+      // Generate invitation token and expiration
+      const invitationToken = generateInvitationToken();
+      const tokenExpires = calculateTokenExpiration(72); // 72 hours
+      const temporaryUserId = generateTemporaryUserId();
 
-      // Create user in DynamoDB
+      // Create user in DynamoDB with invitation status
       try {
-        const newUser = await createUser({
-          id: cognitoUserId,
+        const newUser = await createUser(temporaryUserId, {
           email: userData.email,
           first_name: userData.first_name,
           last_name: userData.last_name,
           role: userData.role,
+          invitation_token: invitationToken,
+          invitation_token_expires: tokenExpires,
+          invitation_status: 'invited',
+          invited_at: new Date().toISOString(),
         });
+
+        // Send invitation email
+        try {
+          // Get inviter's name
+          const inviter = await getUser(currentUser.userId);
+          const inviterName = inviter
+            ? `${inviter.first_name} ${inviter.last_name}`
+            : 'An administrator';
+
+          await sendInvitationEmail({
+            toEmail: userData.email,
+            toName: `${userData.first_name} ${userData.last_name}`,
+            invitedBy: inviterName,
+            token: invitationToken,
+            role: userData.role,
+          });
+        } catch (emailError) {
+          console.error('Failed to send invitation email:', emailError);
+          // Don't fail the request if email fails - admin can resend
+        }
 
         return c.json(
           {
@@ -110,32 +129,29 @@ app.post(
               role: newUser.role,
               first_name: newUser.first_name,
               last_name: newUser.last_name,
+              invitation_status: newUser.invitation_status,
+              invited_at: newUser.invited_at,
               created_at: newUser.created_at,
             },
+            message: 'Invitation sent successfully',
           },
           201
         );
       } catch (dbError) {
-        // If DynamoDB creation fails, try to clean up Cognito user
-        console.error('Error creating user in database:', dbError);
-        try {
-          await deleteUserFromCognito(cognitoUserId);
-        } catch (cleanupError) {
-          console.error('Error cleaning up Cognito user:', cleanupError);
-        }
+        console.error('Error creating user invitation:', dbError);
         return c.json(
           {
-            error: 'Failed to create user',
+            error: 'Failed to create invitation',
             message: dbError instanceof Error ? dbError.message : 'Unknown error',
           },
           500
         );
       }
     } catch (error) {
-      console.error('Error creating user:', error);
+      console.error('Error creating user invitation:', error);
       return c.json(
         {
-          error: 'Failed to create user',
+          error: 'Failed to create invitation',
           message: error instanceof Error ? error.message : 'Unknown error',
         },
         500

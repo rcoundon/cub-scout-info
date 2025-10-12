@@ -3,6 +3,7 @@ import {
   AdminCreateUserCommand,
   AdminSetUserPasswordCommand,
   AdminInitiateAuthCommand,
+  AdminRespondToAuthChallengeCommand,
   AdminUserGlobalSignOutCommand,
   AdminGetUserCommand,
   AdminUpdateUserAttributesCommand,
@@ -44,7 +45,12 @@ export async function createCognitoUser(email: string, temporaryPassword: string
   });
 
   const response = await client.send(command);
-  return response.User;
+
+  if (!response.User?.Username) {
+    throw new Error('Failed to create user: No username returned from Cognito');
+  }
+
+  return response.User.Username;
 }
 
 /**
@@ -63,7 +69,7 @@ export async function setUserPassword(username: string, password: string, perman
 
 /**
  * Authenticate a user with username and password
- * Returns JWT tokens on success
+ * Returns JWT tokens on success or challenge info if password change required
  */
 export async function authenticateUser(email: string, password: string) {
   const command = new AdminInitiateAuthCommand({
@@ -78,8 +84,51 @@ export async function authenticateUser(email: string, password: string) {
 
   const response = await client.send(command);
 
+  // Handle NEW_PASSWORD_REQUIRED challenge
+  if (response.ChallengeName === 'NEW_PASSWORD_REQUIRED') {
+    return {
+      challengeName: 'NEW_PASSWORD_REQUIRED',
+      session: response.Session,
+      username: email,
+    };
+  }
+
   if (!response.AuthenticationResult) {
     throw new Error('Authentication failed: No tokens returned');
+  }
+
+  return {
+    accessToken: response.AuthenticationResult.AccessToken,
+    idToken: response.AuthenticationResult.IdToken,
+    refreshToken: response.AuthenticationResult.RefreshToken,
+    expiresIn: response.AuthenticationResult.ExpiresIn,
+  };
+}
+
+/**
+ * Complete the NEW_PASSWORD_REQUIRED challenge
+ * Used when a user logs in with a temporary password
+ */
+export async function completeNewPasswordChallenge(
+  username: string,
+  newPassword: string,
+  session: string
+) {
+  const command = new AdminRespondToAuthChallengeCommand({
+    UserPoolId: Resource.CubsSiteAuth.id,
+    ClientId: process.env.USER_POOL_CLIENT_ID || '',
+    ChallengeName: 'NEW_PASSWORD_REQUIRED',
+    ChallengeResponses: {
+      USERNAME: username,
+      NEW_PASSWORD: newPassword,
+    },
+    Session: session,
+  });
+
+  const response = await client.send(command);
+
+  if (!response.AuthenticationResult) {
+    throw new Error('Password change failed: No tokens returned');
   }
 
   return {
