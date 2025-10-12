@@ -79,12 +79,12 @@
 - [x] Add category support (general, event, fundraising, urgent, achievement)
 
 ### 2.6 File Upload System
-- [ ] Configure S3 bucket for file storage
-- [ ] Set up secure S3 access policies
-- [ ] Implement file upload endpoint
-- [ ] Add file type and size validation
-- [ ] Create pre-signed URL generation for downloads
-- [ ] Implement file deletion
+- [x] Configure S3 bucket for file storage
+- [x] Set up secure S3 access policies
+- [x] Implement file upload endpoint
+- [x] Add file type and size validation (PDF, Word, Excel, images, TXT up to 10MB)
+- [x] Create pre-signed URL generation for downloads
+- [x] Implement file deletion
 - [ ] Add virus scanning (optional - AWS S3 ClamAV)
 
 ### 2.7 User Management API (Admin)
