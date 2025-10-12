@@ -57,7 +57,7 @@ const emit = defineEmits<{
   blur: []
 }>()
 
-const inputId = computed(() => `input-${Math.random().toString(36).substr(2, 9)}`)
+const inputId = `input-${useId()}`
 
 const inputClasses = computed(() => {
   const base = 'input'
