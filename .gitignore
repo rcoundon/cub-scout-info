@@ -60,6 +60,9 @@ sst-env.d.ts
 coverage/
 *.lcov
 .nyc_output/
+test-results/
+playwright-report/
+playwright/.cache/
 
 # Temporary files
 *.tmp
