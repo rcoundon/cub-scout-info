@@ -21,7 +21,6 @@ export default defineNuxtConfig({
       userPoolClientId: process.env.NUXT_PUBLIC_USER_POOL_CLIENT_ID || '',
     },
   },
-
   typescript: {
     strict: true,
     typeCheck: false,

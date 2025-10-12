@@ -27,6 +27,7 @@ const form = ref({
 
 const errors = ref<Record<string, string>>({})
 const submitting = ref(false)
+const attachments = ref<any[]>([])
 
 onMounted(async () => {
   if (!isNew.value) {
@@ -39,6 +40,17 @@ onMounted(async () => {
         category: announcement.category || 'general',
         status: announcement.status,
         expires_at: announcement.expires_at ? new Date(announcement.expires_at).toISOString().slice(0, 16) : '',
+      }
+
+      // Load attachments
+      try {
+        const config = useRuntimeConfig()
+        const response = await $fetch<{ attachments: any[] }>(
+          `${config.public.apiUrl}/api/announcements/${route.params.id}/attachments`
+        )
+        attachments.value = response.attachments
+      } catch (error) {
+        console.error('Failed to load attachments:', error)
       }
     } else {
       router.push('/admin/announcements')
@@ -185,6 +197,17 @@ const handleCancel = () => {
           label="Expiry Date & Time"
           hint="Leave empty if announcement doesn't expire"
         />
+
+        <!-- File Attachments (only for existing announcements) -->
+        <div v-if="!isNew" class="border-t border-gray-200 pt-6">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">File Attachments</h3>
+          <p class="text-sm text-gray-600 mb-4">Upload documents, forms, or images related to this announcement.</p>
+          <FileUpload
+            v-model="attachments"
+            parent-type="announcements"
+            :parent-id="route.params.id as string"
+          />
+        </div>
 
         <!-- Actions -->
         <div class="flex gap-4 pt-4">

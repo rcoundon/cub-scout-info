@@ -19,7 +19,8 @@ const s3Client = new S3Client({});
  * Generate a presigned URL for uploading a file to S3
  */
 export async function generateUploadUrl(
-  eventId: string,
+  parentType: 'event' | 'announcement',
+  parentId: string,
   fileName: string,
   fileType: string,
   uploadedBy: string
@@ -28,8 +29,8 @@ export async function generateUploadUrl(
   const attachmentId = crypto.randomUUID();
 
   // Create S3 key with organized folder structure
-  // Format: events/{eventId}/attachments/{attachmentId}/{fileName}
-  const s3Key = `events/${eventId}/attachments/${attachmentId}/${fileName}`;
+  // Format: {parentType}s/{parentId}/attachments/{attachmentId}/{fileName}
+  const s3Key = `${parentType}s/${parentId}/attachments/${attachmentId}/${fileName}`;
 
   // Create presigned URL for upload (expires in 5 minutes)
   const command = new PutObjectCommand({
@@ -47,24 +48,38 @@ export async function generateUploadUrl(
   };
 }
 
+// Backwards compatibility wrapper for events
+export async function generateUploadUrlForEvent(
+  eventId: string,
+  fileName: string,
+  fileType: string,
+  uploadedBy: string
+) {
+  return generateUploadUrl('event', eventId, fileName, fileType, uploadedBy);
+}
+
 /**
  * Create attachment metadata in DynamoDB after successful upload
  */
 export async function createAttachment(
-  eventId: string,
+  parentType: 'event' | 'announcement',
+  parentId: string,
   attachmentId: string,
   fileName: string,
+  originalName: string,
   fileSize: number,
-  fileType: string,
+  contentType: string,
   s3Key: string,
   uploadedBy: string
 ) {
   const result = await AttachmentEntity.create({
     id: attachmentId,
-    event_id: eventId,
+    parent_type: parentType,
+    parent_id: parentId,
     file_name: fileName,
+    original_name: originalName,
     file_size: fileSize,
-    file_type: fileType,
+    content_type: contentType,
     s3_key: s3Key,
     uploaded_by: uploadedBy,
   }).go();
@@ -75,20 +90,36 @@ export async function createAttachment(
 /**
  * Get attachment by ID
  */
-export async function getAttachment(eventId: string, attachmentId: string) {
+export async function getAttachment(
+  parentType: 'event' | 'announcement',
+  parentId: string,
+  attachmentId: string
+) {
   const result = await AttachmentEntity.get({
-    event_id: eventId,
+    parent_type: parentType,
+    parent_id: parentId,
     id: attachmentId
   }).go();
   return result.data || null;
 }
 
 /**
- * List all attachments for an event
+ * List all attachments for a parent (event or announcement)
  */
-export async function getEventAttachments(eventId: string) {
-  const result = await AttachmentEntity.query.primary({ event_id: eventId }).go();
+export async function getAttachments(
+  parentType: 'event' | 'announcement',
+  parentId: string
+) {
+  const result = await AttachmentEntity.query.primary({
+    parent_type: parentType,
+    parent_id: parentId
+  }).go();
   return result.data;
+}
+
+// Backwards compatibility wrapper for events
+export async function getEventAttachments(eventId: string) {
+  return getAttachments('event', eventId);
 }
 
 /**
@@ -108,9 +139,13 @@ export async function generateDownloadUrl(s3Key: string): Promise<string> {
 /**
  * Delete attachment (removes from both S3 and DynamoDB)
  */
-export async function deleteAttachment(eventId: string, attachmentId: string) {
+export async function deleteAttachment(
+  parentType: 'event' | 'announcement',
+  parentId: string,
+  attachmentId: string
+) {
   // First get the attachment to know the S3 key
-  const attachment = await getAttachment(eventId, attachmentId);
+  const attachment = await getAttachment(parentType, parentId, attachmentId);
 
   if (!attachment) {
     return false;
@@ -126,7 +161,8 @@ export async function deleteAttachment(eventId: string, attachmentId: string) {
 
   // Delete from DynamoDB
   await AttachmentEntity.delete({
-    event_id: eventId,
+    parent_type: parentType,
+    parent_id: parentId,
     id: attachmentId
   }).go();
 
@@ -142,6 +178,8 @@ export function validateFile(fileName: string, fileSize: number, fileType: strin
     'application/pdf',
     'application/msword',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'image/jpeg',
     'image/png',
     'image/gif',
@@ -154,7 +192,7 @@ export function validateFile(fileName: string, fileSize: number, fileType: strin
   }
 
   if (!allowedTypes.includes(fileType)) {
-    return { valid: false, error: 'File type not allowed. Allowed types: PDF, DOC, DOCX, images (JPEG, PNG, GIF, WebP), TXT' };
+    return { valid: false, error: 'File type not allowed. Allowed types: PDF, Word (DOC/DOCX), Excel (XLS/XLSX), images (JPEG, PNG, GIF, WebP), TXT' };
   }
 
   return { valid: true };

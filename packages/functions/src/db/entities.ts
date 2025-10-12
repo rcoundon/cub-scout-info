@@ -319,7 +319,8 @@ export const AnnouncementEntity = new Entity(
 );
 
 /**
- * Event Attachment Entity
+ * Attachment Entity
+ * Supports attachments for events and announcements
  */
 export const AttachmentEntity = new Entity(
   {
@@ -335,7 +336,11 @@ export const AttachmentEntity = new Entity(
         readOnly: true,
         default: () => crypto.randomUUID(),
       },
-      event_id: {
+      parent_type: {
+        type: ['event', 'announcement'] as const,
+        required: true,
+      },
+      parent_id: {
         type: 'string',
         required: true,
       },
@@ -343,11 +348,15 @@ export const AttachmentEntity = new Entity(
         type: 'string',
         required: true,
       },
+      original_name: {
+        type: 'string',
+        required: true,
+      },
       file_size: {
         type: 'number',
         required: true,
       },
-      file_type: {
+      content_type: {
         type: 'string',
         required: true,
       },
@@ -370,8 +379,8 @@ export const AttachmentEntity = new Entity(
       primary: {
         pk: {
           field: 'PK',
-          composite: ['event_id'],
-          template: 'EVENT#${event_id}',
+          composite: ['parent_type', 'parent_id'],
+          template: '${parent_type}#${parent_id}',
         },
         sk: {
           field: 'SK',

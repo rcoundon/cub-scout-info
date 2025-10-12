@@ -40,6 +40,7 @@ const form = ref({
 
 const errors = ref<Record<string, string>>({})
 const submitting = ref(false)
+const attachments = ref<any[]>([])
 
 // Watch for recurring checkbox changes
 watch(() => form.value.is_recurring, (isRecurring) => {
@@ -116,6 +117,17 @@ onMounted(async () => {
         is_recurring: event.is_recurring || false,
         recurrence_frequency: recurrence.frequency as 'WEEKLY' | 'DAILY' | 'MONTHLY',
         recurrence_end_date: recurrence.endDate,
+      }
+
+      // Load attachments
+      try {
+        const config = useRuntimeConfig()
+        const response = await $fetch<{ attachments: any[] }>(
+          `${config.public.apiUrl}/api/events/${route.params.id}/attachments`
+        )
+        attachments.value = response.attachments
+      } catch (error) {
+        console.error('Failed to load attachments:', error)
       }
     } else {
       router.push('/admin/events')
@@ -516,6 +528,17 @@ const handleCancel = () => {
           <p class="mt-2 text-sm text-red-700">
             ℹ️ This event will remain visible to the public with a prominent cancellation notice.
           </p>
+        </div>
+
+        <!-- File Attachments (only for existing events) -->
+        <div v-if="!isNew" class="border-t border-gray-200 pt-6">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">File Attachments</h3>
+          <p class="text-sm text-gray-600 mb-4">Upload documents, forms, or images related to this event.</p>
+          <FileUpload
+            v-model="attachments"
+            parent-type="events"
+            :parent-id="route.params.id as string"
+          />
         </div>
 
         <!-- Submit Error -->

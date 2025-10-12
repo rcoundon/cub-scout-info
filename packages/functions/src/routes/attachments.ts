@@ -4,24 +4,35 @@ import { z } from 'zod';
 import {
   generateUploadUrl,
   createAttachment,
-  getEventAttachments,
+  getAttachments,
   getAttachment,
   generateDownloadUrl,
   deleteAttachment,
   validateFile,
 } from '../services/attachments';
 import { getEvent } from '../services/events';
+import { getAnnouncement } from '../services/announcements';
 import { requireAuth, requireEditor, getUserContext } from '../middleware/auth';
 
 const app = new Hono();
 
+// Helper function to verify parent exists
+async function verifyParent(parentType: 'event' | 'announcement', parentId: string) {
+  if (parentType === 'event') {
+    return await getEvent(parentId);
+  } else {
+    return await getAnnouncement(parentId);
+  }
+}
+
 /**
- * POST /api/events/:eventId/attachments/upload-url
+ * POST /api/:parentType/:parentId/attachments/upload-url
  * Generate a presigned URL for uploading a file
  * Requires editor role
+ * parentType: 'events' or 'announcements'
  */
 app.post(
-  '/events/:eventId/attachments/upload-url',
+  '/:parentType/:parentId/attachments/upload-url',
   requireEditor,
   zValidator(
     'json',
@@ -33,14 +44,22 @@ app.post(
   ),
   async (c) => {
     try {
-      const eventId = c.req.param('eventId');
+      const parentTypeParam = c.req.param('parentType');
+      const parentId = c.req.param('parentId');
       const { fileName, fileSize, fileType } = c.req.valid('json');
       const user = getUserContext(c);
 
-      // Verify event exists
-      const event = await getEvent(eventId);
-      if (!event) {
-        return c.json({ error: 'Event not found' }, 404);
+      // Validate parent type
+      if (parentTypeParam !== 'events' && parentTypeParam !== 'announcements') {
+        return c.json({ error: 'Invalid parent type' }, 400);
+      }
+
+      const parentType = parentTypeParam === 'events' ? 'event' : 'announcement';
+
+      // Verify parent exists
+      const parent = await verifyParent(parentType, parentId);
+      if (!parent) {
+        return c.json({ error: `${parentType === 'event' ? 'Event' : 'Announcement'} not found` }, 404);
       }
 
       // Validate file
@@ -51,7 +70,8 @@ app.post(
 
       // Generate presigned upload URL
       const { uploadUrl, attachmentId, s3Key } = await generateUploadUrl(
-        eventId,
+        parentType,
+        parentId,
         fileName,
         fileType,
         user.userId
@@ -78,42 +98,54 @@ app.post(
 );
 
 /**
- * POST /api/events/:eventId/attachments
+ * POST /api/:parentType/:parentId/attachments
  * Confirm file upload and create attachment metadata
  * Requires editor role
+ * parentType: 'events' or 'announcements'
  */
 app.post(
-  '/events/:eventId/attachments',
+  '/:parentType/:parentId/attachments',
   requireEditor,
   zValidator(
     'json',
     z.object({
       attachmentId: z.string().uuid(),
       fileName: z.string().min(1).max(255),
+      originalName: z.string().min(1).max(255),
       fileSize: z.number().positive(),
-      fileType: z.string().min(1),
+      contentType: z.string().min(1),
       s3Key: z.string().min(1),
     })
   ),
   async (c) => {
     try {
-      const eventId = c.req.param('eventId');
-      const { attachmentId, fileName, fileSize, fileType, s3Key } = c.req.valid('json');
+      const parentTypeParam = c.req.param('parentType');
+      const parentId = c.req.param('parentId');
+      const { attachmentId, fileName, originalName, fileSize, contentType, s3Key } = c.req.valid('json');
       const user = getUserContext(c);
 
-      // Verify event exists
-      const event = await getEvent(eventId);
-      if (!event) {
-        return c.json({ error: 'Event not found' }, 404);
+      // Validate parent type
+      if (parentTypeParam !== 'events' && parentTypeParam !== 'announcements') {
+        return c.json({ error: 'Invalid parent type' }, 400);
+      }
+
+      const parentType = parentTypeParam === 'events' ? 'event' : 'announcement';
+
+      // Verify parent exists
+      const parent = await verifyParent(parentType, parentId);
+      if (!parent) {
+        return c.json({ error: `${parentType === 'event' ? 'Event' : 'Announcement'} not found` }, 404);
       }
 
       // Create attachment metadata
       const attachment = await createAttachment(
-        eventId,
+        parentType,
+        parentId,
         attachmentId,
         fileName,
+        originalName,
         fileSize,
-        fileType,
+        contentType,
         s3Key,
         user.userId
       );
@@ -139,21 +171,30 @@ app.post(
 );
 
 /**
- * GET /api/events/:eventId/attachments
- * List all attachments for an event (public if event is published)
+ * GET /api/:parentType/:parentId/attachments
+ * List all attachments for a parent (public if parent is published)
+ * parentType: 'events' or 'announcements'
  */
-app.get('/events/:eventId/attachments', async (c) => {
+app.get('/:parentType/:parentId/attachments', async (c) => {
   try {
-    const eventId = c.req.param('eventId');
+    const parentTypeParam = c.req.param('parentType');
+    const parentId = c.req.param('parentId');
 
-    // Verify event exists
-    const event = await getEvent(eventId);
-    if (!event) {
-      return c.json({ error: 'Event not found' }, 404);
+    // Validate parent type
+    if (parentTypeParam !== 'events' && parentTypeParam !== 'announcements') {
+      return c.json({ error: 'Invalid parent type' }, 400);
+    }
+
+    const parentType = parentTypeParam === 'events' ? 'event' : 'announcement';
+
+    // Verify parent exists
+    const parent = await verifyParent(parentType, parentId);
+    if (!parent) {
+      return c.json({ error: `${parentType === 'event' ? 'Event' : 'Announcement'} not found` }, 404);
     }
 
     // Get attachments
-    const attachments = await getEventAttachments(eventId);
+    const attachments = await getAttachments(parentType, parentId);
 
     return c.json({ attachments });
   } catch (error) {
@@ -163,24 +204,33 @@ app.get('/events/:eventId/attachments', async (c) => {
 });
 
 /**
- * GET /api/attachments/:eventId/:attachmentId/download-url
- * Generate presigned download URL (public if event is published)
+ * GET /api/attachments/:parentType/:parentId/:attachmentId/download-url
+ * Generate presigned download URL (public if parent is published)
+ * parentType: 'events' or 'announcements'
  */
-app.get('/attachments/:eventId/:attachmentId/download-url', async (c) => {
+app.get('/attachments/:parentType/:parentId/:attachmentId/download-url', async (c) => {
   try {
-    const eventId = c.req.param('eventId');
+    const parentTypeParam = c.req.param('parentType');
+    const parentId = c.req.param('parentId');
     const attachmentId = c.req.param('attachmentId');
 
+    // Validate parent type
+    if (parentTypeParam !== 'events' && parentTypeParam !== 'announcements') {
+      return c.json({ error: 'Invalid parent type' }, 400);
+    }
+
+    const parentType = parentTypeParam === 'events' ? 'event' : 'announcement';
+
     // Get attachment
-    const attachment = await getAttachment(eventId, attachmentId);
+    const attachment = await getAttachment(parentType, parentId, attachmentId);
     if (!attachment) {
       return c.json({ error: 'Attachment not found' }, 404);
     }
 
-    // Verify event exists
-    const event = await getEvent(eventId);
-    if (!event) {
-      return c.json({ error: 'Event not found' }, 404);
+    // Verify parent exists
+    const parent = await verifyParent(parentType, parentId);
+    if (!parent) {
+      return c.json({ error: `${parentType === 'event' ? 'Event' : 'Announcement'} not found` }, 404);
     }
 
     // Generate download URL
@@ -190,8 +240,9 @@ app.get('/attachments/:eventId/:attachmentId/download-url', async (c) => {
       success: true,
       downloadUrl,
       fileName: attachment.file_name,
+      originalName: attachment.original_name,
       fileSize: attachment.file_size,
-      fileType: attachment.file_type,
+      contentType: attachment.content_type,
       expiresIn: 3600, // 1 hour
     });
   } catch (error) {
@@ -201,15 +252,24 @@ app.get('/attachments/:eventId/:attachmentId/download-url', async (c) => {
 });
 
 /**
- * DELETE /api/attachments/:eventId/:attachmentId
+ * DELETE /api/attachments/:parentType/:parentId/:attachmentId
  * Delete an attachment (requires editor role)
+ * parentType: 'events' or 'announcements'
  */
-app.delete('/attachments/:eventId/:attachmentId', requireEditor, async (c) => {
+app.delete('/attachments/:parentType/:parentId/:attachmentId', requireEditor, async (c) => {
   try {
-    const eventId = c.req.param('eventId');
+    const parentTypeParam = c.req.param('parentType');
+    const parentId = c.req.param('parentId');
     const attachmentId = c.req.param('attachmentId');
 
-    const deleted = await deleteAttachment(eventId, attachmentId);
+    // Validate parent type
+    if (parentTypeParam !== 'events' && parentTypeParam !== 'announcements') {
+      return c.json({ error: 'Invalid parent type' }, 400);
+    }
+
+    const parentType = parentTypeParam === 'events' ? 'event' : 'announcement';
+
+    const deleted = await deleteAttachment(parentType, parentId, attachmentId);
 
     if (!deleted) {
       return c.json({ error: 'Attachment not found' }, 404);

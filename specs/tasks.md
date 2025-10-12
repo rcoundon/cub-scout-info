@@ -47,32 +47,36 @@
 - [x] Create authentication middleware
 
 ### 2.3 API Development - Core Endpoints
-- [ ] Set up Hono with AWS Lambda adapter
-- [ ] Configure API routing with Hono
-- [ ] Implement error handling middleware
-- [ ] Set up request validation (using Zod or Hono validator)
-- [ ] Implement logging middleware
+- [x] Set up Hono with AWS Lambda adapter
+- [x] Configure API routing with Hono
+- [x] Implement error handling middleware
+- [x] Set up request validation (using Zod)
+- [x] Implement logging middleware
 
 ### 2.4 Events API
-- [ ] Create event model and repository
-- [ ] Implement GET /api/events (public - list events)
-- [ ] Implement GET /api/events/:id (public - event details)
-- [ ] Implement POST /api/admin/events (create event)
-- [ ] Implement PUT /api/admin/events/:id (update event)
-- [ ] Implement DELETE /api/admin/events/:id (delete event)
-- [ ] Implement POST /api/admin/events/:id/duplicate
-- [ ] Add event filtering and search functionality
-- [ ] Implement recurring event logic
-- [ ] Create iCal export functionality
+- [x] Create event model and repository (ElectroDB)
+- [x] Implement GET /api/events (public - list events)
+- [x] Implement GET /api/events/:id (public - event details)
+- [x] Implement POST /api/events (create event)
+- [x] Implement PUT /api/events/:id (update event)
+- [x] Implement DELETE /api/events/:id (delete event)
+- [x] Implement GET /api/events/admin/all (admin - all events)
+- [x] Add event filtering and search functionality
+- [x] Implement recurring event logic
+- [x] Create iCal export functionality (calendar.ics endpoint)
+- [x] Add event cancellation support
+- [x] Add fundraising event type
 
 ### 2.5 Announcements API
-- [ ] Create announcement model and repository
-- [ ] Implement GET /api/announcements (public)
-- [ ] Implement POST /api/admin/announcements
-- [ ] Implement PUT /api/admin/announcements/:id
-- [ ] Implement DELETE /api/admin/announcements/:id
-- [ ] Implement announcement expiry logic
-- [ ] Add priority sorting
+- [x] Create announcement model and repository (ElectroDB)
+- [x] Implement GET /api/announcements (public)
+- [x] Implement POST /api/announcements (create announcement)
+- [x] Implement PUT /api/announcements/:id (update announcement)
+- [x] Implement DELETE /api/announcements/:id (delete announcement)
+- [x] Implement GET /api/announcements/admin/all (admin - all announcements)
+- [x] Implement announcement expiry logic
+- [x] Add priority sorting
+- [x] Add category support (general, event, fundraising, urgent, achievement)
 
 ### 2.6 File Upload System
 - [ ] Configure S3 bucket for file storage
@@ -84,10 +88,10 @@
 - [ ] Add virus scanning (optional - AWS S3 ClamAV)
 
 ### 2.7 User Management API (Admin)
-- [ ] Implement GET /api/admin/users
-- [ ] Implement POST /api/admin/users
-- [ ] Implement PUT /api/admin/users/:id
-- [ ] Implement DELETE /api/admin/users/:id
+- [x] Implement GET /api/admin/users
+- [x] Implement POST /api/admin/users
+- [x] Implement PUT /api/admin/users/:id
+- [x] Implement DELETE /api/admin/users/:id
 - [ ] Add user activity tracking
 
 ### 2.8 Additional Features
@@ -99,83 +103,110 @@
 ## Phase 3: Frontend Development (Week 6-9)
 
 ### 3.1 Design System Setup
-- [ ] Choose and install UI framework (Vuetify 3 or Tailwind CSS)
-- [ ] Create design tokens (colors, spacing, typography)
-- [ ] Build common components (Button, Input, Card, etc.)
-- [ ] Create layout components (Header, Footer, Navigation)
-- [ ] Implement responsive navigation with mobile menu
-- [ ] Set up theming (if needed)
+- [x] Choose and install UI framework (Tailwind CSS)
+- [x] Create design tokens (colors, spacing, typography)
+- [x] Build common components (Button, Input, Card, etc.)
+- [x] Create layout components (Header, Footer, Navigation)
+- [x] Implement responsive navigation with mobile menu
+- [x] Set up theming (Scout colors - primary, secondary, accent)
+- [x] Fix button sizing consistency across components
 
 ### 3.2 Authentication UI
-- [ ] Create login page (pages/login.vue)
-- [ ] Create password reset flow
-- [ ] Implement auth state management (Pinia store)
-- [ ] Create auth middleware for protected routes
+- [x] Create login page (pages/login.vue)
+- [x] Create password reset flow
+- [x] Implement auth state management (Pinia store)
+- [x] Create auth middleware for protected routes (admin, editor)
 - [ ] Add session timeout handling
 - [ ] Implement "Remember me" functionality
 
 ### 3.3 Public Pages
-- [ ] Create home page
-  - [ ] Announcements section
-  - [ ] Upcoming events preview
-  - [ ] Hero section with division info
-- [ ] Create events list page
-  - [ ] Event cards with summary
-  - [ ] Filtering options
-  - [ ] Search functionality
-- [ ] Create event detail page
-  - [ ] Full event information display
-  - [ ] Download attachments
-  - [ ] Export to calendar button
-- [ ] Create calendar view page
-  - [ ] Integrate calendar component
-  - [ ] Month/week/day views
-  - [ ] Event click handlers
-- [ ] Create about page
-- [ ] Create contact page with form
+- [x] Create home page (pages/index.vue)
+  - [x] Hero section with division info and "When We Meet" section
+  - [x] Upcoming events preview by age group
+  - [x] Quick access cards for Events, Announcements, Resources
+- [x] Create events list page (pages/events/index.vue)
+  - [x] Event cards with summary, date, time, location
+  - [x] Age group filtering (Beavers/Cubs/Scouts) with localStorage persistence
+  - [x] Event type filtering (Meeting/Camp/Trip/Special/Fundraising)
+  - [x] Search functionality
+  - [x] Calendar subscription (live updates and one-time download)
+  - [x] Calendar view toggle (list/calendar)
+  - [x] Recurring event visual indicators (stacked cards)
+  - [x] Cancelled event indicators with red banner and ring
+  - [x] Fixed card alignment for cancelled vs regular events
+- [x] Create event detail page (pages/events/[id].vue)
+  - [x] Full event information display
+  - [x] Cost display (Free or £X.XX)
+  - [x] Export to Google Calendar button
+  - [x] Download as .ics file
+  - [x] Age group and event type badges with colors/icons
+  - [ ] Download attachments (S3 not implemented yet)
+- [x] Create calendar view component (components/EventsCalendar.vue)
+  - [x] Custom calendar implementation (month view)
+  - [x] Event colors by age group (Beavers: blue, Cubs: green, Scouts: teal)
+  - [x] Event type icons on calendar
+  - [x] Event time display (start - end)
+  - [x] Event click navigation to detail page
+  - [x] Month navigation (prev/next/today)
+  - [x] Legend for age groups and event types
+- [x] Create about page (pages/about.vue)
+  - [x] Useful links section with Fundraising link
+- [x] Create contact page (pages/contact.vue)
+- [x] Create announcements page (pages/announcements.vue)
 
 ### 3.4 Admin Interface
-- [ ] Create admin dashboard layout
-  - [ ] Side navigation
-  - [ ] User info display
-  - [ ] Quick stats
-- [ ] Create event management interface
-  - [ ] Event list with edit/delete actions
-  - [ ] Event creation form
-  - [ ] Event edit form
-  - [ ] Rich text editor for descriptions
-  - [ ] File upload component
-  - [ ] Date/time picker
-  - [ ] Recurring event configuration
-- [ ] Create announcement management
-  - [ ] Announcement list
-  - [ ] Announcement form
-  - [ ] Priority and expiry settings
-- [ ] Create user management (admin only)
-  - [ ] User list
-  - [ ] User creation form
-  - [ ] Role assignment
+- [x] Create admin dashboard layout (layouts/admin.vue)
+  - [x] Top navigation with user info and logout
+  - [x] Navigation links (Dashboard, Events, Announcements, Users)
+  - [ ] Quick stats on dashboard
+- [x] Create event management interface (pages/admin/events/)
+  - [x] Event list with edit/delete actions (index.vue)
+  - [x] Event creation form ([id].vue with id='new')
+  - [x] Event edit form ([id].vue)
+  - [x] Event type dropdown (Meeting/Camp/Trip/Special/Fundraising/Other)
+  - [x] Age group selection (Beavers/Cubs/Scouts)
+  - [x] Date/time picker (datetime-local inputs)
+  - [x] Recurring event configuration (frequency, until date)
+  - [x] Event cancellation with reason
+  - [ ] Rich text editor for descriptions (currently textarea)
+  - [ ] File upload component (S3 not implemented)
+- [x] Create announcement management (pages/admin/announcements/)
+  - [x] Announcement list (index.vue)
+  - [x] Announcement form ([id].vue)
+  - [x] Priority settings (low/medium/high)
+  - [x] Category selection (general/event/fundraising/urgent/achievement)
+  - [x] Expiry date settings
+  - [x] Status settings (draft/published)
+- [x] Create user management (pages/admin/users/)
+  - [x] User list (index.vue)
+  - [x] User creation form ([id].vue)
+  - [x] Role assignment (admin/editor/viewer)
+  - [x] User deletion
 - [ ] Create analytics dashboard
   - [ ] Charts and graphs
   - [ ] Key metrics display
 
 ### 3.5 API Integration
-- [ ] Create API client service (composables/useApi.ts)
-- [ ] Implement event fetching composables (composables/useEvents.ts)
-- [ ] Implement announcement fetching composables (composables/useAnnouncements.ts)
-- [ ] Add optimistic updates with Pinia
-- [ ] Implement error handling and display
-- [ ] Add loading states
-- [ ] Implement data caching (using useFetch or useAsyncData)
+- [x] Create Pinia stores for state management
+- [x] Implement events store (stores/events.ts)
+- [x] Implement announcements store (stores/announcements.ts)
+- [x] Implement auth store (stores/auth.ts)
+- [x] Implement users store (stores/users.ts)
+- [x] Add error handling and display
+- [x] Add loading states
+- [x] Use $fetch for API calls with proper headers
+- [ ] Add optimistic updates
+- [ ] Implement data caching strategies
 
 ### 3.6 Calendar Functionality
-- [ ] Integrate calendar library (FullCalendar Vue or Vue Cal)
-- [ ] Implement event rendering on calendar
-- [ ] Add event click navigation
-- [ ] Implement calendar navigation
-- [ ] Add view switching (month/week/day)
-- [ ] Create iCal export functionality
-- [ ] Add calendar subscription feature
+- [x] Create custom calendar component (components/EventsCalendar.vue)
+- [x] Implement event rendering on calendar with colors and icons
+- [x] Add event click navigation to detail pages
+- [x] Implement calendar navigation (prev/next/today buttons)
+- [x] Create iCal export functionality (.ics download)
+- [x] Add calendar subscription feature (live updates via webcal)
+- [x] Support recurring event expansion in calendar view
+- [ ] Add week/day views (currently month only)
 
 ## Phase 4: Testing (Week 10)
 
@@ -347,3 +378,73 @@
 - **Total**: 12 weeks to launch
 
 *Note: Timeline assumes 1-2 developers working part-time. Adjust based on available resources.*
+
+## Recent Updates
+
+### Session: December 2024
+- [x] Fixed button sizing consistency (View Events / Learn More buttons)
+- [x] Fixed event card alignment for cancelled vs regular events
+- [x] Added 28px spacer to all cards for consistent content alignment
+- [x] Adjusted stacked card shadows for recurring events
+- [x] Fixed CSS source map console warning
+- [x] Updated tasks.md to reflect actual project state
+
+## Current Status Summary
+
+### ✅ Completed (Core Features Working)
+- Infrastructure and deployment (SST v3, AWS Lambda, DynamoDB)
+- Authentication system (AWS Cognito, JWT, RBAC)
+- Events API with recurring events and iCal export
+- Announcements API with categories and expiry
+- User management API
+- Full admin interface for managing events, announcements, and users
+- Public pages with calendar view and filtering
+- Calendar subscription (live updates and downloads)
+- Responsive design with Tailwind CSS
+- Age group and event type color coding
+
+### 🚧 In Progress / Needs Work
+- File upload system (S3 integration not implemented)
+- Contact form with email (SES not configured)
+- Analytics dashboard
+- Rich text editor for descriptions
+- Audit logging system
+- Session timeout handling
+- Testing (unit, integration, E2E)
+- Documentation (user guide, admin guide)
+
+### 📋 Remaining Priority Tasks
+1. **File Upload System**
+   - Configure S3 bucket
+   - Implement file upload/download endpoints
+   - Add attachment support to events
+
+2. **Contact Form**
+   - Set up AWS SES
+   - Implement contact form endpoint
+   - Add email notifications
+
+3. **Testing**
+   - Backend unit tests
+   - Frontend component tests
+   - E2E tests for critical paths
+
+4. **Documentation**
+   - User guide
+   - Admin documentation
+   - API documentation
+
+5. **Polish & Optimization**
+   - Performance optimization
+   - Accessibility improvements
+   - SEO optimization
+   - Cost optimization
+
+### 🎯 Nice-to-Have Features
+- Analytics dashboard with charts
+- Rich text editor for event descriptions
+- Audit logging for admin actions
+- Email notifications for event reminders
+- Photo gallery
+- Week/day calendar views
+- Mobile app (future consideration)
