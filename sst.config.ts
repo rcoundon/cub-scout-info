@@ -90,6 +90,11 @@ export default $config({
         NODE_ENV: $app.stage === 'production' ? 'production' : 'development',
         USER_POOL_CLIENT_ID: authClient.id,
         ORGANIZATION_NAME: '1st Holmer Green Scout Group',
+        FROM_EMAIL: 'hello@1stholmergreenscouts.org.uk',
+        ADMIN_EMAIL: 'hello@1stholmergreenscouts.org.uk',
+        SITE_URL: $app.stage === 'production'
+          ? 'https://1stholmergreenscouts.org.uk'
+          : 'http://localhost:3000',
       },
       permissions: [
         {

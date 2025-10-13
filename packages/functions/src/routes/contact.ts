@@ -8,6 +8,7 @@ import {
   updateContactMessageStatus,
   deleteContactMessage,
 } from '../services/contact';
+import { sendContactFormNotification } from '../services/email';
 import { requireAuth, requireEditor } from '../middleware/auth';
 
 const app = new Hono();
@@ -27,7 +28,23 @@ app.post('/', zValidator('json', contactMessageSchema), async (c) => {
   try {
     const messageData = c.req.valid('json');
 
+    // Save to database
     const contactMessage = await createContactMessage(messageData);
+
+    // Send email notification to admin
+    try {
+      await sendContactFormNotification({
+        fromName: messageData.name,
+        fromEmail: messageData.email,
+        subject: messageData.subject,
+        message: messageData.message,
+        messageId: contactMessage.id,
+      });
+    } catch (emailError) {
+      // Log the error but don't fail the request
+      console.error('Failed to send email notification:', emailError);
+      // The message is still saved in the database, so the admin can see it there
+    }
 
     return c.json(
       {

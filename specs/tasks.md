@@ -85,6 +85,7 @@
 - [x] Add file type and size validation (PDF, Word, Excel, images, TXT up to 10MB)
 - [x] Create pre-signed URL generation for downloads
 - [x] Implement file deletion
+- [x] Add attachment support to events (PDFs, images, documents)
 - [ ] Add virus scanning (optional - AWS S3 ClamAV)
 
 ### 2.7 User Management API (Admin)
@@ -95,7 +96,8 @@
 - [ ] Add user activity tracking
 
 ### 2.8 Additional Features
-- [ ] Implement contact form endpoint with email (SES)
+- [x] Set up AWS SES for email sending
+- [ ] Implement contact form endpoint with email
 - [ ] Create audit logging system
 - [ ] Implement analytics data collection
 - [ ] Set up API rate limiting
@@ -140,7 +142,7 @@
   - [x] Export to Google Calendar button
   - [x] Download as .ics file
   - [x] Age group and event type badges with colors/icons
-  - [ ] Download attachments (S3 not implemented yet)
+  - [x] Download attachments
 - [x] Create calendar view component (components/EventsCalendar.vue)
   - [x] Custom calendar implementation (month view)
   - [x] Event colors by age group (Beavers: blue, Cubs: green, Scouts: teal)
@@ -168,8 +170,8 @@
   - [x] Date/time picker (datetime-local inputs)
   - [x] Recurring event configuration (frequency, until date)
   - [x] Event cancellation with reason
+  - [x] File upload component
   - [ ] Rich text editor for descriptions (currently textarea)
-  - [ ] File upload component (S3 not implemented)
 - [x] Create announcement management (pages/admin/announcements/)
   - [x] Announcement list (index.vue)
   - [x] Announcement form ([id].vue)
@@ -381,6 +383,16 @@
 
 ## Recent Updates
 
+### Session: October 2025 - Production Deployment
+- [x] Deployed to production AWS account (scouts profile)
+- [x] Configured custom domain: https://1stholmergreenscouts.org.uk with SSL
+- [x] Set up ImprovMX email forwarding (hello@1stholmergreenscouts.org.uk)
+- [x] Created admin user with proper ElectroDB integration
+- [x] Fixed 502 errors by adding Nitro AWS Lambda preset
+- [x] Fixed API URL double slash issue
+- [x] Fixed ElectroDB user lookup by using proper create() method
+- [x] Cleaned up debug logging from troubleshooting
+
 ### Session: December 2024
 - [x] Fixed button sizing consistency (View Events / Learn More buttons)
 - [x] Fixed event card alignment for cancelled vs regular events
@@ -397,15 +409,16 @@
 - Events API with recurring events and iCal export
 - Announcements API with categories and expiry
 - User management API
+- File upload system (S3 integration with attachments)
 - Full admin interface for managing events, announcements, and users
 - Public pages with calendar view and filtering
 - Calendar subscription (live updates and downloads)
 - Responsive design with Tailwind CSS
 - Age group and event type color coding
+- Production deployment to custom domain with SSL
 
 ### 🚧 In Progress / Needs Work
-- File upload system (S3 integration not implemented)
-- Contact form with email (SES not configured)
+- Contact form endpoint and email integration (SES configured, endpoint needs implementation)
 - Analytics dashboard
 - Rich text editor for descriptions
 - Audit logging system
@@ -414,27 +427,22 @@
 - Documentation (user guide, admin guide)
 
 ### 📋 Remaining Priority Tasks
-1. **File Upload System**
-   - Configure S3 bucket
-   - Implement file upload/download endpoints
-   - Add attachment support to events
-
-2. **Contact Form**
-   - Set up AWS SES
+1. **Contact Form**
+   - ✅ Set up AWS SES
    - Implement contact form endpoint
    - Add email notifications
 
-3. **Testing**
+2. **Testing**
    - Backend unit tests
    - Frontend component tests
    - E2E tests for critical paths
 
-4. **Documentation**
+3. **Documentation**
    - User guide
    - Admin documentation
    - API documentation
 
-5. **Polish & Optimization**
+4. **Polish & Optimization**
    - Performance optimization
    - Accessibility improvements
    - SEO optimization

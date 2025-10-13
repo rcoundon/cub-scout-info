@@ -115,8 +115,8 @@ const handleSubmit = async () => {
                   </div>
                   <div>
                     <h3 class="font-semibold text-gray-900 mb-1">Email</h3>
-                    <a href="mailto:cubs@example.com" class="text-primary-600 hover:text-primary-700">
-                      cubs@example.com
+                    <a href="mailto:hello@1stholmergreenscouts.org.uk" class="text-primary-600 hover:text-primary-700">
+                      hello@1stholmergreenscouts.org.uk
                     </a>
                   </div>
                 </div>
