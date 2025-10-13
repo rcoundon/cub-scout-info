@@ -10,6 +10,7 @@ const form = ref({
   email: '',
   subject: '',
   message: '',
+  website: '', // Honeypot field - should remain empty
 })
 
 const errors = ref<Record<string, string>>({})
@@ -49,6 +50,13 @@ const validate = () => {
 const handleSubmit = async () => {
   if (!validate()) return
 
+  // Honeypot check - if website field is filled, it's a bot
+  if (form.value.website) {
+    // Silently fail for bots (don't give them feedback)
+    submitting.value = false
+    return
+  }
+
   submitting.value = true
 
   try {
@@ -69,6 +77,7 @@ const handleSubmit = async () => {
       email: '',
       subject: '',
       message: '',
+      website: '',
     }
 
     submitted.value = true
@@ -78,7 +87,12 @@ const handleSubmit = async () => {
       submitted.value = false
     }, 5000)
   } catch (error: any) {
-    errors.value.submit = error.data?.error || 'Failed to send message. Please try again.'
+    // Handle rate limiting
+    if (error.status === 429) {
+      errors.value.submit = error.data?.message || 'Too many submissions. Please try again later.'
+    } else {
+      errors.value.submit = error.data?.error || 'Failed to send message. Please try again.'
+    }
   } finally {
     submitting.value = false
   }
@@ -206,6 +220,19 @@ const handleSubmit = async () => {
                   :error="errors.subject"
                   :required="true"
                 />
+
+                <!-- Honeypot field - hidden from users, visible to bots -->
+                <div class="hidden" aria-hidden="true">
+                  <label for="website">Website</label>
+                  <input
+                    id="website"
+                    v-model="form.website"
+                    type="text"
+                    name="website"
+                    autocomplete="off"
+                    tabindex="-1"
+                  />
+                </div>
 
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">

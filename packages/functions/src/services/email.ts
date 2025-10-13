@@ -386,3 +386,139 @@ Message ID: ${messageId}
     throw new Error('Failed to send contact form notification');
   }
 }
+
+export interface SendContactConfirmationParams {
+  toEmail: string;
+  toName: string;
+  subject: string;
+}
+
+/**
+ * Send a confirmation email to the contact form submitter
+ */
+export async function sendContactConfirmation(params: SendContactConfirmationParams) {
+  const { toEmail, toName, subject } = params;
+
+  const htmlBody = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thank you for contacting us</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table role="presentation" style="width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 40px 40px 20px 40px; text-align: center; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); border-radius: 8px 8px 0 0;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: bold;">
+                ${ORGANIZATION_NAME}
+              </h1>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <h2 style="margin: 0 0 20px 0; color: #1f2937; font-size: 24px;">
+                Thank You for Contacting Us!
+              </h2>
+
+              <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.5;">
+                Hello ${toName},
+              </p>
+
+              <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.5;">
+                We have received your message regarding <strong>"${subject}"</strong> and will get back to you as soon as possible.
+              </p>
+
+              <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.5;">
+                We typically respond within 1-2 business days. If your enquiry is urgent, please feel free to contact us directly.
+              </p>
+
+              <!-- Contact Info Box -->
+              <div style="background-color: #f9fafb; border-left: 4px solid #3b82f6; padding: 20px; margin: 30px 0;">
+                <p style="margin: 0 0 10px 0; color: #374151; font-weight: bold;">Need immediate assistance?</p>
+                <p style="margin: 0; color: #4b5563; line-height: 1.6;">
+                  Email: <a href="mailto:${ADMIN_EMAIL}" style="color: #3b82f6; text-decoration: none;">${ADMIN_EMAIL}</a>
+                </p>
+              </div>
+
+              <p style="margin: 30px 0 0 0; color: #4b5563; font-size: 16px; line-height: 1.5;">
+                Thank you for your interest in ${ORGANIZATION_NAME}!
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px 40px; background-color: #f9fafb; border-top: 1px solid #e5e7eb; border-radius: 0 0 8px 8px;">
+              <p style="margin: 0; color: #6b7280; font-size: 12px; line-height: 1.5; text-align: center;">
+                This is an automated confirmation email. Please do not reply to this message.
+              </p>
+              <p style="margin: 10px 0 0 0; color: #6b7280; font-size: 12px; line-height: 1.5; text-align: center;">
+                © ${new Date().getFullYear()} ${ORGANIZATION_NAME}. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
+
+  const textBody = `
+Thank You for Contacting ${ORGANIZATION_NAME}
+
+Hello ${toName},
+
+We have received your message regarding "${subject}" and will get back to you as soon as possible.
+
+We typically respond within 1-2 business days. If your enquiry is urgent, please feel free to contact us directly at ${ADMIN_EMAIL}.
+
+Thank you for your interest in ${ORGANIZATION_NAME}!
+
+---
+This is an automated confirmation email. Please do not reply to this message.
+
+© ${new Date().getFullYear()} ${ORGANIZATION_NAME}
+  `;
+
+  const command = new SendEmailCommand({
+    Source: FROM_EMAIL,
+    Destination: {
+      ToAddresses: [toEmail],
+    },
+    Message: {
+      Subject: {
+        Data: `Thank you for contacting ${ORGANIZATION_NAME}`,
+        Charset: 'UTF-8',
+      },
+      Body: {
+        Text: {
+          Data: textBody,
+          Charset: 'UTF-8',
+        },
+        Html: {
+          Data: htmlBody,
+          Charset: 'UTF-8',
+        },
+      },
+    },
+  });
+
+  try {
+    const response = await client.send(command);
+    console.log('Contact confirmation sent:', { toEmail, messageId: response.MessageId });
+    return response;
+  } catch (error) {
+    console.error('Failed to send contact confirmation:', error);
+    throw new Error('Failed to send contact confirmation');
+  }
+}

@@ -42,6 +42,10 @@ export default $config({
           pointInTimeRecovery: {
             enabled: true, // Enable point-in-time recovery (35-day retention)
           },
+          ttl: {
+            enabled: true,
+            attributeName: 'ttl', // Used for rate limiting records auto-cleanup
+          },
         },
       },
     });

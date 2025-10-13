@@ -97,7 +97,7 @@
 
 ### 2.8 Additional Features
 - [x] Set up AWS SES for email sending
-- [ ] Implement contact form endpoint with email
+- [x] Implement contact form endpoint with email
 - [ ] Create audit logging system
 - [ ] Implement analytics data collection
 - [ ] Set up API rate limiting
@@ -383,6 +383,23 @@
 
 ## Recent Updates
 
+### Session: October 2025 - Contact Form Spam Prevention & Auto-Reply
+- [x] Implemented honeypot spam detection (hidden 'website' field)
+- [x] Added rate limiting (3 submissions per hour per IP)
+- [x] Created rate-limit service with DynamoDB TTL auto-cleanup
+- [x] Added auto-reply confirmation emails to contact form submitters
+- [x] Graceful error handling for email failures
+- [x] Parallel email sending (admin notification + sender confirmation)
+
+### Session: October 2025 - Contact Form Email Integration
+- [x] Implemented contact form email notifications using AWS SES
+- [x] Added sendContactFormNotification function to email service
+- [x] Configured FROM_EMAIL and ADMIN_EMAIL environment variables
+- [x] Email notifications sent to hello@1stholmergreenscouts.org.uk
+- [x] Reply-to header set to contact form submitter for easy replies
+- [x] Updated contact page with correct email address
+- [x] Verified and tested in production
+
 ### Session: October 2025 - Production Deployment
 - [x] Deployed to production AWS account (scouts profile)
 - [x] Configured custom domain: https://1stholmergreenscouts.org.uk with SSL
@@ -410,6 +427,11 @@
 - Announcements API with categories and expiry
 - User management API
 - File upload system (S3 integration with attachments)
+- Contact form with email notifications and spam prevention
+  - Admin notifications to hello@1stholmergreenscouts.org.uk
+  - Auto-reply confirmation emails to submitters
+  - Honeypot spam detection
+  - Rate limiting (3 submissions per hour per IP)
 - Full admin interface for managing events, announcements, and users
 - Public pages with calendar view and filtering
 - Calendar subscription (live updates and downloads)
@@ -418,7 +440,6 @@
 - Production deployment to custom domain with SSL
 
 ### 🚧 In Progress / Needs Work
-- Contact form endpoint and email integration (SES configured, endpoint needs implementation)
 - Analytics dashboard
 - Rich text editor for descriptions
 - Audit logging system
@@ -427,22 +448,17 @@
 - Documentation (user guide, admin guide)
 
 ### 📋 Remaining Priority Tasks
-1. **Contact Form**
-   - ✅ Set up AWS SES
-   - Implement contact form endpoint
-   - Add email notifications
-
-2. **Testing**
+1. **Testing**
    - Backend unit tests
    - Frontend component tests
    - E2E tests for critical paths
 
-3. **Documentation**
+2. **Documentation**
    - User guide
    - Admin documentation
    - API documentation
 
-4. **Polish & Optimization**
+3. **Polish & Optimization**
    - Performance optimization
    - Accessibility improvements
    - SEO optimization

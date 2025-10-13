@@ -8,7 +8,8 @@ import {
   updateContactMessageStatus,
   deleteContactMessage,
 } from '../services/contact';
-import { sendContactFormNotification } from '../services/email';
+import { sendContactFormNotification, sendContactConfirmation } from '../services/email';
+import { checkRateLimit, getIpAddress } from '../services/rate-limit';
 import { requireAuth, requireEditor } from '../middleware/auth';
 
 const app = new Hono();
@@ -19,6 +20,7 @@ const contactMessageSchema = z.object({
   email: z.string().email().max(200),
   subject: z.string().min(1).max(200),
   message: z.string().min(1).max(2000),
+  website: z.string().optional(), // Honeypot field - should be empty
 });
 
 /**
@@ -28,23 +30,66 @@ app.post('/', zValidator('json', contactMessageSchema), async (c) => {
   try {
     const messageData = c.req.valid('json');
 
-    // Save to database
-    const contactMessage = await createContactMessage(messageData);
+    // Honeypot check - if website field is filled, it's a bot
+    if (messageData.website && messageData.website.trim().length > 0) {
+      console.log('Contact form spam detected: honeypot field filled');
+      // Return success to not tip off the bot
+      return c.json(
+        {
+          success: true,
+          message: 'Thank you for your message. We will get back to you soon!',
+        },
+        201
+      );
+    }
 
-    // Send email notification to admin
-    try {
-      await sendContactFormNotification({
+    // Rate limiting check
+    const ipAddress = getIpAddress(c.req.header());
+    const rateLimit = await checkRateLimit(ipAddress, 'contact-form');
+
+    if (!rateLimit.allowed) {
+      console.log(`Rate limit exceeded for IP: ${ipAddress}`);
+      return c.json(
+        {
+          error: 'Too many requests',
+          message: 'You have submitted too many messages. Please try again later.',
+          resetTime: rateLimit.resetTime,
+        },
+        429
+      );
+    }
+
+    // Save to database (exclude honeypot field)
+    const { website, ...cleanData } = messageData;
+    const contactMessage = await createContactMessage(cleanData);
+
+    // Send email notifications (admin + confirmation to sender)
+    // Run both in parallel and handle errors gracefully
+    const emailPromises = [
+      // Admin notification
+      sendContactFormNotification({
         fromName: messageData.name,
         fromEmail: messageData.email,
         subject: messageData.subject,
         message: messageData.message,
         messageId: contactMessage.id,
-      });
-    } catch (emailError) {
-      // Log the error but don't fail the request
-      console.error('Failed to send email notification:', emailError);
-      // The message is still saved in the database, so the admin can see it there
-    }
+      }).catch(error => {
+        console.error('Failed to send admin notification:', error);
+      }),
+
+      // Auto-reply confirmation to sender
+      sendContactConfirmation({
+        toEmail: messageData.email,
+        toName: messageData.name,
+        subject: messageData.subject,
+      }).catch(error => {
+        console.error('Failed to send confirmation to sender:', error);
+      }),
+    ];
+
+    // Wait for both emails (non-blocking for the response)
+    await Promise.allSettled(emailPromises);
+    // The message is still saved in the database, so the admin can see it there
 
     return c.json(
       {
