@@ -62,24 +62,168 @@ aws sts get-caller-identity
 
 ```bash
 # If you don't have a domain, register one in Route 53
-aws route53domains register-domain --domain-name your-cubs-site.org.uk
+aws route53domains register-domain --domain-name 1stholmergreenscouts.org.uk
+
+# Create a hosted zone for your domain
+aws route53 create-hosted-zone \
+  --name 1stholmergreenscouts.org.uk \
+  --caller-reference $(date +%s) \
+  --profile scouts
 
 # Request SSL certificate in Certificate Manager
-# Note: Certificate for CloudFront MUST be in us-east-1
+# IMPORTANT: Certificate for CloudFront MUST be in us-east-1
 aws acm request-certificate \
-  --domain-name your-cubs-site.org.uk \
-  --subject-alternative-names www.your-cubs-site.org.uk \
+  --domain-name 1stholmergreenscouts.org.uk \
+  --subject-alternative-names www.1stholmergreenscouts.org.uk \
   --validation-method DNS \
-  --region us-east-1
+  --region us-east-1 \
+  --profile scouts
 
 # List certificates to get ARN
-aws acm list-certificates --region us-east-1
+aws acm list-certificates --region us-east-1 --profile scouts
 
-# Add DNS validation records to Route 53
-# (This is typically done via console or automated with CDK/Terraform)
+# Describe certificate to get validation records
+aws acm describe-certificate \
+  --certificate-arn arn:aws:acm:us-east-1:ACCOUNT_ID:certificate/CERT_ID \
+  --region us-east-1 \
+  --profile scouts
+
+# Add DNS validation records to Route 53 (via console or CLI)
+# Wait for certificate status to change to "ISSUED"
 ```
 
-## Infrastructure as Code Deployment
+## Deployment with SST v3 (Current Method)
+
+This project uses [SST v3](https://sst.dev) for infrastructure deployment. SST handles all AWS resources including DynamoDB, S3, Cognito, Lambda, and CloudFront.
+
+### 1. Prerequisites
+
+```bash
+# Install pnpm if not already installed
+npm install -g pnpm
+
+# Install dependencies
+pnpm install
+
+# Configure AWS profile for production
+aws configure --profile scouts
+# Enter your AWS credentials for the production account
+```
+
+### 2. Configure Environment Variables
+
+Create/update `.env` file with production settings:
+
+```bash
+# AWS Configuration
+AWS_REGION=eu-west-2
+AWS_PROFILE=scouts
+
+# Application Configuration
+ORGANIZATION_NAME=1st Holmer Green Scout Group
+
+# Production Domain Configuration
+# Certificate must be in us-east-1 for CloudFront
+ACM_CERTIFICATE_ARN=arn:aws:acm:us-east-1:634384016985:certificate/YOUR_CERT_ID
+
+# SST Stage
+SST_STAGE=production
+```
+
+### 3. Deploy to Production
+
+```bash
+# Deploy infrastructure and application to production
+sst deploy --stage production
+
+# SST will output:
+# - API URL
+# - Site URL (CloudFront domain)
+# - User Pool ID
+# - User Pool Client ID
+
+# Note the CloudFront distribution domain (e.g., d1234567890abc.cloudfront.net)
+```
+
+### 4. Set Up DNS Records
+
+After deployment, configure Route53 to point your domain to CloudFront:
+
+**Option A: Automated Script**
+```bash
+./scripts/setup-dns.sh
+# When prompted, enter the CloudFront domain from SST output
+```
+
+**Option B: Manual Setup**
+```bash
+# Get your hosted zone ID
+aws route53 list-hosted-zones-by-name \
+  --query "HostedZones[?Name=='1stholmergreenscouts.org.uk.'].Id" \
+  --output text \
+  --profile scouts
+
+# Create A record for root domain (see scripts/setup-dns.sh for full example)
+# Create A record for www subdomain
+```
+
+See `scripts/README.md` for detailed DNS setup instructions.
+
+### 5. Verify Deployment
+
+```bash
+# Wait a few minutes for DNS propagation, then test:
+curl https://1stholmergreenscouts.org.uk
+curl https://www.1stholmergreenscouts.org.uk
+
+# Check certificate is valid
+openssl s_client -connect 1stholmergreenscouts.org.uk:443 -servername 1stholmergreenscouts.org.uk
+```
+
+### 6. Create Initial Admin User
+
+```bash
+# Get User Pool ID from SST output, then create admin user
+aws cognito-idp admin-create-user \
+  --user-pool-id eu-west-2_XXXXX \
+  --username admin@1stholmergreenscouts.org.uk \
+  --user-attributes \
+    Name=email,Value=admin@1stholmergreenscouts.org.uk \
+    Name=email_verified,Value=true \
+  --profile scouts
+
+# Admin user will receive temporary password via email
+# They should log in at https://1stholmergreenscouts.org.uk/login
+# and will be prompted to change password
+```
+
+### Development Workflow
+
+```bash
+# Run locally for development
+pnpm dev
+
+# Deploy to dev stage
+sst deploy --stage dev
+
+# Remove dev stage resources
+sst remove --stage dev
+```
+
+### Updating the Application
+
+```bash
+# Make your changes, then deploy
+sst deploy --stage production
+
+# SST will automatically:
+# - Update Lambda functions
+# - Rebuild and deploy frontend to CloudFront
+# - Update environment variables
+# - Invalidate CloudFront cache
+```
+
+## Infrastructure as Code Deployment (Legacy Methods)
 
 ### Option A: Using AWS CDK (Recommended)
 

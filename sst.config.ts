@@ -13,7 +13,9 @@ export default $config({
       providers: {
         aws: {
           region: 'eu-west-2', // London
-          profile: process.env.AWS_PROFILE || 'personal',
+          profile: input?.stage === 'production'
+            ? process.env.AWS_PROFILE || 'scouts'
+            : process.env.AWS_PROFILE || 'personal',
         },
       },
     };
@@ -75,6 +77,7 @@ export default $config({
     const api = new sst.aws.Function('CubsSiteApi', {
       handler: 'packages/functions/src/api.handler',
       link: [table, uploadsBucket, auth],
+      runtime: 'nodejs22.x',
       url: {
         cors: {
           allowOrigins: ['*'],
@@ -86,6 +89,7 @@ export default $config({
       environment: {
         NODE_ENV: $app.stage === 'production' ? 'production' : 'development',
         USER_POOL_CLIENT_ID: authClient.id,
+        ORGANIZATION_NAME: '1st Holmer Green Scout Group',
       },
       permissions: [
         {
@@ -98,8 +102,11 @@ export default $config({
     // Nuxt Frontend
     const site = new sst.aws.Nuxt('CubsSiteFrontend', {
       path: 'frontend',
+      domain: $app.stage === 'production'
+        ? '1stholmergreenscouts.org.uk'
+        : undefined,
       environment: {
-        NUXT_PUBLIC_API_URL: api.url,
+        NUXT_PUBLIC_API_URL: api.url.apply(url => url.replace(/\/$/, '')),
         NUXT_PUBLIC_USER_POOL_ID: auth.id,
         NUXT_PUBLIC_USER_POOL_CLIENT_ID: authClient.id,
       },

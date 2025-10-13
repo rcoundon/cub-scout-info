@@ -139,7 +139,7 @@ export const useAuthStore = defineStore('auth', () => {
             Authorization: `Bearer ${tokens.value.accessToken}`,
           },
         }
-      )
+      ) 
       user.value = response
     } catch (err: any) {
       console.error('Failed to fetch user profile:', err)

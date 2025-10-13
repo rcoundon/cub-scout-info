@@ -10,7 +10,7 @@ const client = new SESClient({});
 // TODO: Configure these in SST or environment variables
 const FROM_EMAIL = process.env.FROM_EMAIL || 'rosscoundonaws@gmail.com';
 const SITE_URL = process.env.SITE_URL || 'http://localhost:3000';
-const SITE_NAME = 'Cubs Scout Group';
+const ORGANIZATION_NAME = process.env.ORGANIZATION_NAME || '1st Holmer Green Scout Group';
 
 export interface SendInvitationEmailParams {
   toEmail: string;
@@ -34,7 +34,7 @@ export async function sendInvitationEmail(params: SendInvitationEmailParams) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Invitation to ${SITE_NAME}</title>
+  <title>Invitation to ${ORGANIZATION_NAME}</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5;">
   <table role="presentation" style="width: 100%; border-collapse: collapse;">
@@ -45,7 +45,7 @@ export async function sendInvitationEmail(params: SendInvitationEmailParams) {
           <tr>
             <td style="padding: 40px 40px 20px 40px; text-align: center; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); border-radius: 8px 8px 0 0;">
               <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">
-                ${SITE_NAME}
+                ${ORGANIZATION_NAME}
               </h1>
             </td>
           </tr>
@@ -62,7 +62,7 @@ export async function sendInvitationEmail(params: SendInvitationEmailParams) {
               </p>
 
               <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.5;">
-                ${invitedBy} has invited you to join ${SITE_NAME} as a <strong>${role}</strong>.
+                ${invitedBy} has invited you to join ${ORGANIZATION_NAME} as a <strong>${role}</strong>.
               </p>
 
               <p style="margin: 0 0 30px 0; color: #4b5563; font-size: 16px; line-height: 1.5;">
@@ -96,7 +96,7 @@ export async function sendInvitationEmail(params: SendInvitationEmailParams) {
                 If you didn't expect this invitation, you can safely ignore this email.
               </p>
               <p style="margin: 10px 0 0 0; color: #6b7280; font-size: 12px; line-height: 1.5; text-align: center;">
-                © ${new Date().getFullYear()} ${SITE_NAME}. All rights reserved.
+                © ${new Date().getFullYear()} ${ORGANIZATION_NAME}. All rights reserved.
               </p>
             </td>
           </tr>
@@ -109,11 +109,11 @@ export async function sendInvitationEmail(params: SendInvitationEmailParams) {
   `;
 
   const textBody = `
-You've Been Invited to ${SITE_NAME}
+You've Been Invited to ${ORGANIZATION_NAME}
 
 Hello ${toName},
 
-${invitedBy} has invited you to join ${SITE_NAME} as a ${role}.
+${invitedBy} has invited you to join ${ORGANIZATION_NAME} as a ${role}.
 
 Accept your invitation by visiting this link:
 ${invitationUrl}
@@ -122,7 +122,7 @@ This invitation will expire in 72 hours.
 
 If you didn't expect this invitation, you can safely ignore this email.
 
-© ${new Date().getFullYear()} ${SITE_NAME}
+© ${new Date().getFullYear()} ${ORGANIZATION_NAME}
   `;
 
   const command = new SendEmailCommand({
@@ -132,7 +132,7 @@ If you didn't expect this invitation, you can safely ignore this email.
     },
     Message: {
       Subject: {
-        Data: `Invitation to join ${SITE_NAME}`,
+        Data: `Invitation to join ${ORGANIZATION_NAME}`,
         Charset: 'UTF-8',
       },
       Body: {
@@ -167,7 +167,7 @@ export async function sendWelcomeEmail(toEmail: string, toName: string) {
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Welcome to ${SITE_NAME}</title>
+  <title>Welcome to ${ORGANIZATION_NAME}</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5;">
   <table role="presentation" style="width: 100%; border-collapse: collapse;">
@@ -176,10 +176,10 @@ export async function sendWelcomeEmail(toEmail: string, toName: string) {
         <table role="presentation" style="width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px;">
           <tr>
             <td style="padding: 40px;">
-              <h2 style="margin: 0 0 20px 0; color: #1f2937;">Welcome to ${SITE_NAME}!</h2>
+              <h2 style="margin: 0 0 20px 0; color: #1f2937;">Welcome to ${ORGANIZATION_NAME}!</h2>
               <p style="margin: 0 0 15px 0; color: #4b5563;">Hi ${toName},</p>
               <p style="margin: 0 0 15px 0; color: #4b5563;">
-                Your account has been successfully activated. You can now log in and start using ${SITE_NAME}.
+                Your account has been successfully activated. You can now log in and start using ${ORGANIZATION_NAME}.
               </p>
               <p style="margin: 0; color: #4b5563;">
                 If you have any questions, please don't hesitate to reach out.
@@ -201,7 +201,7 @@ export async function sendWelcomeEmail(toEmail: string, toName: string) {
     },
     Message: {
       Subject: {
-        Data: `Welcome to ${SITE_NAME}`,
+        Data: `Welcome to ${ORGANIZATION_NAME}`,
         Charset: 'UTF-8',
       },
       Body: {

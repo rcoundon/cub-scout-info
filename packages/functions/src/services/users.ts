@@ -24,7 +24,7 @@ export async function createUser(
  * Get a user by ID
  */
 export async function getUser(userId: string) {
-  const result = await UserEntity.get({ id: userId }).go();
+  const result = await UserEntity.get({ id: userId }).go({ ignoreOwnership: true });
   return result.data || null;
 }
 
@@ -32,7 +32,7 @@ export async function getUser(userId: string) {
  * Get a user by email
  */
 export async function getUserByEmail(email: string) {
-  const result = await UserEntity.query.byEmail({ email: email.toLowerCase() }).go();
+  const result = await UserEntity.query.byEmail({ email: email.toLowerCase() }).go({ ignoreOwnership: true });
   return result.data[0] || null;
 }
 
@@ -40,7 +40,7 @@ export async function getUserByEmail(email: string) {
  * Get all users
  */
 export async function getAllUsers() {
-  const result = await UserEntity.scan.go();
+  const result = await UserEntity.scan.go({ ignoreOwnership: true });
   return result.data;
 }
 
@@ -85,7 +85,7 @@ export async function getUserByInvitationToken(token: string) {
   // Since we don't have a direct index on invitation_token,
   // we need to scan the users table
   // In a production system, you might want to add a GSI for this
-  const result = await UserEntity.scan.go();
+  const result = await UserEntity.scan.go({ ignoreOwnership: true });
   const user = result.data.find(u => u.invitation_token === token);
   return user || null;
 }
