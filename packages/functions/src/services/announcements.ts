@@ -1,9 +1,36 @@
 import { AnnouncementEntity } from '../db/entities';
 import type { Announcement, AnnouncementStatus } from '../types/announcements';
+import { getUser } from './users';
 
 /**
  * Announcements Service using ElectroDB
  */
+
+/**
+ * Enrich announcement with creator information
+ */
+async function enrichAnnouncementWithCreator(announcement: Announcement) {
+  try {
+    const creator = await getUser(announcement.created_by);
+    return {
+      ...announcement,
+      creator_name: creator ? `${creator.first_name} ${creator.last_name}` : 'Unknown',
+    };
+  } catch (error) {
+    console.error('Failed to fetch creator:', error);
+    return {
+      ...announcement,
+      creator_name: 'Unknown',
+    };
+  }
+}
+
+/**
+ * Enrich multiple announcements with creator information
+ */
+async function enrichAnnouncementsWithCreators(announcements: Announcement[]) {
+  return Promise.all(announcements.map(enrichAnnouncementWithCreator));
+}
 
 /**
  * Create a new announcement
@@ -20,7 +47,9 @@ export async function createAnnouncement(
  */
 export async function getAnnouncement(id: string) {
   const result = await AnnouncementEntity.get({ id }).go();
-  return result.data || null;
+  if (!result.data) return null;
+
+  return enrichAnnouncementWithCreator(result.data);
 }
 
 /**
@@ -75,11 +104,13 @@ export async function getPublishedAnnouncements() {
 
   // Sort by priority (high > medium > low) then by date (newest first)
   const priorityOrder = { high: 3, medium: 2, low: 1 };
-  return active.sort((a, b) => {
+  const sorted = active.sort((a, b) => {
     const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
     if (priorityDiff !== 0) return priorityDiff;
     return b.created_at.localeCompare(a.created_at);
   });
+
+  return enrichAnnouncementsWithCreators(sorted);
 }
 
 /**
@@ -92,11 +123,13 @@ export async function getAnnouncementsByStatus(status: AnnouncementStatus) {
 
   // Sort by priority (high > medium > low) then by date (newest first)
   const priorityOrder = { high: 3, medium: 2, low: 1 };
-  return result.data.sort((a, b) => {
+  const sorted = result.data.sort((a, b) => {
     const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
     if (priorityDiff !== 0) return priorityDiff;
     return b.created_at.localeCompare(a.created_at);
   });
+
+  return enrichAnnouncementsWithCreators(sorted);
 }
 
 /**

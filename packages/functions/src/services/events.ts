@@ -1,9 +1,36 @@
 import { EventEntity } from '../db/entities';
 import type { Event, EventStatus, EventType } from '../types/events';
+import { getUser } from './users';
 
 /**
  * Events Service using ElectroDB
  */
+
+/**
+ * Enrich event with creator information
+ */
+async function enrichEventWithCreator(event: Event) {
+  try {
+    const creator = await getUser(event.created_by);
+    return {
+      ...event,
+      creator_name: creator ? `${creator.first_name} ${creator.last_name}` : 'Unknown',
+    };
+  } catch (error) {
+    console.error('Failed to fetch creator:', error);
+    return {
+      ...event,
+      creator_name: 'Unknown',
+    };
+  }
+}
+
+/**
+ * Enrich multiple events with creator information
+ */
+async function enrichEventsWithCreators(events: Event[]) {
+  return Promise.all(events.map(enrichEventWithCreator));
+}
 
 /**
  * Parse recurrence rule and expand recurring events into individual occurrences
@@ -85,7 +112,9 @@ export async function createEvent(
  */
 export async function getEvent(id: string) {
   const result = await EventEntity.get({ id }).go();
-  return result.data || null;
+  if (!result.data) return null;
+
+  return enrichEventWithCreator(result.data);
 }
 
 /**
@@ -112,9 +141,10 @@ export async function deleteEvent(id: string) {
  */
 export async function getPublishedEvents() {
   const result = await EventEntity.query.byStatus({ status: 'published' }).go();
-  return result.data.sort(
+  const sorted = result.data.sort(
     (a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
   );
+  return enrichEventsWithCreators(sorted);
 }
 
 /**
@@ -128,9 +158,10 @@ export async function getPublicEvents() {
     EventEntity.query.byStatus({ status: 'cancelled' }).go(),
   ]);
 
-  return [...published.data, ...cancelled.data].sort(
+  const sorted = [...published.data, ...cancelled.data].sort(
     (a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
   );
+  return enrichEventsWithCreators(sorted);
 }
 
 /**
@@ -159,9 +190,10 @@ export async function getPublishedEventsExpanded() {
  */
 export async function getEventsByStatusRaw(status: EventStatus) {
   const result = await EventEntity.query.byStatus({ status }).go();
-  return result.data.sort(
+  const sorted = result.data.sort(
     (a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
   );
+  return enrichEventsWithCreators(sorted);
 }
 
 /**

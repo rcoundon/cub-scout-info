@@ -179,11 +179,16 @@ const getExpiryText = (expiresAt?: string) => {
 
                 <!-- Footer -->
                 <div class="flex items-center justify-between text-sm">
-                  <div class="flex items-center gap-2 text-gray-500">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span>{{ formatDate(announcement.created_at) }}</span>
+                  <div class="flex flex-col gap-1">
+                    <div class="flex items-center gap-2 text-gray-500">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span>{{ formatDate(announcement.created_at) }}</span>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                      Created by {{ announcement.creator_name || 'Unknown' }}
+                    </div>
                   </div>
 
                   <span class="text-primary-600 font-medium flex items-center gap-1">

@@ -13,6 +13,7 @@ const router = useRouter()
 // Form state
 const email = ref('')
 const password = ref('')
+const rememberMe = ref(true) // Default to true for convenience
 const emailError = ref('')
 const passwordError = ref('')
 const formError = ref('')
@@ -94,7 +95,7 @@ const handleSubmit = async () => {
   }
 
   // Attempt login
-  const result = await authStore.login(email.value, password.value)
+  const result = await authStore.login(email.value, password.value, rememberMe.value)
 
   if (typeof result === 'object' && result.requiresPasswordChange) {
     // Show password change form
@@ -189,8 +190,17 @@ const handlePasswordChange = async () => {
             @blur="validatePassword"
           />
 
-          <!-- Forgot Password Link -->
-          <div class="text-right">
+          <!-- Remember Me & Forgot Password -->
+          <div class="flex items-center justify-between">
+            <label class="flex items-center cursor-pointer">
+              <input
+                v-model="rememberMe"
+                type="checkbox"
+                class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 focus:ring-2"
+              />
+              <span class="ml-2 text-sm text-gray-700">Remember me</span>
+            </label>
+
             <NuxtLink
               to="/forgot-password"
               class="text-sm text-primary-600 hover:text-primary-700 font-medium"

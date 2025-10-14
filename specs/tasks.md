@@ -3,6 +3,7 @@
 ## Phase 1: Project Setup and Infrastructure (Week 1-2)
 
 ### 1.1 Project Initialization
+
 - [x] Set up Git repository
 - [x] Create project structure
 - [x] Initialize frontend (Nuxt 3/Vue.js 3)
@@ -12,6 +13,7 @@
 - [x] Set up TypeScript (recommended for both frontend and backend)
 
 ### 1.2 AWS Account and Infrastructure Setup
+
 - [x] Create/configure AWS account
 - [x] Set up AWS CLI and credentials
 - [x] Initialize SST v3 project for infrastructure
@@ -21,6 +23,7 @@
 - [x] Document Route 53 configuration (see specs/domain-setup.md)
 
 ### 1.3 Development Environment
+
 - [x] Install required dependencies
 - [x] ~~Set up local DynamoDB~~ (Not needed - SST dev mode uses live AWS DynamoDB)
 - [x] Configure local development server (Nuxt dev server)
@@ -30,6 +33,7 @@
 ## Phase 2: Backend Development (Week 3-5)
 
 ### 2.1 DynamoDB Setup
+
 - [x] Design and finalize DynamoDB table schema (single-table design)
 - [x] Define access patterns and GSI requirements
 - [x] Set up AWS SDK for DynamoDB in backend (using ElectroDB)
@@ -38,6 +42,7 @@
 - [x] Configure point-in-time recovery and backups
 
 ### 2.2 Authentication System
+
 - [x] Set up AWS Cognito User Pool
 - [x] Configure user authentication flow
 - [x] Implement JWT validation
@@ -47,6 +52,7 @@
 - [x] Create authentication middleware
 
 ### 2.3 API Development - Core Endpoints
+
 - [x] Set up Hono with AWS Lambda adapter
 - [x] Configure API routing with Hono
 - [x] Implement error handling middleware
@@ -54,6 +60,7 @@
 - [x] Implement logging middleware
 
 ### 2.4 Events API
+
 - [x] Create event model and repository (ElectroDB)
 - [x] Implement GET /api/events (public - list events)
 - [x] Implement GET /api/events/:id (public - event details)
@@ -68,6 +75,7 @@
 - [x] Add fundraising event type
 
 ### 2.5 Announcements API
+
 - [x] Create announcement model and repository (ElectroDB)
 - [x] Implement GET /api/announcements (public)
 - [x] Implement POST /api/announcements (create announcement)
@@ -79,6 +87,7 @@
 - [x] Add category support (general, event, fundraising, urgent, achievement)
 
 ### 2.6 File Upload System
+
 - [x] Configure S3 bucket for file storage
 - [x] Set up secure S3 access policies
 - [x] Implement file upload endpoint
@@ -89,6 +98,7 @@
 - [ ] Add virus scanning (optional - AWS S3 ClamAV)
 
 ### 2.7 User Management API (Admin)
+
 - [x] Implement GET /api/admin/users
 - [x] Implement POST /api/admin/users
 - [x] Implement PUT /api/admin/users/:id
@@ -96,6 +106,7 @@
 - [ ] Add user activity tracking
 
 ### 2.8 Additional Features
+
 - [x] Set up AWS SES for email sending
 - [x] Implement contact form endpoint with email
 - [ ] Create audit logging system
@@ -105,6 +116,7 @@
 ## Phase 3: Frontend Development (Week 6-9)
 
 ### 3.1 Design System Setup
+
 - [x] Choose and install UI framework (Tailwind CSS)
 - [x] Create design tokens (colors, spacing, typography)
 - [x] Build common components (Button, Input, Card, etc.)
@@ -114,14 +126,16 @@
 - [x] Fix button sizing consistency across components
 
 ### 3.2 Authentication UI
+
 - [x] Create login page (pages/login.vue)
 - [x] Create password reset flow
 - [x] Implement auth state management (Pinia store)
 - [x] Create auth middleware for protected routes (admin, editor)
-- [ ] Add session timeout handling
-- [ ] Implement "Remember me" functionality
+- [x] Add session timeout handling
+- [x] Implement "Remember me" functionality
 
 ### 3.3 Public Pages
+
 - [x] Create home page (pages/index.vue)
   - [x] Hero section with division info and "When We Meet" section
   - [x] Upcoming events preview by age group
@@ -157,6 +171,7 @@
 - [x] Create announcements page (pages/announcements.vue)
 
 ### 3.4 Admin Interface
+
 - [x] Create admin dashboard layout (layouts/admin.vue)
   - [x] Top navigation with user info and logout
   - [x] Navigation links (Dashboard, Events, Announcements, Users)
@@ -189,6 +204,7 @@
   - [ ] Key metrics display
 
 ### 3.5 API Integration
+
 - [x] Create Pinia stores for state management
 - [x] Implement events store (stores/events.ts)
 - [x] Implement announcements store (stores/announcements.ts)
@@ -201,6 +217,7 @@
 - [ ] Implement data caching strategies
 
 ### 3.6 Calendar Functionality
+
 - [x] Create custom calendar component (components/EventsCalendar.vue)
 - [x] Implement event rendering on calendar with colors and icons
 - [x] Add event click navigation to detail pages
@@ -213,7 +230,8 @@
 ## Phase 4: Testing (Week 10)
 
 ### 4.1 Backend Testing
-- [ ] Set up Jest for unit testing
+
+- [ ] Set up Vitest for unit testing
 - [ ] Write unit tests for models
 - [ ] Write unit tests for services/repositories
 - [ ] Write integration tests for API endpoints
@@ -223,6 +241,7 @@
 - [ ] Achieve >80% code coverage
 
 ### 4.2 Frontend Testing
+
 - [ ] Set up Vitest and Vue Test Utils
 - [ ] Write component unit tests
 - [ ] Write integration tests for pages
@@ -232,6 +251,7 @@
 - [ ] Write critical path E2E tests
 
 ### 4.3 Security Testing
+
 - [ ] Run security audit (npm audit)
 - [ ] Test for XSS vulnerabilities
 - [ ] Test for CSRF protection
@@ -241,6 +261,7 @@
 - [ ] Test file upload security
 
 ### 4.4 Performance Testing
+
 - [ ] Run Lighthouse audits
 - [ ] Test page load times
 - [ ] Test API response times
@@ -251,19 +272,21 @@
 ## Phase 5: AWS Deployment Setup (Week 11)
 
 ### 5.1 Infrastructure Provisioning
-- [ ] Define SST v3 resources in sst.config.ts
-- [ ] Create DynamoDB table with GSIs using SST
-- [ ] Configure DynamoDB on-demand capacity mode
+
+- [x] Define SST v3 resources in sst.config.ts
+- [x] Create DynamoDB table with GSIs using SST
+- [x] Configure DynamoDB on-demand capacity mode
 - [ ] Enable point-in-time recovery on DynamoDB
-- [ ] Create S3 buckets (frontend via StaticSite, file uploads)
-- [ ] Set up CloudFront distribution (automatic with StaticSite)
-- [ ] Configure Hono API with SST Function
-- [ ] Set up Lambda layers (if needed)
-- [ ] Configure Cognito User Pool with SST
-- [ ] Set up CloudWatch logs and metrics (automatic)
-- [ ] Use SST Config or Parameter Store for secrets
+- [x] Create S3 buckets (frontend via StaticSite, file uploads)
+- [x] Set up CloudFront distribution (automatic with StaticSite)
+- [x] Configure Hono API with SST Function
+- [x] Set up Lambda layers (if needed)
+- [x] Configure Cognito User Pool with SST
+- [x] Set up CloudWatch logs and metrics (automatic)
+- [x] Use SST Config or Parameter Store for secrets
 
 ### 5.2 CI/CD Pipeline
+
 - [ ] Set up GitHub Actions or AWS CodePipeline
 - [ ] Configure build workflow (Nuxt generate for frontend)
 - [ ] Add automated testing to pipeline
@@ -274,12 +297,14 @@
 - [ ] Set up deployment notifications
 
 ### 5.3 DynamoDB Data Setup
+
 - [ ] Create scripts to initialize DynamoDB table structure
 - [ ] Test table structure in staging
 - [ ] Create seed data for production (initial admin user)
 - [ ] Document GSI usage and access patterns
 
 ### 5.4 Monitoring and Alerting
+
 - [ ] Create CloudWatch dashboards
 - [ ] Set up error rate alarms
 - [ ] Set up performance alarms
@@ -290,12 +315,14 @@
 ## Phase 6: Launch Preparation (Week 12)
 
 ### 6.1 Content Preparation
+
 - [ ] Prepare initial events data
 - [ ] Prepare about page content
 - [ ] Create initial announcements
 - [ ] Prepare user guide for admins
 
 ### 6.2 Documentation
+
 - [ ] Write user documentation
 - [ ] Write admin documentation
 - [ ] Document API endpoints
@@ -304,6 +331,7 @@
 - [ ] Create disaster recovery plan
 
 ### 6.3 Legal and Compliance
+
 - [ ] Create privacy policy
 - [ ] Create terms of service
 - [ ] Implement cookie consent (if needed)
@@ -311,6 +339,7 @@
 - [ ] Get photo consent process in place
 
 ### 6.4 Pre-Launch Testing
+
 - [ ] User acceptance testing (UAT)
 - [ ] Admin training sessions
 - [ ] Test all critical user journeys
@@ -320,7 +349,8 @@
 - [ ] Final security review
 
 ### 6.5 Launch
-- [ ] Deploy to production
+
+- [x] Deploy to production
 - [ ] Verify all systems operational
 - [ ] Monitor for errors
 - [ ] Communicate launch to users
@@ -329,6 +359,7 @@
 ## Phase 7: Post-Launch (Week 13+)
 
 ### 7.1 Monitoring and Optimization
+
 - [ ] Monitor application performance
 - [ ] Review user feedback
 - [ ] Identify and fix bugs
@@ -336,6 +367,7 @@
 - [ ] Reduce costs where possible
 
 ### 7.2 Feature Enhancements
+
 - [ ] Prioritize feature requests
 - [ ] Plan next iteration
 - [ ] Implement email notifications (if not in Phase 1)
@@ -343,6 +375,7 @@
 - [ ] Implement additional requested features
 
 ### 7.3 Maintenance
+
 - [ ] Regular security updates
 - [ ] Dependency updates
 - [ ] Regular backups verification
@@ -352,6 +385,7 @@
 ## Task Assignment Recommendations
 
 ### Critical Path Tasks (Must Complete First)
+
 1. Project setup and infrastructure
 2. Database design and setup
 3. Authentication system
@@ -360,17 +394,20 @@
 6. Deployment infrastructure
 
 ### Parallel Work Streams
+
 - **Backend Team**: API development, database, authentication
 - **Frontend Team**: UI components, pages, integration
 - **DevOps**: Infrastructure, CI/CD, monitoring
 
 ### Dependencies
+
 - Frontend work depends on API endpoints being available
 - Deployment depends on both frontend and backend completion
 - Testing can begin once features are partially complete
 - Documentation can be written alongside development
 
 ## Estimated Timeline
+
 - **Phase 1**: 2 weeks
 - **Phase 2**: 3 weeks
 - **Phase 3**: 4 weeks
@@ -383,7 +420,20 @@
 
 ## Recent Updates
 
+### Session: October 2025 - Session Timeout & Remember Me
+
+- [x] Implemented "Remember me" functionality with sessionStorage vs localStorage
+- [x] Added automatic token refresh when tokens expire
+- [x] Created session timeout monitoring (checks every minute)
+- [x] Added SessionTimeoutWarning component with visual notification
+- [x] Auto-refresh tokens 10 minutes before expiry
+- [x] Show warning 5 minutes before session expires
+- [x] Allow users to extend session or logout from warning
+- [x] Added token expiry tracking in auth store
+- [x] Updated login page with "Remember me" checkbox (default checked)
+
 ### Session: October 2025 - Contact Form Spam Prevention & Auto-Reply
+
 - [x] Implemented honeypot spam detection (hidden 'website' field)
 - [x] Added rate limiting (3 submissions per hour per IP)
 - [x] Created rate-limit service with DynamoDB TTL auto-cleanup
@@ -392,18 +442,20 @@
 - [x] Parallel email sending (admin notification + sender confirmation)
 
 ### Session: October 2025 - Contact Form Email Integration
+
 - [x] Implemented contact form email notifications using AWS SES
 - [x] Added sendContactFormNotification function to email service
 - [x] Configured FROM_EMAIL and ADMIN_EMAIL environment variables
-- [x] Email notifications sent to hello@1stholmergreenscouts.org.uk
+- [x] Email notifications sent to <hello@1stholmergreenscouts.org.uk>
 - [x] Reply-to header set to contact form submitter for easy replies
 - [x] Updated contact page with correct email address
 - [x] Verified and tested in production
 
 ### Session: October 2025 - Production Deployment
+
 - [x] Deployed to production AWS account (scouts profile)
-- [x] Configured custom domain: https://1stholmergreenscouts.org.uk with SSL
-- [x] Set up ImprovMX email forwarding (hello@1stholmergreenscouts.org.uk)
+- [x] Configured custom domain: <https://1stholmergreenscouts.org.uk> with SSL
+- [x] Set up ImprovMX email forwarding (<hello@1stholmergreenscouts.org.uk>)
 - [x] Created admin user with proper ElectroDB integration
 - [x] Fixed 502 errors by adding Nitro AWS Lambda preset
 - [x] Fixed API URL double slash issue
@@ -411,6 +463,7 @@
 - [x] Cleaned up debug logging from troubleshooting
 
 ### Session: December 2024
+
 - [x] Fixed button sizing consistency (View Events / Learn More buttons)
 - [x] Fixed event card alignment for cancelled vs regular events
 - [x] Added 28px spacer to all cards for consistent content alignment
@@ -421,14 +474,19 @@
 ## Current Status Summary
 
 ### ✅ Completed (Core Features Working)
+
 - Infrastructure and deployment (SST v3, AWS Lambda, DynamoDB)
 - Authentication system (AWS Cognito, JWT, RBAC)
+  - Session timeout handling with auto-refresh
+  - "Remember me" functionality (localStorage vs sessionStorage)
+  - Visual session expiry warnings
+  - Automatic token refresh 10 minutes before expiry
 - Events API with recurring events and iCal export
 - Announcements API with categories and expiry
 - User management API
 - File upload system (S3 integration with attachments)
 - Contact form with email notifications and spam prevention
-  - Admin notifications to hello@1stholmergreenscouts.org.uk
+  - Admin notifications to <hello@1stholmergreenscouts.org.uk>
   - Auto-reply confirmation emails to submitters
   - Honeypot spam detection
   - Rate limiting (3 submissions per hour per IP)
@@ -440,14 +498,15 @@
 - Production deployment to custom domain with SSL
 
 ### 🚧 In Progress / Needs Work
+
 - Analytics dashboard
 - Rich text editor for descriptions
 - Audit logging system
-- Session timeout handling
 - Testing (unit, integration, E2E)
 - Documentation (user guide, admin guide)
 
 ### 📋 Remaining Priority Tasks
+
 1. **Testing**
    - Backend unit tests
    - Frontend component tests
@@ -465,6 +524,7 @@
    - Cost optimization
 
 ### 🎯 Nice-to-Have Features
+
 - Analytics dashboard with charts
 - Rich text editor for event descriptions
 - Audit logging for admin actions

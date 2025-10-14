@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "AWS_PROFILE=personal sst dev --stage dev",
     "build": "sst build",
-    "deploy": "sst deploy",
+    "deploy:production": "AWS_PROFILE=scouts sst deploy --stage production",
     "remove": "sst remove",
     "console": "sst console",
     "typecheck": "pnpm -r typecheck",
@@ -19,8 +19,8 @@
     "format": "biome format --write ."
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
-    "sst": "^3.2.5",
-    "typescript": "^5.6.3"
+    "@biomejs/biome": "2.2.6",
+    "sst": "3.17.19",
+    "typescript": "5.9.3"
   }
 }

@@ -568,7 +568,12 @@ const getEventTypeIcon = (type: string) => {
                 </div>
 
                 <!-- Description -->
-                <p class="text-gray-600 mb-4 line-clamp-3">{{ event.description }}</p>
+                <p class="text-gray-600 mb-3 line-clamp-3">{{ event.description }}</p>
+
+                <!-- Creator Info -->
+                <p class="text-xs text-gray-500 mb-4">
+                  Created by {{ event.creator_name || 'Unknown' }}
+                </p>
               </div>
 
               <!-- Footer -->
@@ -656,7 +661,12 @@ const getEventTypeIcon = (type: string) => {
                 </div>
 
                 <!-- Description -->
-                <p class="text-gray-600 line-clamp-2">{{ event.description }}</p>
+                <p class="text-gray-600 mb-2 line-clamp-2">{{ event.description }}</p>
+
+                <!-- Creator Info -->
+                <p class="text-xs text-gray-500">
+                  Created by {{ event.creator_name || 'Unknown' }}
+                </p>
               </div>
               </BaseCard>
               </div>

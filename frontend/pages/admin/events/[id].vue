@@ -38,9 +38,20 @@ const form = ref({
   recurrence_end_date: '',
 })
 
+const currentEvent = ref<Event | null>(null)
 const errors = ref<Record<string, string>>({})
 const submitting = ref(false)
 const attachments = ref<any[]>([])
+
+const formatDateTime = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
 
 // Watch for recurring checkbox changes
 watch(() => form.value.is_recurring, (isRecurring) => {
@@ -92,6 +103,7 @@ onMounted(async () => {
   if (!isNew.value) {
     const event = await eventsStore.fetchEventById(route.params.id as string)
     if (event) {
+      currentEvent.value = event
       const startDate = new Date(event.start_date)
       const endDate = new Date(event.end_date)
 
@@ -279,6 +291,33 @@ const handleCancel = () => {
       <h1 class="text-3xl font-display font-bold text-gray-900">{{ pageTitle }}</h1>
       <p class="text-gray-600 mt-1">{{ isNew ? 'Create a new event' : 'Update event details' }}</p>
     </div>
+
+    <!-- Metadata (for existing events) -->
+    <BaseCard v-if="!isNew && currentEvent" class="mb-6 bg-gray-50">
+      <h3 class="text-sm font-medium text-gray-700 mb-3">Event Information</h3>
+      <div class="flex flex-wrap gap-6 text-sm">
+        <div class="flex items-center gap-2 text-gray-600">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <span>Created by <strong>{{ currentEvent.creator_name || 'Unknown' }}</strong></span>
+        </div>
+
+        <div class="flex items-center gap-2 text-gray-600">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>{{ formatDateTime(currentEvent.created_at) }}</span>
+        </div>
+
+        <div v-if="currentEvent.updated_at && currentEvent.updated_at !== currentEvent.created_at" class="flex items-center gap-2 text-gray-600">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span>Last updated {{ formatDateTime(currentEvent.updated_at) }}</span>
+        </div>
+      </div>
+    </BaseCard>
 
     <!-- Form -->
     <BaseCard>
