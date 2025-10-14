@@ -214,7 +214,7 @@ const handleCancel = () => {
               <option value="achievement">Achievement</option>
             </select>
             <p class="mt-1 text-sm text-gray-500">
-              Helps organize announcements
+              Helps organise announcements
             </p>
           </div>
 

@@ -149,6 +149,8 @@ const customEventContent = (event: any) => {
 </template>
 
 <style scoped>
+@reference "~/assets/css/main.css";
+
 .events-calendar-vuecal {
   @apply bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden;
 }

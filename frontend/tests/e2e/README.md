@@ -20,6 +20,7 @@ tests/e2e/
 ## Test Coverage
 
 ### Authentication Tests (`auth.spec.ts`)
+
 - Login page display
 - Valid credential login
 - Invalid credential handling
@@ -29,6 +30,7 @@ tests/e2e/
 - Role-based access control
 
 ### Events Tests (`events.spec.ts`)
+
 - Events list display
 - Event detail pages
 - Age group filtering
@@ -38,6 +40,7 @@ tests/e2e/
 - RSVP functionality (authenticated)
 
 ### Admin Tests (`admin.spec.ts`)
+
 - **Event Management**: Create, edit, delete, publish events
 - **Announcement Management**: Create, edit, set priority
 - **User Management**: View users, change roles
@@ -45,6 +48,7 @@ tests/e2e/
 - **File Attachments**: Upload to events
 
 ### Homepage & Contact Tests (`homepage.spec.ts`)
+
 - Homepage loading
 - Events and announcements display
 - Navigation links
@@ -56,26 +60,31 @@ tests/e2e/
 ## Running Tests
 
 ### Run all tests
+
 ```bash
 pnpm test:e2e
 ```
 
 ### Run tests with UI
+
 ```bash
 pnpm test:e2e:ui
 ```
 
 ### Run tests in debug mode
+
 ```bash
 pnpm test:e2e:debug
 ```
 
 ### Run specific test file
+
 ```bash
 pnpm test:e2e auth.spec.ts
 ```
 
 ### Run tests in specific browser
+
 ```bash
 pnpm test:e2e --project=chromium
 pnpm test:e2e --project=firefox
@@ -83,6 +92,7 @@ pnpm test:e2e --project=webkit
 ```
 
 ### View test report
+
 ```bash
 pnpm test:e2e:report
 ```
@@ -103,6 +113,7 @@ test('My test', async ({ authenticatedPage }) => {
 ```
 
 Available fixtures:
+
 - `authenticatedPage` - Generic authenticated user (editor role)
 - `adminPage` - Admin user
 - `editorPage` - Editor user
@@ -157,11 +168,13 @@ Tests are designed to run in CI environments:
 
 1. Create a new test file in `tests/e2e/`
 2. Import test utilities from fixtures:
+
 ```typescript
 import { test, expect } from './fixtures'
 ```
 
-3. Use descriptive test names and organize with `describe` blocks:
+3. Use descriptive test names and organise with `describe` blocks:
+
 ```typescript
 test.describe('Feature Name', () => {
   test('should do something specific', async ({ page }) => {
@@ -171,11 +184,13 @@ test.describe('Feature Name', () => {
 ```
 
 4. Use data-testid attributes in components for reliable selectors:
+
 ```typescript
 await page.click('[data-testid="submit-button"]')
 ```
 
 5. Add fallback selectors for robustness:
+
 ```typescript
 await page.click('[data-testid="submit-button"], button[type="submit"]')
 ```
@@ -194,17 +209,21 @@ await page.click('[data-testid="submit-button"], button[type="submit"]')
 ## Debugging
 
 ### View trace files
+
 When tests fail, trace files are captured. View them with:
+
 ```bash
 playwright show-trace trace.zip
 ```
 
 ### Run in headed mode
+
 ```bash
 pnpm test:e2e --headed
 ```
 
 ### Use debug mode
+
 ```bash
 pnpm test:e2e:debug
 ```
@@ -243,6 +262,7 @@ pnpm test:setup-users  # Uses sst shell automatically
 ```
 
 This will create three test users in Cognito and DynamoDB:
+
 - `admin@test.com` / `Admin123!` (admin role)
 - `editor@test.com` / `Editor123!` (editor role)
 - `viewer@test.com` / `Viewer123!` (viewer role)
