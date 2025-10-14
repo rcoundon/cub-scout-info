@@ -36,6 +36,9 @@ export default defineNuxtConfig({
     css: {
       devSourcemap: false,
     },
+    build: {
+      sourcemap: false,
+    },
   },
 
   compatibilityDate: '2024-10-09',

@@ -148,75 +148,99 @@ const customEventContent = (event: any) => {
   </div>
 </template>
 
-<style scoped>
+<style>
 @reference "~/assets/css/main.css";
 
 .events-calendar-vuecal {
   @apply bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden;
 }
 
-.vuecal--rounded {
+.events-calendar-vuecal .vuecal--rounded {
   @apply rounded-t-lg;
 }
 
-:deep(.vuecal__event) {
-  @apply cursor-pointer transition-opacity;
+.events-calendar-vuecal .vuecal__event {
+  cursor: pointer;
+  transition-property: opacity;
 }
 
-:deep(.vuecal__event:hover) {
-  @apply opacity-80;
+.events-calendar-vuecal .vuecal__event:hover {
+  opacity: 0.8;
 }
 
-.custom-event {
+.events-calendar-vuecal .custom-event {
   @apply text-white text-xs px-2 py-1 rounded flex items-center gap-1 h-full;
 }
 
-.event-icon {
-  @apply flex-shrink-0;
+.events-calendar-vuecal .event-icon {
+  flex-shrink: 0;
 }
 
-.event-title {
-  @apply font-medium truncate flex-1;
+.events-calendar-vuecal .event-title {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
 }
 
 /* Today highlight */
-:deep(.vuecal__cell--today) {
-  @apply bg-blue-50;
+.events-calendar-vuecal .vuecal__cell--today {
+  background-color: #eff6ff;
 }
 
-:deep(.vuecal__cell--today .vuecal__cell-date) {
-  @apply bg-primary-600 text-white rounded-full w-7 h-7 flex items-center justify-center;
+.events-calendar-vuecal .vuecal__cell--today .vuecal__cell-date {
+  background-color: #0d9488;
+  color: white;
+  border-radius: 9999px;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Header styling */
-:deep(.vuecal__title) {
-  @apply text-xl font-semibold text-gray-900;
+.events-calendar-vuecal .vuecal__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
 }
 
-:deep(.vuecal__arrow) {
-  @apply text-gray-600 hover:bg-gray-100 rounded-lg transition-colors;
+.events-calendar-vuecal .vuecal__arrow {
+  color: #4b5563;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.events-calendar-vuecal .vuecal__arrow:hover {
+  background-color: #f3f4f6;
 }
 
 /* Weekday headers */
-:deep(.vuecal__heading) {
-  @apply text-sm font-semibold text-gray-600 bg-white border-b border-gray-200;
+.events-calendar-vuecal .vuecal__heading {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #4b5563;
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 /* Cell styling */
-:deep(.vuecal__cell) {
-  @apply border-gray-200;
+.events-calendar-vuecal .vuecal__cell {
+  border-color: #e5e7eb;
 }
 
 /* Event styling based on age group */
-:deep(.vuecal__event.event-beavers) {
+.events-calendar-vuecal .vuecal__event.event-beavers {
   background-color: #6366f1 !important;
 }
 
-:deep(.vuecal__event.event-cubs) {
+.events-calendar-vuecal .vuecal__event.event-cubs {
   background-color: #15803d !important;
 }
 
-:deep(.vuecal__event.event-scouts) {
+.events-calendar-vuecal .vuecal__event.event-scouts {
   background-color: #0d9488 !important;
 }
 </style>
