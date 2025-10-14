@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useEventsStore } from '~/stores/events'
+import { useRoute, useRouter } from 'vue-router'
 
 definePageMeta({
   layout: 'default',
 })
 
 const eventsStore = useEventsStore()
+const route = useRoute()
+const router = useRouter()
 const searchQuery = ref('')
 const eventTypeFilter = ref<'all' | 'meeting' | 'camp' | 'trip' | 'special' | 'fundraising' | 'other'>('all')
 const viewMode = ref<'list' | 'calendar'>('list')
@@ -27,6 +30,12 @@ onMounted(() => {
     if (saved) {
       selectedAgeGroups.value = JSON.parse(saved)
     }
+
+    // Restore view mode from URL query parameter
+    const viewParam = route.query.view as string
+    if (viewParam === 'calendar' || viewParam === 'list') {
+      viewMode.value = viewParam
+    }
   }
 })
 
@@ -36,6 +45,18 @@ watch(selectedAgeGroups, (newGroups) => {
     localStorage.setItem('selectedAgeGroups', JSON.stringify(newGroups))
   }
 }, { deep: true })
+
+// Update URL query parameter when view mode changes
+watch(viewMode, (newView) => {
+  if (process.client) {
+    router.push({
+      query: {
+        ...route.query,
+        view: newView,
+      },
+    })
+  }
+})
 
 const subscribeToCalendar = () => {
   const feedUrl = getCalendarFeedUrl()
@@ -498,7 +519,7 @@ const getEventTypeIcon = (type: string) => {
 
     <!-- Calendar View -->
     <div v-else-if="viewMode === 'calendar'">
-      <EventsCalendar :events="expandedEventsForCalendar" />
+      <EventsCalendarVueCal :events="expandedEventsForCalendar" />
     </div>
 
     <!-- Events List -->
@@ -510,7 +531,7 @@ const getEventTypeIcon = (type: string) => {
           <NuxtLink
             v-for="event in upcomingEvents"
             :key="event.id"
-            :to="`/events/${event.id}`"
+            :to="{ path: `/events/${event.id}`, query: { ...route.query } }"
             class="block"
           >
             <div :class="{ 'stacked-card': event.is_recurring }">
@@ -606,7 +627,7 @@ const getEventTypeIcon = (type: string) => {
           <NuxtLink
             v-for="event in pastEvents"
             :key="event.id"
-            :to="`/events/${event.id}`"
+            :to="{ path: `/events/${event.id}`, query: { ...route.query } }"
             class="block"
           >
             <div :class="{ 'stacked-card': event.is_recurring }">

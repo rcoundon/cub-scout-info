@@ -150,7 +150,10 @@ const isPastDeadline = computed(() => {
 })
 
 const goBack = () => {
-  router.push('/events')
+  router.push({
+    path: '/events',
+    query: { ...route.query },
+  })
 }
 
 const formatFileSize = (bytes: number): string => {
