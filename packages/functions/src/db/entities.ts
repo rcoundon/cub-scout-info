@@ -45,6 +45,9 @@ export const UserEntity = new Entity(
         type: 'string',
         required: true,
       },
+      leadership_name: {
+        type: 'string',
+      },
       created_at: {
         type: 'string',
         required: true,

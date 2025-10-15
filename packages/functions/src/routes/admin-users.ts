@@ -8,7 +8,6 @@ import {
   createUser,
   updateUser,
   deleteUser,
-  updateUserRole,
 } from '../services/users';
 import { deleteUserFromCognito } from '../services/cognito';
 import { requireAdmin, getUserContext } from '../middleware/auth';
@@ -38,6 +37,7 @@ app.get('/', requireAdmin, async (c) => {
       role: user.role,
       first_name: user.first_name,
       last_name: user.last_name,
+      leadership_name: user.leadership_name,
       created_at: user.created_at,
       last_login: user.last_login,
     }));
@@ -62,6 +62,7 @@ app.post(
       email: z.string().email(),
       first_name: z.string().min(1),
       last_name: z.string().min(1),
+      leadership_name: z.string().optional(),
       role: z.enum(['admin', 'editor', 'viewer']),
     })
   ),
@@ -93,6 +94,7 @@ app.post(
           email: userData.email,
           first_name: userData.first_name,
           last_name: userData.last_name,
+          leadership_name: userData.leadership_name,
           role: userData.role,
           invitation_token: invitationToken,
           invitation_token_expires: tokenExpires,
@@ -129,6 +131,7 @@ app.post(
               role: newUser.role,
               first_name: newUser.first_name,
               last_name: newUser.last_name,
+              leadership_name: newUser.leadership_name,
               invitation_status: newUser.invitation_status,
               invited_at: newUser.invited_at,
               created_at: newUser.created_at,
@@ -179,6 +182,7 @@ app.get('/:id', requireAdmin, async (c) => {
       role: user.role,
       first_name: user.first_name,
       last_name: user.last_name,
+      leadership_name: user.leadership_name,
       created_at: user.created_at,
       updated_at: user.updated_at,
       last_login: user.last_login,
@@ -203,6 +207,7 @@ app.put(
     z.object({
       first_name: z.string().min(1).optional(),
       last_name: z.string().min(1).optional(),
+      leadership_name: z.string().optional(),
       role: z.enum(['admin', 'editor', 'viewer']).optional(),
     })
   ),
@@ -244,6 +249,7 @@ app.put(
           role: updatedUser.role,
           first_name: updatedUser.first_name,
           last_name: updatedUser.last_name,
+          leadership_name: updatedUser.leadership_name,
           updated_at: updatedUser.updated_at,
         },
       });

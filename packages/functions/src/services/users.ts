@@ -51,7 +51,31 @@ export async function updateUser(
   userId: string,
   updates: Partial<Omit<User, 'id' | 'created_at' | 'email'>>
 ) {
-  const result = await UserEntity.patch({ id: userId }).set(updates).go({ response: 'all_new' });
+  // Handle empty string for leadership_name to remove it
+  const patch = UserEntity.patch({ id: userId });
+
+  // Separate fields to remove (empty strings) from fields to set
+  const fieldsToRemove: string[] = [];
+  const fieldsToSet: Partial<Omit<User, 'id' | 'created_at' | 'email'>> = {};
+
+  for (const [key, value] of Object.entries(updates)) {
+    if (key === 'leadership_name' && value === '') {
+      fieldsToRemove.push(key);
+    } else if (value !== undefined) {
+      fieldsToSet[key as keyof typeof fieldsToSet] = value;
+    }
+  }
+
+  // Apply updates
+  let query = patch;
+  if (Object.keys(fieldsToSet).length > 0) {
+    query = query.set(fieldsToSet);
+  }
+  if (fieldsToRemove.length > 0) {
+    query = query.remove(fieldsToRemove);
+  }
+
+  const result = await query.go({ response: 'all_new' });
   return result.data || null;
 }
 

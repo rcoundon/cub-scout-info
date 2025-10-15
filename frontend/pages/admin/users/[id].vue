@@ -23,6 +23,7 @@ const form = ref({
   email: '',
   first_name: '',
   last_name: '',
+  leadership_name: '',
   role: 'viewer' as 'admin' | 'editor' | 'viewer',
 })
 
@@ -37,6 +38,7 @@ onMounted(async () => {
         email: user.email,
         first_name: user.first_name,
         last_name: user.last_name,
+        leadership_name: user.leadership_name || '',
         role: user.role,
       }
     } else {
@@ -90,14 +92,21 @@ const handleSubmit = async () => {
         email: form.value.email,
         first_name: form.value.first_name,
         last_name: form.value.last_name,
+        leadership_name: form.value.leadership_name.trim() || undefined,
         role: form.value.role,
       })
     } else {
-      success = await usersStore.updateUser(route.params.id as string, {
+      // For updates, we need to explicitly handle empty string to remove the field
+      const updates: any = {
         first_name: form.value.first_name,
         last_name: form.value.last_name,
         role: form.value.role,
-      })
+      }
+
+      // Always include leadership_name in updates, using empty string to clear it
+      updates.leadership_name = form.value.leadership_name.trim() || ''
+
+      success = await usersStore.updateUser(route.params.id as string, updates)
     }
 
     if (success) {
@@ -174,6 +183,14 @@ const handleCancel = () => {
             :required="true"
           />
         </div>
+
+        <!-- Leadership Name -->
+        <BaseInput
+          v-model="form.leadership_name"
+          label="Leadership Name"
+          placeholder="e.g., Baloo, Akela, Bagheera (optional)"
+          hint="Optional scout/leadership name to display alongside their real name"
+        />
 
         <!-- Role -->
         <div>

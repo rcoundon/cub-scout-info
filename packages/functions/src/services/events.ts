@@ -12,9 +12,22 @@ import { getUser } from './users';
 async function enrichEventWithCreator(event: Event) {
   try {
     const creator = await getUser(event.created_by);
+    if (!creator) {
+      return {
+        ...event,
+        creator_name: 'Unknown',
+      };
+    }
+
+    // Format: "Leadership Name (First Last)" or just "First Last" if no leadership name
+    const fullName = `${creator.first_name} ${creator.last_name}`;
+    const creator_name = creator.leadership_name
+      ? `${creator.leadership_name} (${fullName})`
+      : fullName;
+
     return {
       ...event,
-      creator_name: creator ? `${creator.first_name} ${creator.last_name}` : 'Unknown',
+      creator_name,
     };
   } catch (error) {
     console.error('Failed to fetch creator:', error);

@@ -7,9 +7,11 @@ export interface User {
   email: string
   first_name: string
   last_name: string
+  leadership_name?: string
   role: 'admin' | 'editor' | 'viewer'
   last_login?: string
   created_at: string
+  invitation_status?: 'invited' | 'active' | 'expired'
 }
 
 export const useUsersStore = defineStore('users', () => {
@@ -70,9 +72,10 @@ export const useUsersStore = defineStore('users', () => {
 
   async function createUser(userData: {
     email: string
-    password: string
+    password?: string
     first_name: string
     last_name: string
+    leadership_name?: string
     role: 'admin' | 'editor' | 'viewer'
   }) {
     loading.value = true
@@ -105,6 +108,7 @@ export const useUsersStore = defineStore('users', () => {
     updates: {
       first_name?: string
       last_name?: string
+      leadership_name?: string
       role?: 'admin' | 'editor' | 'viewer'
     }
   ) {

@@ -11,6 +11,7 @@ export interface User {
   role: UserRole;
   first_name: string;
   last_name: string;
+  leadership_name?: string; // Optional leadership/scout name (e.g., "Baloo", "Akela")
   created_at: string; // ISO 8601 timestamp
   updated_at: string; // ISO 8601 timestamp
   last_login?: string; // ISO 8601 timestamp
