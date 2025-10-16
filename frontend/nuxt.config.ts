@@ -8,6 +8,10 @@ export default defineNuxtConfig({
 
   app: {
     head: {
+      htmlAttrs: {
+        lang: 'en'
+      },
+      title: '1st Holmer Green Scout Group - Cubs',
       link: [
         { rel: 'icon', type: 'image/jpeg', href: '/assets/scout-logo.jpg' }
       ]

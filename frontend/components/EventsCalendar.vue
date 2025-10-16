@@ -83,9 +83,9 @@ const goToToday = () => {
 
 const getAgeGroupColor = (ageGroup: string) => {
   const colors: Record<string, string> = {
-    beavers: 'bg-primary-500',
+    beavers: 'bg-primary-700',
     cubs: 'bg-green-700',
-    scouts: 'bg-teal-600',
+    scouts: 'bg-primary-800',
   }
   return colors[ageGroup] || colors.cubs
 }
@@ -220,7 +220,7 @@ const formatTime = (dateString: string) => {
           <span class="text-gray-600 font-medium text-sm block mb-2">Age Groups:</span>
           <div class="flex flex-wrap items-center gap-3 text-sm">
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 bg-primary-500 rounded"></span>
+              <span class="w-3 h-3 bg-primary-700 rounded"></span>
               <span class="text-gray-700">Beavers</span>
             </div>
             <div class="flex items-center gap-2">
@@ -228,7 +228,7 @@ const formatTime = (dateString: string) => {
               <span class="text-gray-700">Cubs</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 bg-teal-600 rounded"></span>
+              <span class="w-3 h-3 bg-primary-800 rounded"></span>
               <span class="text-gray-700">Scouts</span>
             </div>
           </div>

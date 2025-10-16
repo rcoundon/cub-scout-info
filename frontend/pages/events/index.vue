@@ -7,6 +7,13 @@ definePageMeta({
   layout: 'default',
 })
 
+useHead({
+  title: 'Upcoming Events - 1st Holmer Green Scout Group',
+  meta: [
+    { name: 'description', content: 'View upcoming Cubs, Beavers, and Scouts events, activities, camps, and meetings. Subscribe to our calendar for automatic updates or add individual events to your calendar.' }
+  ]
+})
+
 const eventsStore = useEventsStore()
 const route = useRoute()
 const router = useRouter()
@@ -227,9 +234,9 @@ const getEventTypeLabel = (type: string) => {
 // Age group colors (used for card backgrounds/borders)
 const getAgeGroupColor = (ageGroup: string) => {
   const colors: Record<string, string> = {
-    beavers: 'bg-primary-500 border-primary-600',
+    beavers: 'bg-primary-700 border-primary-800',
     cubs: 'bg-green-700 border-green-800',
-    scouts: 'bg-teal-600 border-teal-700',
+    scouts: 'bg-primary-800 border-primary-900',
   }
   return colors[ageGroup] || colors.cubs
 }

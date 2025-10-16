@@ -48,6 +48,8 @@
         <button
           class="md:hidden p-2 rounded-lg hover:bg-gray-100"
           @click="toggleMobileMenu"
+          :aria-label="mobileMenuOpen ? 'Close menu' : 'Open menu'"
+          :aria-expanded="mobileMenuOpen"
         >
           <svg
             class="w-6 h-6"
