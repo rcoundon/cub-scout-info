@@ -507,6 +507,11 @@ const downloadAttachment = async (attachment: any) => {
               </div>
             </BaseCard>
 
+            <!-- Location Map -->
+            <ClientOnly>
+              <LocationMap :address="event.location" />
+            </ClientOnly>
+
             <!-- Add to Calendar Buttons -->
             <BaseCard v-if="isUpcoming && event.status !== 'cancelled'">
               <h4 class="font-semibold text-gray-900 mb-2">Add This Event</h4>
