@@ -213,5 +213,10 @@ const getExpiryText = (expiresAt?: string) => {
         <p class="text-gray-500 mt-2">Check back soon for updates and news!</p>
       </div>
     </div>
+
+    <!-- External Links Section -->
+    <div class="mt-12 max-w-2xl mx-auto">
+      <ExternalLinks />
+    </div>
   </div>
 </template>

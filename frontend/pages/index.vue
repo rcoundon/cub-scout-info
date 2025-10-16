@@ -260,6 +260,11 @@ const getEventTypeLabel = (type: string) => {
           </div>
         </div>
       </div>
+
+      <!-- External Links Section -->
+      <div class="mt-20 max-w-2xl mx-auto">
+        <ExternalLinks />
+      </div>
     </div>
   </div>
 </template>

@@ -140,11 +140,16 @@ interface Attachment {
   s3_key: string;
 }
 
-const props = defineProps<{
-  parentType: 'events' | 'announcements';
-  parentId: string;
-  modelValue: Attachment[];
-}>();
+const props = withDefaults(
+  defineProps<{
+    parentType: 'events' | 'announcements';
+    parentId?: string;
+    modelValue: Attachment[];
+  }>(),
+  {
+    parentId: '',
+  }
+);
 
 const emit = defineEmits<{
   'update:modelValue': [value: Attachment[]];
@@ -193,6 +198,10 @@ async function handleFileSelect(event: Event) {
   const file = target.files?.[0];
 
   if (!file) return;
+  if (!props.parentId) {
+    errorMessage.value = 'Cannot upload file: Parent ID is not set';
+    return;
+  }
 
   errorMessage.value = '';
 
@@ -295,6 +304,11 @@ function getDownloadUrl(attachment: Attachment): string {
 
 async function deleteAttachment(attachmentId: string) {
   if (!confirm('Are you sure you want to delete this file?')) {
+    return;
+  }
+
+  if (!props.parentId) {
+    errorMessage.value = 'Cannot delete file: Parent ID is not set';
     return;
   }
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
 import { useEventsStore, type Event } from '~/stores/events'
+import { useExternalLinksStore, type ExternalLink } from '~/stores/external-links'
 import { useRouter, useRoute } from 'vue-router'
 
 definePageMeta({
@@ -9,6 +10,7 @@ definePageMeta({
 })
 
 const eventsStore = useEventsStore()
+const linksStore = useExternalLinksStore()
 const router = useRouter()
 const route = useRoute()
 
@@ -42,6 +44,7 @@ const currentEvent = ref<Event | null>(null)
 const errors = ref<Record<string, string>>({})
 const submitting = ref(false)
 const attachments = ref<any[]>([])
+const externalLinks = ref<ExternalLink[]>([])
 
 const formatDateTime = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-GB', {
@@ -153,6 +156,14 @@ onMounted(async () => {
         attachments.value = response.attachments
       } catch (error) {
         console.error('Failed to load attachments:', error)
+      }
+
+      // Load external links
+      try {
+        const links = await linksStore.fetchEventExternalLinks(route.params.id as string)
+        externalLinks.value = links
+      } catch (error) {
+        console.error('Failed to load external links:', error)
       }
     } else {
       router.push('/admin/events')
@@ -279,6 +290,34 @@ const handleSubmit = async () => {
     console.log('Event creation result:', success)
 
     if (success) {
+      // Save external links after event is saved
+      const eventId = isNew.value ? eventsStore.currentEvent?.id : route.params.id as string
+      if (eventId && externalLinks.value.length > 0) {
+        try {
+          // Delete existing links
+          const existingLinks = await linksStore.fetchEventExternalLinks(eventId)
+          for (const link of existingLinks) {
+            if (link.id) {
+              await linksStore.deleteExternalLink(link.id)
+            }
+          }
+
+          // Create new links
+          for (const [index, link] of externalLinks.value.entries()) {
+            await linksStore.createExternalLink({
+              parent_type: 'event',
+              parent_id: eventId,
+              url: link.url,
+              label: link.label,
+              display_order: index,
+              is_active: true,
+            })
+          }
+        } catch (error) {
+          console.error('Failed to save external links:', error)
+        }
+      }
+
       router.push('/admin/events')
     } else {
       console.error('Event creation failed - store returned', success)
@@ -587,6 +626,15 @@ const handleCancel = () => {
             v-model="attachments"
             parent-type="events"
             :parent-id="route.params.id as string"
+          />
+        </div>
+
+        <!-- External Links -->
+        <div class="border-t border-gray-200 pt-6">
+          <ExternalLinkManager
+            v-model="externalLinks"
+            parent-type="event"
+            :parent-id="isNew ? undefined : (route.params.id as string)"
           />
         </div>
 

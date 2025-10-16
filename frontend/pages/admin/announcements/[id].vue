@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useAnnouncementsStore } from '~/stores/announcements'
+import { useExternalLinksStore, type ExternalLink } from '~/stores/external-links'
 import { useRouter, useRoute } from 'vue-router'
 
 definePageMeta({
@@ -9,6 +10,7 @@ definePageMeta({
 })
 
 const announcementsStore = useAnnouncementsStore()
+const linksStore = useExternalLinksStore()
 const router = useRouter()
 const route = useRoute()
 
@@ -29,6 +31,7 @@ const currentAnnouncement = ref<any>(null)
 const errors = ref<Record<string, string>>({})
 const submitting = ref(false)
 const attachments = ref<any[]>([])
+const externalLinks = ref<ExternalLink[]>([])
 
 onMounted(async () => {
   if (!isNew.value) {
@@ -53,6 +56,14 @@ onMounted(async () => {
         attachments.value = response.attachments
       } catch (error) {
         console.error('Failed to load attachments:', error)
+      }
+
+      // Load external links
+      try {
+        const links = await linksStore.fetchAnnouncementExternalLinks(route.params.id as string)
+        externalLinks.value = links
+      } catch (error) {
+        console.error('Failed to load external links:', error)
       }
     } else {
       router.push('/admin/announcements')
@@ -110,6 +121,34 @@ const handleSubmit = async () => {
     }
 
     if (success) {
+      // Save external links after announcement is saved
+      const announcementId = isNew.value ? announcementsStore.currentAnnouncement?.id : route.params.id as string
+      if (announcementId && externalLinks.value.length > 0) {
+        try {
+          // Delete existing links
+          const existingLinks = await linksStore.fetchAnnouncementExternalLinks(announcementId)
+          for (const link of existingLinks) {
+            if (link.id) {
+              await linksStore.deleteExternalLink(link.id)
+            }
+          }
+
+          // Create new links
+          for (const [index, link] of externalLinks.value.entries()) {
+            await linksStore.createExternalLink({
+              parent_type: 'announcement',
+              parent_id: announcementId,
+              url: link.url,
+              label: link.label,
+              display_order: index,
+              is_active: true,
+            })
+          }
+        } catch (error) {
+          console.error('Failed to save external links:', error)
+        }
+      }
+
       router.push('/admin/announcements')
     }
   } finally {
@@ -245,6 +284,15 @@ const handleCancel = () => {
             v-model="attachments"
             parent-type="announcements"
             :parent-id="route.params.id as string"
+          />
+        </div>
+
+        <!-- External Links -->
+        <div class="border-t border-gray-200 pt-6">
+          <ExternalLinkManager
+            v-model="externalLinks"
+            parent-type="announcement"
+            :parent-id="isNew ? undefined : (route.params.id as string)"
           />
         </div>
 

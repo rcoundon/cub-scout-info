@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useEventsStore } from '~/stores/events'
+import { useExternalLinksStore, type ExternalLink } from '~/stores/external-links'
 import { useRoute, useRouter } from 'vue-router'
 
 definePageMeta({
@@ -8,12 +9,14 @@ definePageMeta({
 })
 
 const eventsStore = useEventsStore()
+const linksStore = useExternalLinksStore()
 const route = useRoute()
 const router = useRouter()
 
 const loading = ref(true)
 const notFound = ref(false)
 const attachments = ref<any[]>([])
+const externalLinks = ref<ExternalLink[]>([])
 
 onMounted(async () => {
   const eventId = route.params.id as string
@@ -23,7 +26,7 @@ onMounted(async () => {
     notFound.value = true
   }
 
-  // Load attachments
+  // Load attachments and external links
   if (event) {
     try {
       const config = useRuntimeConfig()
@@ -33,6 +36,14 @@ onMounted(async () => {
       attachments.value = response.attachments
     } catch (error) {
       console.error('Failed to load attachments:', error)
+    }
+
+    // Load external links
+    try {
+      const links = await linksStore.fetchEventExternalLinks(eventId)
+      externalLinks.value = links.filter(link => link.is_active)
+    } catch (error) {
+      console.error('Failed to load external links:', error)
     }
   }
 
@@ -311,6 +322,58 @@ const downloadAttachment = async (attachment: any) => {
                     stroke-linejoin="round"
                     stroke-width="2"
                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                  />
+                </svg>
+              </a>
+            </div>
+          </BaseCard>
+
+          <!-- External Links -->
+          <BaseCard v-if="externalLinks.length > 0">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Related Links</h2>
+            <div class="space-y-3">
+              <a
+                v-for="link in externalLinks"
+                :key="link.id"
+                :href="link.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
+              >
+                <div class="flex items-center space-x-3 flex-1 min-w-0">
+                  <svg
+                    class="h-8 w-8 text-primary-600 flex-shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">
+                      {{ link.label || link.url }}
+                    </p>
+                    <p v-if="link.label" class="text-xs text-gray-500 truncate">
+                      {{ link.url }}
+                    </p>
+                  </div>
+                </div>
+                <svg
+                  class="h-5 w-5 text-gray-400 group-hover:text-primary-600 flex-shrink-0 ml-3"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                   />
                 </svg>
               </a>

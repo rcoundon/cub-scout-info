@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useAnnouncementsStore } from '~/stores/announcements'
+import { useExternalLinksStore, type ExternalLink } from '~/stores/external-links'
 import { useRoute, useRouter } from 'vue-router'
 
 definePageMeta({
@@ -8,12 +9,14 @@ definePageMeta({
 })
 
 const announcementsStore = useAnnouncementsStore()
+const linksStore = useExternalLinksStore()
 const route = useRoute()
 const router = useRouter()
 
 const loading = ref(true)
 const notFound = ref(false)
 const attachments = ref<any[]>([])
+const externalLinks = ref<ExternalLink[]>([])
 const config = useRuntimeConfig()
 
 onMounted(async () => {
@@ -24,7 +27,7 @@ onMounted(async () => {
     notFound.value = true
   }
 
-  // Load attachments
+  // Load attachments and external links
   if (announcement) {
     try {
       const response = await $fetch<{ attachments: any[] }>(
@@ -33,6 +36,14 @@ onMounted(async () => {
       attachments.value = response.attachments
     } catch (error) {
       console.error('Failed to load attachments:', error)
+    }
+
+    // Load external links
+    try {
+      const links = await linksStore.fetchAnnouncementExternalLinks(announcementId)
+      externalLinks.value = links.filter(link => link.is_active)
+    } catch (error) {
+      console.error('Failed to load external links:', error)
     }
   }
 
@@ -261,6 +272,58 @@ const downloadAttachment = async (attachment: any) => {
                   stroke-linejoin="round"
                   stroke-width="2"
                   d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- External Links -->
+        <div v-if="externalLinks.length > 0" class="mt-6 pt-6 border-t border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Related Links</h3>
+          <div class="space-y-2">
+            <a
+              v-for="link in externalLinks"
+              :key="link.id"
+              :href="link.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
+            >
+              <div class="flex items-center space-x-3 flex-1 min-w-0">
+                <svg
+                  class="h-6 w-6 text-primary-600 flex-shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                  />
+                </svg>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">
+                    {{ link.label || link.url }}
+                  </p>
+                  <p v-if="link.label" class="text-xs text-gray-500 truncate">
+                    {{ link.url }}
+                  </p>
+                </div>
+              </div>
+              <svg
+                class="h-5 w-5 text-gray-400 group-hover:text-primary-600 flex-shrink-0 ml-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                 />
               </svg>
             </a>

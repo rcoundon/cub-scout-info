@@ -571,6 +571,101 @@ export const ContactMessageEntity = new Entity(
 );
 
 /**
+ * External Link Entity
+ * Manages external hyperlinks displayed on the site
+ * Can be global or associated with specific events/announcements
+ */
+export const ExternalLinkEntity = new Entity(
+  {
+    model: {
+      entity: 'ExternalLink',
+      version: '1',
+      service: 'cubs-site',
+    },
+    attributes: {
+      id: {
+        type: 'string',
+        required: true,
+        readOnly: true,
+        default: () => crypto.randomUUID(),
+      },
+      parent_type: {
+        type: ['event', 'announcement', 'global'] as const,
+        required: true,
+        default: 'global',
+      },
+      parent_id: {
+        type: 'string',
+        required: true,
+        default: 'none',
+      },
+      url: {
+        type: 'string',
+        required: true,
+      },
+      label: {
+        type: 'string',
+      },
+      display_order: {
+        type: 'number',
+        required: true,
+        default: 0,
+      },
+      is_active: {
+        type: 'boolean',
+        required: true,
+        default: true,
+      },
+      created_by: {
+        type: 'string',
+        required: true,
+      },
+      created_at: {
+        type: 'string',
+        required: true,
+        readOnly: true,
+        default: () => new Date().toISOString(),
+      },
+      updated_at: {
+        type: 'string',
+        required: false,
+        readOnly: true,
+        watch: '*',
+        set: () => new Date().toISOString(),
+      },
+    },
+    indexes: {
+      primary: {
+        pk: {
+          field: 'PK',
+          composite: ['id'],
+          template: 'EXTERNALLINK#${id}',
+        },
+        sk: {
+          field: 'SK',
+          composite: [],
+          template: 'METADATA',
+        },
+      },
+      byParent: {
+        index: 'GSI1',
+        pk: {
+          field: 'GSI1PK',
+          composite: ['parent_type', 'parent_id'],
+          template: 'EXTERNALLINK#${parent_type}#${parent_id}',
+        },
+        sk: {
+          field: 'GSI1SK',
+          composite: ['display_order', 'id'],
+          template: 'ORDER#${display_order}#${id}',
+        },
+      },
+    },
+  },
+  { client, table: tableName }
+);
+
+/**
  * Create a Service to access all entities
  * This allows for transactions and batch operations
  */
@@ -582,6 +677,7 @@ export const CubsService = new Service(
     attachment: AttachmentEntity,
     audit: AuditEntity,
     contactMessage: ContactMessageEntity,
+    externalLink: ExternalLinkEntity,
   },
   { client, table: tableName }
 );

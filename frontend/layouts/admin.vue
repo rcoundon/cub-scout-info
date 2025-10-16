@@ -98,6 +98,11 @@ const navItems = [
     icon: 'svg',
   },
   {
+    label: 'External Links',
+    path: '/admin/external-links',
+    icon: 'svg',
+  },
+  {
     label: 'Users',
     path: '/admin/users',
     icon: 'svg',
