@@ -12,6 +12,9 @@ interface Props {
 const props = defineProps<Props>()
 const route = useRoute()
 
+// Active view state (month, week, day)
+const activeView = ref<'month' | 'week' | 'day'>('month')
+
 // Transform events into VueCal format
 const calendarEvents = computed(() => {
   return props.events.map(event => ({
@@ -70,18 +73,64 @@ const customEventContent = (event: any) => {
 
 <template>
   <div class="events-calendar-vuecal">
+    <!-- Custom View Selector -->
+    <div class="calendar-view-selector flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
+      <h2 class="text-xl font-semibold text-gray-900">Events Calendar</h2>
+      <div class="inline-flex rounded-lg border border-gray-200 p-1 bg-gray-50">
+        <button
+          @click="activeView = 'month'"
+          :class="{
+            'bg-white shadow-sm text-gray-900': activeView === 'month',
+            'text-gray-600 hover:text-gray-900': activeView !== 'month',
+          }"
+          class="px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          Month
+        </button>
+        <button
+          @click="activeView = 'week'"
+          :class="{
+            'bg-white shadow-sm text-gray-900': activeView === 'week',
+            'text-gray-600 hover:text-gray-900': activeView !== 'week',
+          }"
+          class="px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          Week
+        </button>
+        <button
+          @click="activeView = 'day'"
+          :class="{
+            'bg-white shadow-sm text-gray-900': activeView === 'day',
+            'text-gray-600 hover:text-gray-900': activeView !== 'day',
+          }"
+          class="px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Day
+        </button>
+      </div>
+    </div>
+
     <VueCal
       :events="calendarEvents"
-      :time="false"
+      :time="activeView !== 'month'"
       :disable-views="['years', 'year']"
-      active-view="month"
+      :active-view="activeView"
       :on-event-click="onEventClick"
       events-on-month-view="short"
       :snap-to-time="15"
       hide-view-selector
       class="vuecal--rounded"
       :twelve-hour="true"
-      style="height: 600px"
+      :style="{ height: activeView === 'month' ? '600px' : '700px' }"
     >
       <template #event="{ event }">
         <div class="custom-event" :style="{ backgroundColor: getAgeGroupColor(event.age_group) }">
@@ -155,8 +204,12 @@ const customEventContent = (event: any) => {
   @apply bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden;
 }
 
-.events-calendar-vuecal .vuecal--rounded {
+.events-calendar-vuecal .calendar-view-selector {
   @apply rounded-t-lg;
+}
+
+.events-calendar-vuecal .vuecal--rounded {
+  @apply rounded-none;
 }
 
 .events-calendar-vuecal .vuecal__event {

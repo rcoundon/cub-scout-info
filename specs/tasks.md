@@ -225,7 +225,7 @@
 - [x] Create iCal export functionality (.ics download)
 - [x] Add calendar subscription feature (live updates via webcal)
 - [x] Support recurring event expansion in calendar view
-- [ ] Add week/day views (currently month only)
+- [x] Add week/day views (currently month only)
 
 ## Phase 4: Testing (Week 10)
 

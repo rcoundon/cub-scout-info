@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "AWS_PROFILE=personal sst dev --stage dev",
-    "build": "sst build",
+    "build": "AWS_PROFILE=scouts sst build --stage production",
     "deploy:production": "AWS_PROFILE=scouts sst deploy --stage production",
     "remove": "sst remove",
     "console": "sst console",
