@@ -31,6 +31,15 @@ export const useAuthStore = defineStore('auth', () => {
   const rememberMe = ref(false)
   const tokenExpiry = ref<number | null>(null) // Unix timestamp in milliseconds
   const sessionTimeoutWarning = ref(false)
+  const initialized = ref(false) // Track if auth has been initialized from storage
+
+  // Promise that resolves when initialization is complete
+  // Create immediately so middleware can await it
+  let initResolve: (() => void) | null = null
+  const initPromise = new Promise<void>((resolve) => {
+    initResolve = resolve
+  })
+  let initStarted = ref(false)
 
   // Getters
   const isAuthenticated = computed(() => !!user.value && !!tokens.value)
@@ -336,6 +345,7 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     tokenExpiry.value = null
     sessionTimeoutWarning.value = false
+    // Don't reset initialized flag - we're still initialized, just not authenticated
 
     // Clear storage
     clearTokensFromStorage()
@@ -345,44 +355,74 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function initializeAuth() {
-    if (!process.client) return
+    // Prevent multiple initializations
+    if (initStarted.value) {
+      return
+    }
+    initStarted.value = true
 
-    // Check both localStorage and sessionStorage
-    const localTokens = localStorage.getItem('auth_tokens')
-    const sessionTokens = sessionStorage.getItem('auth_tokens')
-    const rememberMeFlag = localStorage.getItem('remember_me') || sessionStorage.getItem('remember_me')
-    const storedExpiry = localStorage.getItem('token_expiry') || sessionStorage.getItem('token_expiry')
+    if (!process.client) {
+      initialized.value = true
+      if (initResolve) initResolve()
+      return
+    }
 
-    const storedTokens = localTokens || sessionTokens
+    try {
+      // Check both localStorage and sessionStorage
+      const localTokens = localStorage.getItem('auth_tokens')
+      const sessionTokens = sessionStorage.getItem('auth_tokens')
+      const rememberMeFlag = localStorage.getItem('remember_me') || sessionStorage.getItem('remember_me')
+      const storedExpiry = localStorage.getItem('token_expiry') || sessionStorage.getItem('token_expiry')
 
-    if (storedTokens) {
-      try {
-        rememberMe.value = rememberMeFlag === 'true'
-        tokens.value = JSON.parse(storedTokens)
+      const storedTokens = localTokens || sessionTokens
 
-        if (storedExpiry) {
-          tokenExpiry.value = parseInt(storedExpiry, 10)
+      if (storedTokens) {
+        try {
+          rememberMe.value = rememberMeFlag === 'true'
+          tokens.value = JSON.parse(storedTokens)
 
-          // Check if token is expired
-          if (Date.now() >= tokenExpiry.value) {
-            console.log('Token expired, attempting refresh...')
-            const refreshed = await refreshTokens()
-            if (!refreshed) {
-              logout()
-              return
+          if (storedExpiry) {
+            tokenExpiry.value = parseInt(storedExpiry, 10)
+
+            // Check if token is expired
+            if (Date.now() >= tokenExpiry.value) {
+              console.log('Token expired, attempting refresh...')
+              const refreshed = await refreshTokens()
+              if (!refreshed) {
+                logout()
+                return
+              }
             }
           }
+
+          await fetchUserProfile()
+
+          // Start session monitoring
+          startSessionMonitoring()
+        } catch (err) {
+          console.error('Failed to restore auth state:', err)
+          logout()
         }
-
-        await fetchUserProfile()
-
-        // Start session monitoring
-        startSessionMonitoring()
-      } catch (err) {
-        console.error('Failed to restore auth state:', err)
-        logout()
       }
+    } finally {
+      // Mark as initialized whether tokens were found or not
+      initialized.value = true
+      if (initResolve) initResolve()
     }
+  }
+
+  // Helper to wait for initialization
+  async function waitForInit() {
+    if (initialized.value) {
+      return
+    }
+
+    // If initialization hasn't started yet, start it
+    if (!initStarted.value) {
+      initializeAuth() // Don't await - we'll await the promise below
+    }
+
+    await initPromise
   }
 
   function getAuthHeader(): Record<string, string> {
@@ -445,6 +485,7 @@ export const useAuthStore = defineStore('auth', () => {
     rememberMe,
     tokenExpiry,
     sessionTimeoutWarning,
+    initialized,
 
     // Getters
     isAuthenticated,
@@ -463,6 +504,7 @@ export const useAuthStore = defineStore('auth', () => {
     resetPassword,
     fetchUserProfile,
     initializeAuth,
+    waitForInit,
     getAuthHeader,
   }
 })

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 
 definePageMeta({
@@ -9,6 +9,20 @@ definePageMeta({
 
 const authStore = useAuthStore()
 const router = useRouter()
+const route = useRoute()
+
+// Get redirect URL from query params
+const redirectPath = computed(() => {
+  const redirect = route.query.redirect as string
+  return redirect || '/'
+})
+
+// If already authenticated, redirect immediately
+onMounted(() => {
+  if (authStore.isAuthenticated) {
+    router.replace(redirectPath.value)
+  }
+})
 
 // Form state
 const email = ref('')
@@ -103,8 +117,8 @@ const handleSubmit = async () => {
     challengeSession.value = result.session || ''
     challengeUsername.value = result.username || email.value
   } else if (typeof result === 'object' && !result.requiresPasswordChange && !result.error) {
-    // Login successful
-    router.push('/')
+    // Login successful - redirect to intended page
+    router.push(redirectPath.value)
   } else {
     formError.value = authStore.error || 'Login failed. Please check your credentials.'
   }
@@ -132,8 +146,8 @@ const handlePasswordChange = async () => {
   )
 
   if (success) {
-    // Redirect to home
-    router.push('/')
+    // Redirect to intended page
+    router.push(redirectPath.value)
   } else {
     formError.value = authStore.error || 'Failed to set new password. Please try again.'
   }

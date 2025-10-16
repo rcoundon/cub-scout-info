@@ -22,7 +22,9 @@
             <NuxtLink to="/" class="text-sm text-gray-600 hover:text-primary-600">
               Back to Site
             </NuxtLink>
-            <span class="text-sm text-gray-600">{{ userName }}</span>
+            <ClientOnly>
+              <span class="text-sm text-gray-600">{{ userName }}</span>
+            </ClientOnly>
             <BaseButton variant="outline" size="sm" @click="handleLogout">
               Logout
             </BaseButton>
