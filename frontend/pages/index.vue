@@ -11,6 +11,9 @@ const eventsStore = useEventsStore()
 // Fetch events on server and client for proper hydration
 await eventsStore.fetchPublishedEvents()
 
+// Capture the current time once during SSR to avoid hydration mismatches
+const currentTime = ref(new Date())
+
 const meetingInfo = [
   {
     ageGroup: 'beavers' as const,
@@ -53,9 +56,8 @@ const meetingInfo = [
 
 // Get 2 upcoming events for each age group
 const eventsByAgeGroup = computed(() => {
-  const now = new Date()
   const upcomingEvents = eventsStore.events
-    .filter(e => new Date(e.end_date) >= now && e.status === 'published')
+    .filter(e => new Date(e.end_date) >= currentTime.value && e.status === 'published')
     .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime())
 
   return {

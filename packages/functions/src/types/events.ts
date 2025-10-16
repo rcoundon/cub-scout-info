@@ -29,6 +29,7 @@ export interface Event {
   created_by: string; // Cognito user ID
   created_at: string; // ISO 8601 timestamp
   updated_at: string; // ISO 8601 timestamp
+  creator_name?: string; // Enriched field - name of user who created the event
 }
 
 export interface EventAttachment {

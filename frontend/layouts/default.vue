@@ -1,6 +1,8 @@
 <template>
   <div class="min-h-screen flex flex-col">
-    <SessionTimeoutWarning />
+    <ClientOnly>
+      <SessionTimeoutWarning />
+    </ClientOnly>
     <LayoutHeader />
 
     <main class="flex-grow">

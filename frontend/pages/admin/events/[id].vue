@@ -61,11 +61,24 @@ watch(() => form.value.is_recurring, (isRecurring) => {
   }
 })
 
-// Watch for start date changes when recurring is enabled
-watch(() => form.value.start_date, (newStartDate) => {
-  if (form.value.is_recurring && newStartDate) {
+// Watch for start date changes
+watch(() => form.value.start_date, (newStartDate, oldStartDate) => {
+  if (!newStartDate) return
+
+  if (form.value.is_recurring) {
     // Auto-update end date to match start date for recurring events
     form.value.end_date = newStartDate
+  } else {
+    // For non-recurring events, default end date to start date
+    // Only auto-update if:
+    // 1. End date is empty, OR
+    // 2. End date was equal to old start date (user hasn't customized it), OR
+    // 3. End date is now before the new start date (invalid)
+    if (!form.value.end_date ||
+        form.value.end_date === oldStartDate ||
+        form.value.end_date < newStartDate) {
+      form.value.end_date = newStartDate
+    }
   }
 })
 
@@ -380,16 +393,14 @@ const handleCancel = () => {
 
         <!-- Start Date & Time -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <BaseInput
+          <BaseDatePicker
             v-model="form.start_date"
-            type="date"
             label="Start Date"
             :error="errors.start_date"
             :required="true"
           />
-          <BaseInput
+          <BaseTimePicker
             v-model="form.start_time"
-            type="time"
             label="Start Time"
             :required="true"
           />
@@ -397,17 +408,16 @@ const handleCancel = () => {
 
         <!-- End Date & Time -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <BaseInput
+          <BaseDatePicker
             v-model="form.end_date"
-            type="date"
             :label="form.is_recurring ? 'Event Duration - End Date' : 'End Date'"
             :error="errors.end_date"
             :required="true"
+            :min-date="form.start_date ? new Date(form.start_date) : undefined"
             :hint="form.is_recurring ? 'For single occurrence (usually same day)' : undefined"
           />
-          <BaseInput
+          <BaseTimePicker
             v-model="form.end_time"
-            type="time"
             :label="form.is_recurring ? 'Event Duration - End Time' : 'End Time'"
             :required="true"
           />
@@ -450,11 +460,11 @@ const handleCancel = () => {
               </div>
 
               <!-- Recurrence End Date -->
-              <BaseInput
+              <BaseDatePicker
                 v-model="form.recurrence_end_date"
-                type="date"
                 label="Stop Repeating On"
                 :error="errors.recurrence_end_date"
+                :min-date="form.start_date ? new Date(form.start_date) : undefined"
                 :hint="`Optional (Default: ${defaultRecurrenceEndDate})`"
               />
             </div>
@@ -500,11 +510,11 @@ const handleCancel = () => {
             step="0.01"
           />
 
-          <BaseInput
+          <BaseDatePicker
             v-model="form.rsvp_deadline"
-            type="date"
             label="RSVP Deadline"
-            hint="Optional"
+            :max-date="form.start_date ? new Date(form.start_date) : undefined"
+            hint="Optional - must be before event starts"
           />
         </div>
 

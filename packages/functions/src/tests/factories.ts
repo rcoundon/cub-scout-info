@@ -51,6 +51,7 @@ export function createMockEvent(overrides?: Partial<Event>): Event {
     created_by: 'test-user-id',
     created_at: '2025-01-01T00:00:00Z',
     updated_at: '2025-01-01T00:00:00Z',
+    creator_name: 'Unknown',
     ...overrides,
   }
 }
@@ -67,6 +68,7 @@ export function createMockAnnouncement(overrides?: Partial<Announcement>): Annou
     created_by: 'test-user-id',
     created_at: '2025-01-01T00:00:00Z',
     updated_at: '2025-01-01T00:00:00Z',
+    creator_name: 'Unknown',
     ...overrides,
   }
 }
