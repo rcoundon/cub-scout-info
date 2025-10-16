@@ -55,6 +55,10 @@
         <slot />
       </main>
     </div>
+
+    <ClientOnly>
+      <CookieConsent />
+    </ClientOnly>
   </div>
 </template>
 

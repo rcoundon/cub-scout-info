@@ -10,6 +10,10 @@
     </main>
 
     <LayoutFooter />
+
+    <ClientOnly>
+      <CookieConsent />
+    </ClientOnly>
   </div>
 </template>
 

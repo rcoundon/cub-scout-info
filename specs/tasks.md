@@ -262,8 +262,8 @@
 
 ### 4.4 Performance Testing
 
-- [ ] Run Lighthouse audits
-- [ ] Test page load times
+- [x] Run Lighthouse audits
+- [x] Test page load times
 - [ ] Test API response times
 - [ ] Load testing with k6 or Artillery
 - [ ] Test with slow network conditions
@@ -276,7 +276,7 @@
 - [x] Define SST v3 resources in sst.config.ts
 - [x] Create DynamoDB table with GSIs using SST
 - [x] Configure DynamoDB on-demand capacity mode
-- [ ] Enable point-in-time recovery on DynamoDB
+- [x] Enable point-in-time recovery on DynamoDB
 - [x] Create S3 buckets (frontend via StaticSite, file uploads)
 - [x] Set up CloudFront distribution (automatic with StaticSite)
 - [x] Configure Hono API with SST Function
@@ -298,7 +298,6 @@
 
 ### 5.3 DynamoDB Data Setup
 
-- [ ] Create scripts to initialize DynamoDB table structure
 - [ ] Test table structure in staging
 - [ ] Create seed data for production (initial admin user)
 - [ ] Document GSI usage and access patterns
@@ -323,8 +322,8 @@
 
 ### 6.2 Documentation
 
-- [ ] Write user documentation
-- [ ] Write admin documentation
+- [x] Write user documentation
+- [x] Write admin documentation
 - [ ] Document API endpoints
 - [ ] Create troubleshooting guide
 - [ ] Document deployment process
@@ -332,7 +331,7 @@
 
 ### 6.3 Legal and Compliance
 
-- [ ] Create privacy policy
+- [x] Create privacy policy
 - [ ] Create terms of service
 - [ ] Implement cookie consent (if needed)
 - [ ] Ensure GDPR compliance
