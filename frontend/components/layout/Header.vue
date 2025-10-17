@@ -36,7 +36,7 @@
               </BaseButton>
             </div>
             <BaseButton v-else variant="primary" @click="handleLogin">
-              Login
+              Admin Login
             </BaseButton>
             <template #fallback>
               <div class="w-20 h-10"></div>
@@ -108,7 +108,7 @@
               </div>
             </div>
             <BaseButton v-else variant="primary" @click="handleLogin">
-              Login
+              Admin Login
             </BaseButton>
           </ClientOnly>
         </div>

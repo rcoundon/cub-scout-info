@@ -1,5 +1,6 @@
 <template>
   <div class="min-h-screen flex flex-col">
+    <DevBanner />
     <ClientOnly>
       <SessionTimeoutWarning />
     </ClientOnly>
