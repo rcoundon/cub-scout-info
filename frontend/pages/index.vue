@@ -9,7 +9,7 @@ definePageMeta({
 useHead({
   title: '1st Holmer Green Scout Group - Cubs, Beavers & Scouts',
   meta: [
-    { name: 'description', content: 'Welcome to 1st Holmer Green Scout Group. View upcoming events, meeting times for Beavers (6-8), Cubs (8-10½), and Scouts (10½-14), and stay connected with our scouting community.' }
+    { name: 'description', content: 'Welcome to 1st Holmer Green Scout Group. View upcoming events, meeting times for Beaver Colony (6-8), Cub Pack (8-10½), and Scout Troop (10½-14), and stay connected with our scouting community.' }
   ]
 })
 
@@ -24,7 +24,7 @@ const currentTime = ref(new Date())
 const meetingInfo = [
   {
     ageGroup: 'beavers' as const,
-    label: 'Beavers',
+    label: 'Beaver Colony',
     ageRange: '6-8 years',
     meetings: [
       { day: 'Monday', time: '6:00 PM - 7:15 PM' }
@@ -36,7 +36,7 @@ const meetingInfo = [
   },
   {
     ageGroup: 'cubs' as const,
-    label: 'Cubs',
+    label: 'Cub Pack',
     ageRange: '8-10½ years',
     meetings: [
       { day: 'Monday', time: '6:45 PM - 8:15 PM' },
@@ -49,7 +49,7 @@ const meetingInfo = [
   },
   {
     ageGroup: 'scouts' as const,
-    label: 'Scouts',
+    label: 'Scout Troop',
     ageRange: '10½-14 years',
     meetings: [
       { day: 'Thursday', time: '7:00 PM - 9:00 PM' }
@@ -113,7 +113,7 @@ const getEventTypeLabel = (type: string) => {
     <div class="container mx-auto px-4 py-16">
       <div class="text-center mb-12">
         <h1 class="text-5xl md:text-6xl font-display font-bold text-primary-900 mb-4">
-          1st Holmer Green Cub Scout Group
+          1st Holmer Green Scout Group
         </h1>
         <p class="text-xl text-gray-700 mb-8">
           Welcome to our events and information portal

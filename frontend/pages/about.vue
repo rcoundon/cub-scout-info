@@ -43,8 +43,8 @@ const leaders = [
           <div class="prose prose-lg max-w-none">
             <h2 class="text-3xl font-display font-bold text-gray-900 mb-4">Who We Are</h2>
             <p class="text-gray-700 mb-4">
-              Our Scout group is a vibrant community where young people from Beavers (6-8 years),
-              Cubs (8-10½ years), and Scouts (10½-14 years) come together to learn new skills, make friends,
+              Our Scout group is a vibrant community where young people from Beaver Colony (6-8 years),
+              Cub Pack (8-10½ years), and Scout Troop (10½-14 years) come together to learn new skills, make friends,
               and have amazing adventures. We're part of the Scouts movement, helping to develop well-rounded
               young people who are prepared to make a positive impact in their communities.
             </p>

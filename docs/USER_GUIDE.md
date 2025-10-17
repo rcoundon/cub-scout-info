@@ -66,7 +66,7 @@ Each event displays:
 - **Date and Time**: When it's happening
 - **Location**: Where to meet
 - **Description**: What the activity involves
-- **Age Group**: Beavers (6-8), Cubs (8-10½), or Scouts (10½-14)
+- **Age Group**: Beaver Colony (6-8), Cub Pack (8-10½), or Scout Trop (10½-14)
 - **Cost**: Any associated fees
 - **Recurring Badge**: Shows if event repeats weekly/monthly
 
@@ -75,7 +75,7 @@ Each event displays:
 Use the filters at the top of the events page to:
 
 - **Search**: Find events by name or description
-- **Age Group**: Filter by Beavers, Cubs, or Scouts
+- **Age Group**: Filter by Beaver Colony, Cub Pack, or Scout Troop
 - **View Type**: Switch between list and calendar view
 
 ### Calendar View

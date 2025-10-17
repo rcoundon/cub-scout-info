@@ -62,6 +62,13 @@ watch(() => form.value.is_recurring, (isRecurring) => {
     // Always set end date to match start date when enabling recurring
     form.value.end_date = form.value.start_date
   }
+  // Clear any existing errors when switching modes
+  if (errors.value.end_time) {
+    delete errors.value.end_time
+  }
+  if (errors.value.end_date) {
+    delete errors.value.end_date
+  }
 })
 
 // Watch for start date changes
@@ -205,13 +212,17 @@ const validate = () => {
     isValid = false
   }
 
-  // Validate dates
+  // Validate dates and times
   if (form.value.start_date && form.value.end_date) {
     const startDateTime = new Date(`${form.value.start_date}T${form.value.start_time}`)
     const endDateTime = new Date(`${form.value.end_date}T${form.value.end_time}`)
 
-    if (endDateTime < startDateTime) {
-      errors.value.end_date = 'End date must be after start date'
+    if (endDateTime <= startDateTime) {
+      if (form.value.is_recurring) {
+        errors.value.end_time = 'End time must be after start time'
+      } else {
+        errors.value.end_date = 'End date/time must be after start date/time'
+      }
       isValid = false
     }
   }
@@ -286,8 +297,6 @@ const handleSubmit = async () => {
     } else {
       success = await eventsStore.updateEvent(route.params.id as string, eventData)
     }
-
-    console.log('Event creation result:', success)
 
     if (success) {
       // Save external links after event is saved
@@ -406,9 +415,9 @@ const handleCancel = () => {
               Age Group <span class="text-red-500">*</span>
             </label>
             <select v-model="form.age_group" class="input">
-              <option value="beavers">Beavers (6-8 years)</option>
-              <option value="cubs">Cubs (8-10½ years)</option>
-              <option value="scouts">Scouts (10½-14 years)</option>
+              <option value="beavers">Beaver Colony (6-8 years)</option>
+              <option value="cubs">Cub Pack (8-10½ years)</option>
+              <option value="scouts">Scout Troop (10½-14 years)</option>
             </select>
           </div>
         </div>
@@ -430,13 +439,14 @@ const handleCancel = () => {
           </p>
         </div>
 
-        <!-- Start Date & Time -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Non-recurring: Start Date & Time -->
+        <div v-if="!form.is_recurring" class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <BaseDatePicker
             v-model="form.start_date"
             label="Start Date"
             :error="errors.start_date"
             :required="true"
+            :allow-past-dates="!isNew"
           />
           <BaseTimePicker
             v-model="form.start_time"
@@ -445,21 +455,46 @@ const handleCancel = () => {
           />
         </div>
 
-        <!-- End Date & Time -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Non-recurring: End Date & Time -->
+        <div v-if="!form.is_recurring" class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <BaseDatePicker
             v-model="form.end_date"
-            :label="form.is_recurring ? 'Event Duration - End Date' : 'End Date'"
+            label="End Date"
             :error="errors.end_date"
             :required="true"
             :min-date="form.start_date ? new Date(form.start_date) : undefined"
-            :hint="form.is_recurring ? 'For single occurrence (usually same day)' : undefined"
           />
           <BaseTimePicker
             v-model="form.end_time"
-            :label="form.is_recurring ? 'Event Duration - End Time' : 'End Time'"
+            label="End Time"
             :required="true"
           />
+        </div>
+
+        <!-- Recurring: Start Date and Times aligned -->
+        <div v-if="form.is_recurring" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <BaseDatePicker
+            v-model="form.start_date"
+            label="Start Date"
+            :error="errors.start_date"
+            :required="true"
+            :allow-past-dates="!isNew"
+          />
+          <div class="space-y-6">
+            <BaseTimePicker
+              v-model="form.start_time"
+              label="Start Time"
+              :required="true"
+            />
+            <BaseTimePicker
+              v-model="form.end_time"
+              label="End Time"
+              :required="true"
+              :error="errors.end_time"
+              :min-time="form.start_time"
+              hint="Must be after start time"
+            />
+          </div>
         </div>
 
         <!-- Recurring Event -->
@@ -480,7 +515,7 @@ const handleCancel = () => {
             <div class="mb-4">
               <p class="text-sm text-indigo-900 font-medium mb-2">📅 Recurrence Schedule</p>
               <p class="text-sm text-indigo-700">
-                The event times above apply to each occurrence. Here you set how often it repeats and when to stop.
+                The start date and times above define when each occurrence happens and how long it lasts. Below you set how often it repeats and when to stop creating occurrences.
               </p>
             </div>
 

@@ -6,38 +6,25 @@
     </label>
 
     <ClientOnly>
-      <VDatePicker
-        v-model="internalValue"
-        :is-dark="false"
-        :min-date="minDate"
-        :max-date="maxDate"
-        :is-required="required"
+      <VueDatePicker
+        :id="inputId"
+        v-model="date"
+        :placeholder="placeholder"
+        :required="required"
         :disabled="disabled"
-        :attributes="attributes"
-        color="teal"
-        trim-weeks
+        :min-date="effectiveMinDate"
+        :max-date="maxDate"
+        :clearable="!required"
+        format="dd MMM yyyy"
+        auto-apply
+        :class="wrapperClasses"
       >
-        <template #default="{ togglePopover }">
-          <div class="relative">
-            <input
-              :id="inputId"
-              type="text"
-              :value="displayValue"
-              :placeholder="placeholder"
-              :required="required"
-              :disabled="disabled"
-              :class="inputClasses"
-              readonly
-              @click="togglePopover"
-            />
-            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-          </div>
+        <template #input-icon>
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
         </template>
-      </VDatePicker>
+      </VueDatePicker>
     </ClientOnly>
 
     <p v-if="error" class="mt-1 text-sm text-red-600">
@@ -51,8 +38,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { DatePicker as VDatePicker } from 'v-calendar'
+import { computed, ref, watch } from 'vue'
+import VueDatePicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
 
 interface Props {
   modelValue?: string | Date | null
@@ -62,15 +50,26 @@ interface Props {
   disabled?: boolean
   error?: string
   hint?: string
-  mode?: 'date' | 'dateTime' | 'time'
   minDate?: Date
   maxDate?: Date
+  allowPastDates?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: null,
-  mode: 'date',
   placeholder: 'Select date',
+  allowPastDates: false,
+})
+
+// Set minimum date to today unless explicitly allowed or overridden
+const effectiveMinDate = computed(() => {
+  if (props.minDate) return props.minDate
+  if (props.allowPastDates) return undefined
+
+  // Default to today at midnight
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return today
 })
 
 const emit = defineEmits<{
@@ -78,48 +77,78 @@ const emit = defineEmits<{
 }>()
 
 const inputId = `datepicker-${useId()}`
+const date = ref<Date | null>(null)
 
-// Highlight today's date
-const attributes = [
-  {
-    key: 'today',
-    highlight: {
-      color: 'blue',
-      fillMode: 'outline',
-    },
-    dates: new Date(),
-  },
-]
+// Initialize date from modelValue
+watch(() => props.modelValue, (newValue) => {
+  if (newValue) {
+    date.value = new Date(newValue)
+  } else {
+    date.value = null
+  }
+}, { immediate: true })
 
-const internalValue = computed({
-  get: () => props.modelValue ? new Date(props.modelValue) : null,
-  set: (value: Date | null) => {
-    if (value) {
-      const year = value.getFullYear()
-      const month = String(value.getMonth() + 1).padStart(2, '0')
-      const day = String(value.getDate()).padStart(2, '0')
-      emit('update:modelValue', `${year}-${month}-${day}`)
-    } else {
-      emit('update:modelValue', '')
-    }
+// Emit changes in YYYY-MM-DD format
+watch(date, (newDate) => {
+  if (newDate) {
+    const year = newDate.getFullYear()
+    const month = String(newDate.getMonth() + 1).padStart(2, '0')
+    const day = String(newDate.getDate()).padStart(2, '0')
+    emit('update:modelValue', `${year}-${month}-${day}`)
+  } else {
+    emit('update:modelValue', '')
   }
 })
 
-const displayValue = computed(() => {
-  if (!internalValue.value) return ''
-
-  return internalValue.value.toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
-})
-
-const inputClasses = computed(() => {
-  const base = 'input cursor-pointer'
-  const errorClass = props.error ? 'border-red-500 focus:ring-red-500' : ''
-  const disabledClass = props.disabled ? 'bg-gray-100 cursor-not-allowed' : ''
-
-  return `${base} ${errorClass} ${disabledClass}`
+const wrapperClasses = computed(() => {
+  const classes = []
+  if (props.error) classes.push('dp-error')
+  if (props.disabled) classes.push('dp-disabled')
+  return classes.join(' ')
 })
 </script>
+
+<style scoped>
+/* Style the input wrapper to match the design system */
+:deep(.dp__input_wrap) {
+  width: 100%;
+}
+
+:deep(.dp__input) {
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  width: 100%;
+  font-size: 1rem;
+  line-height: 1.5;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+:deep(.dp__input:focus) {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+:deep(.dp__input:disabled) {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Error state */
+:deep(.dp-error .dp__input) {
+  border-color: #ef4444;
+}
+
+:deep(.dp-error .dp__input:focus) {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Disabled state */
+:deep(.dp-disabled .dp__input) {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+</style>

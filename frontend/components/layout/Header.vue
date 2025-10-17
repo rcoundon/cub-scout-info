@@ -17,7 +17,9 @@
             v-for="item in navigationItems"
             :key="item.path"
             :to="item.path"
+            :exact="item.path === '/'"
             class="text-gray-700 hover:text-primary-600 transition-colors font-medium text-lg"
+            active-class="!text-primary-600 font-semibold border-b-2 border-primary-600"
           >
             {{ item.label }}
           </NuxtLink>
@@ -85,7 +87,9 @@
             v-for="item in navigationItems"
             :key="item.path"
             :to="item.path"
+            :exact="item.path === '/'"
             class="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2 text-lg"
+            active-class="!text-primary-600 font-semibold"
             @click="closeMobileMenu"
           >
             {{ item.label }}

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useEventsStore } from '~/stores/events'
-import { useAnnouncementsStore } from '~/stores/announcements'
+import { ref, computed, onMounted } from 'vue'
+import { useEventsStore, type Event } from '~/stores/events'
+import { useAnnouncementsStore, type Announcement } from '~/stores/announcements'
 
 definePageMeta({
   layout: 'admin',
@@ -18,6 +18,70 @@ const stats = ref({
   totalAnnouncements: 0,
   publishedAnnouncements: 0,
 })
+
+type ActivityItem = {
+  id: string
+  type: 'event' | 'announcement'
+  title: string
+  status: string
+  updated_at: string
+  link: string
+}
+
+const recentActivity = computed<ActivityItem[]>(() => {
+  const activities: ActivityItem[] = []
+
+  // Add events
+  eventsStore.events.forEach((event: Event) => {
+    activities.push({
+      id: event.id,
+      type: 'event',
+      title: event.title,
+      status: event.status,
+      updated_at: event.updated_at || event.created_at,
+      link: `/admin/events/${event.id}`,
+    })
+  })
+
+  // Add announcements
+  announcementsStore.announcements.forEach((announcement: Announcement) => {
+    activities.push({
+      id: announcement.id,
+      type: 'announcement',
+      title: announcement.title,
+      status: announcement.status,
+      updated_at: announcement.updated_at || announcement.created_at,
+      link: `/admin/announcements/${announcement.id}`,
+    })
+  })
+
+  // Sort by most recent and take top 5
+  return activities
+    .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+    .slice(0, 5)
+})
+
+const formatTimeAgo = (dateString: string) => {
+  const date = new Date(dateString)
+  const now = new Date()
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+
+  if (seconds < 60) return 'just now'
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
+  if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+}
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'published': return 'text-green-600 bg-green-50'
+    case 'draft': return 'text-yellow-600 bg-yellow-50'
+    case 'cancelled': return 'text-red-600 bg-red-50'
+    case 'archived': return 'text-gray-600 bg-gray-50'
+    default: return 'text-gray-600 bg-gray-50'
+  }
+}
 
 onMounted(async () => {
   await Promise.all([
@@ -133,8 +197,41 @@ onMounted(async () => {
         <template #header>
           <h2 class="text-xl font-semibold">Recent Activity</h2>
         </template>
-        <div class="space-y-3">
-          <p class="text-sm text-gray-600">Latest events and announcements will appear here</p>
+        <div v-if="recentActivity.length === 0" class="text-center py-8">
+          <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-sm text-gray-600">No recent activity</p>
+        </div>
+        <div v-else class="space-y-3">
+          <NuxtLink
+            v-for="item in recentActivity"
+            :key="item.id"
+            :to="item.link"
+            class="block p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-200"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-xs font-medium text-gray-500 uppercase">
+                    {{ item.type }}
+                  </span>
+                  <span
+                    class="px-2 py-0.5 text-xs font-medium rounded-full"
+                    :class="getStatusColor(item.status)"
+                  >
+                    {{ item.status }}
+                  </span>
+                </div>
+                <p class="text-sm font-medium text-gray-900 truncate">
+                  {{ item.title }}
+                </p>
+              </div>
+              <span class="text-xs text-gray-500 whitespace-nowrap">
+                {{ formatTimeAgo(item.updated_at) }}
+              </span>
+            </div>
+          </NuxtLink>
         </div>
       </BaseCard>
     </div>
