@@ -131,15 +131,15 @@ const handleCancel = () => {
   <div>
     <!-- Header -->
     <div class="mb-6">
-      <h1 class="text-3xl font-display font-bold text-gray-900">{{ pageTitle }}</h1>
-      <p class="text-gray-600 mt-1">{{ isNew ? 'Send an invitation to create a new user account' : 'Update user details and permissions' }}</p>
-      <div v-if="isNew" class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-        <p class="text-sm text-blue-800">
+      <h1 class="text-3xl font-display font-bold text-gray-900 dark:text-gray-100">{{ pageTitle }}</h1>
+      <p class="text-gray-600 dark:text-gray-300 mt-1">{{ isNew ? 'Send an invitation to create a new user account' : 'Update user details and permissions' }}</p>
+      <div v-if="isNew" class="mt-2 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <p class="text-sm text-blue-800 dark:text-blue-200">
           ℹ️ The user will receive an email invitation to set up their own password and activate their account.
         </p>
       </div>
-      <div v-if="isEditingSelf" class="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <p class="text-sm text-yellow-800">
+      <div v-if="isEditingSelf" class="mt-2 p-3 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+        <p class="text-sm text-yellow-800 dark:text-yellow-200">
           ⚠️ You are editing your own account. You cannot change your own role.
         </p>
       </div>
@@ -149,8 +149,8 @@ const handleCancel = () => {
     <BaseCard>
       <form @submit.prevent="handleSubmit" class="space-y-6">
         <!-- Form-level error -->
-        <div v-if="errors.form" class="p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p class="text-sm text-red-800">{{ errors.form }}</p>
+        <div v-if="errors.form" class="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
+          <p class="text-sm text-red-800 dark:text-red-200">{{ errors.form }}</p>
         </div>
 
         <!-- Email -->
@@ -194,8 +194,8 @@ const handleCancel = () => {
 
         <!-- Role -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Role <span class="text-red-500">*</span>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+            Role <span class="text-red-500 dark:text-red-400">*</span>
           </label>
           <select
             v-model="form.role"
@@ -207,10 +207,10 @@ const handleCancel = () => {
             <option value="editor">Editor - Can create and edit content</option>
             <option value="admin">Admin - Full access to all features</option>
           </select>
-          <p v-if="errors.role" class="mt-1 text-sm text-red-600">
+          <p v-if="errors.role" class="mt-1 text-sm text-red-600 dark:text-red-400">
             {{ errors.role }}
           </p>
-          <p class="mt-1 text-sm text-gray-500">
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Select the appropriate permission level for this user
           </p>
         </div>

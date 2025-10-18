@@ -1,8 +1,8 @@
 <template>
   <div class="w-full">
-    <label v-if="label" :for="inputId" class="block text-sm font-medium text-gray-700 mb-1">
+    <label v-if="label" :for="inputId" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
       {{ label }}
-      <span v-if="required" class="text-red-500">*</span>
+      <span v-if="required" class="text-red-500 dark:text-red-400">*</span>
     </label>
 
     <input
@@ -20,11 +20,11 @@
       @blur="handleBlur"
     />
 
-    <p v-if="error" class="mt-1 text-sm text-red-600">
+    <p v-if="error" class="mt-1 text-sm text-red-600 dark:text-red-400">
       {{ error }}
     </p>
 
-    <p v-else-if="hint" class="mt-1 text-sm text-gray-500">
+    <p v-else-if="hint" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
       {{ hint }}
     </p>
   </div>

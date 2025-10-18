@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-white shadow-sm sticky top-0 z-50">
+  <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50 transition-colors">
     <nav class="container mx-auto px-4">
       <div class="flex items-center justify-between h-24">
         <!-- Logo -->
@@ -18,16 +18,19 @@
             :key="item.path"
             :to="item.path"
             :exact="item.path === '/'"
-            class="text-gray-700 hover:text-primary-600 transition-colors font-medium text-lg"
-            active-class="!text-primary-600 font-semibold border-b-2 border-primary-600"
+            class="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium text-lg"
+            active-class="!text-primary-600 dark:!text-primary-400 font-semibold border-b-2 border-primary-600 dark:border-primary-400"
           >
             {{ item.label }}
           </NuxtLink>
 
+          <!-- Color Mode Toggle -->
+          <ColorModeToggle />
+
           <!-- Auth Actions - Wrap in ClientOnly to prevent hydration mismatch -->
           <ClientOnly>
             <div v-if="isAuthenticated" class="flex items-center space-x-4">
-              <span class="text-base text-gray-600">{{ userName }}</span>
+              <span class="text-base text-gray-600 dark:text-gray-300">{{ userName }}</span>
               <NuxtLink v-if="canAccessAdmin" to="/admin">
                 <BaseButton variant="secondary">
                   Admin
@@ -80,7 +83,7 @@
       <!-- Mobile Menu -->
       <div
         v-if="mobileMenuOpen"
-        class="md:hidden py-4 border-t border-gray-200"
+        class="md:hidden py-4 border-t border-gray-200 dark:border-gray-700"
       >
         <div class="flex flex-col space-y-3">
           <NuxtLink
@@ -88,18 +91,24 @@
             :key="item.path"
             :to="item.path"
             :exact="item.path === '/'"
-            class="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2 text-lg"
-            active-class="!text-primary-600 font-semibold"
+            class="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium py-2 text-lg"
+            active-class="!text-primary-600 dark:!text-primary-400 font-semibold"
             @click="closeMobileMenu"
           >
             {{ item.label }}
           </NuxtLink>
 
+          <!-- Color Mode Toggle -->
+          <div class="py-2 flex items-center gap-2">
+            <span class="text-sm text-gray-600 dark:text-gray-400">Theme:</span>
+            <ColorModeToggle />
+          </div>
+
           <!-- Auth Actions - Wrap in ClientOnly to prevent hydration mismatch -->
           <ClientOnly>
-            <div v-if="isAuthenticated" class="pt-3 border-t border-gray-200">
-              <p class="text-base font-medium text-gray-900 mb-1">{{ userName }}</p>
-              <p class="text-sm text-gray-600 mb-2">{{ userEmail }}</p>
+            <div v-if="isAuthenticated" class="pt-3 border-t border-gray-200 dark:border-gray-700">
+              <p class="text-base font-medium text-gray-900 dark:text-gray-100 mb-1">{{ userName }}</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ userEmail }}</p>
               <div class="space-y-2">
                 <NuxtLink v-if="canAccessAdmin" to="/admin" @click="closeMobileMenu">
                   <BaseButton variant="secondary" class="w-full">

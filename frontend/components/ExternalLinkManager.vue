@@ -1,7 +1,7 @@
 <template>
-  <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
-    <h3 class="text-lg font-semibold text-gray-900 mb-4">External Links</h3>
-    <p class="text-sm text-gray-600 mb-4">
+  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">External Links</h3>
+    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
       Add helpful external links for this {{ parentType }}. Links will open in new tabs.
     </p>
 
@@ -10,19 +10,19 @@
       <div
         v-for="(link, index) in links"
         :key="link.id"
-        class="flex items-center gap-2 bg-white p-3 rounded border border-gray-200"
+        class="flex items-center gap-2 bg-white dark:bg-gray-700 p-3 rounded border border-gray-200 dark:border-gray-600"
       >
         <div class="flex-1 min-w-0">
-          <div class="font-medium text-sm text-gray-900 truncate">
+          <div class="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">
             {{ link.label || link.url }}
           </div>
-          <div class="text-xs text-gray-500 truncate">
+          <div class="text-xs text-gray-500 dark:text-gray-400 truncate">
             {{ link.url }}
           </div>
         </div>
         <button
           @click="removeLink(index)"
-          class="p-1 text-red-600 hover:bg-red-50 rounded"
+          class="p-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded"
           type="button"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -32,7 +32,7 @@
       </div>
     </div>
 
-    <div v-else class="text-sm text-gray-500 italic mb-4">
+    <div v-else class="text-sm text-gray-500 dark:text-gray-400 italic mb-4">
       No external links yet
     </div>
 
@@ -40,7 +40,7 @@
     <div class="space-y-3">
       <!-- Select from Global Links -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
           Add from existing links
         </label>
         <select
@@ -60,11 +60,11 @@
       </div>
 
       <!-- Or Add New Link -->
-      <div class="border-t border-gray-200 pt-3">
-        <p class="text-sm font-medium text-gray-700 mb-2">Or add a new link</p>
+      <div class="border-t border-gray-200 dark:border-gray-700 pt-3">
+        <p class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Or add a new link</p>
         <div class="space-y-2">
           <div>
-            <label class="block text-xs text-gray-600 mb-1">URL *</label>
+            <label class="block text-xs text-gray-600 dark:text-gray-300 mb-1">URL *</label>
             <input
               v-model="newLink.url"
               type="url"
@@ -73,7 +73,7 @@
             />
           </div>
           <div>
-            <label class="block text-xs text-gray-600 mb-1">Label (optional)</label>
+            <label class="block text-xs text-gray-600 dark:text-gray-300 mb-1">Label (optional)</label>
             <input
               v-model="newLink.label"
               type="text"

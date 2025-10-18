@@ -93,29 +93,17 @@ const getEventTypeIcon = (type: string) => {
   }
   return icons[type] || icons.other
 }
-
-const getEventTypeLabel = (type: string) => {
-  const labels: Record<string, string> = {
-    meeting: 'Meeting',
-    camp: 'Camp',
-    trip: 'Trip',
-    special: 'Special Event',
-    fundraising: 'Fundraising',
-    other: 'Other',
-  }
-  return labels[type] || type
-}
 </script>
 
 <template>
-  <div class="bg-gradient-to-br from-primary-50 to-secondary-50">
+  <div class="bg-gradient-to-br from-primary-50 to-secondary-50 dark:from-gray-900 dark:to-gray-800">
     <!-- Hero Section -->
     <div class="container mx-auto px-4 py-16">
       <div class="text-center mb-12">
-        <h1 class="text-5xl md:text-6xl font-display font-bold text-primary-900 mb-4">
+        <h1 class="text-5xl md:text-6xl font-display font-bold text-primary-900 dark:text-primary-300 mb-4">
           1st Holmer Green Scout Group
         </h1>
-        <p class="text-xl text-gray-700 mb-8">
+        <p class="text-xl text-gray-700 dark:text-gray-300 mb-8">
           Welcome to our events and information portal
         </p>
         <div class="flex gap-4 justify-center">
@@ -132,13 +120,13 @@ const getEventTypeLabel = (type: string) => {
       <div class="grid md:grid-cols-3 gap-6 mt-16">
         <NuxtLink to="/events" class="block">
           <div class="card-hover p-6 h-full">
-            <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-primary-600 dark:text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
-            <h2 class="text-xl font-semibold mb-2">Upcoming Events</h2>
-            <p class="text-gray-600">
+            <h2 class="text-xl font-semibold mb-2 dark:text-gray-100">Upcoming Events</h2>
+            <p class="text-gray-600 dark:text-gray-300">
               Stay updated with all Cubs activities, camps, and special events
             </p>
           </div>
@@ -146,13 +134,13 @@ const getEventTypeLabel = (type: string) => {
 
         <NuxtLink to="/announcements" class="block">
           <div class="card-hover p-6 h-full">
-            <div class="w-12 h-12 bg-secondary-100 rounded-lg flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-12 h-12 bg-secondary-100 dark:bg-secondary-900 rounded-lg flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-secondary-600 dark:text-secondary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
               </svg>
             </div>
-            <h2 class="text-xl font-semibold mb-2">Announcements</h2>
-            <p class="text-gray-600">
+            <h2 class="text-xl font-semibold mb-2 dark:text-gray-100">Announcements</h2>
+            <p class="text-gray-600 dark:text-gray-300">
               Important updates and news for Cubs families
             </p>
           </div>
@@ -160,13 +148,13 @@ const getEventTypeLabel = (type: string) => {
 
         <NuxtLink to="/about" class="block">
           <div class="card-hover p-6 h-full">
-            <div class="w-12 h-12 bg-accent-100 rounded-lg flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-12 h-12 bg-accent-100 dark:bg-accent-900 rounded-lg flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-accent-600 dark:text-accent-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </div>
-            <h2 class="text-xl font-semibold mb-2">Resources</h2>
-            <p class="text-gray-600">
+            <h2 class="text-xl font-semibold mb-2 dark:text-gray-100">Resources</h2>
+            <p class="text-gray-600 dark:text-gray-300">
               Access forms, guides, and important documents
             </p>
           </div>
@@ -175,12 +163,12 @@ const getEventTypeLabel = (type: string) => {
 
       <!-- When We Meet Section -->
       <div class="mt-20">
-        <h2 class="text-4xl font-display font-bold text-center text-primary-900 mb-12">When We Meet</h2>
+        <h2 class="text-4xl font-display font-bold text-center text-primary-900 dark:text-primary-300 mb-12">When We Meet</h2>
         <div class="grid md:grid-cols-3 gap-6">
           <div
             v-for="meeting in meetingInfo"
             :key="meeting.ageGroup"
-            class="bg-white rounded-lg shadow-md overflow-hidden border-t-4"
+            class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border-t-4"
             :class="meeting.borderColor"
           >
             <div class="p-6">
@@ -197,15 +185,15 @@ const getEventTypeLabel = (type: string) => {
               <!-- Meeting Details -->
               <div class="space-y-4">
                 <div class="flex items-start gap-3">
-                  <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div class="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
                   <div class="flex-1">
-                    <p class="font-semibold text-gray-900 mb-1">Meeting Times</p>
+                    <p class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Meeting Times</p>
                     <div class="space-y-1">
-                      <p v-for="(meet, idx) in meeting.meetings" :key="idx" class="text-gray-600 text-sm">
+                      <p v-for="(meet, idx) in meeting.meetings" :key="idx" class="text-gray-600 dark:text-gray-300 text-sm">
                         {{ meet.day }}s: {{ meet.time }}
                       </p>
                     </div>
@@ -213,22 +201,22 @@ const getEventTypeLabel = (type: string) => {
                 </div>
 
                 <div class="flex items-start gap-3">
-                  <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div class="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </div>
                   <div>
-                    <p class="font-semibold text-gray-900">{{ meeting.location }}</p>
-                    <p class="text-gray-600 text-sm">{{ meeting.address }}</p>
+                    <p class="font-semibold text-gray-900 dark:text-gray-100">{{ meeting.location }}</p>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm">{{ meeting.address }}</p>
                   </div>
                 </div>
               </div>
 
               <!-- Upcoming Events Preview -->
-              <div class="mt-6 pt-6 border-t border-gray-200">
-                <h3 class="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
@@ -239,20 +227,20 @@ const getEventTypeLabel = (type: string) => {
                     v-for="event in eventsByAgeGroup[meeting.ageGroup]"
                     :key="event.id"
                     :to="`/events/${event.id}`"
-                    class="block p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
+                    class="block p-3 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors group"
                   >
                     <div class="flex items-center gap-2 mb-1">
-                      <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-3 h-3 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="getEventTypeIcon(event.event_type)" />
                       </svg>
-                      <p class="text-sm font-medium text-gray-900 group-hover:text-primary-600 transition-colors">
+                      <p class="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                         {{ event.title }}
                       </p>
                     </div>
-                    <p class="text-xs text-gray-600 ml-5">{{ formatDate(event.start_date) }}</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 ml-5">{{ formatDate(event.start_date) }}</p>
                   </NuxtLink>
                 </div>
-                <div v-else class="text-sm text-gray-500 italic">
+                <div v-else class="text-sm text-gray-500 dark:text-gray-400 italic">
                   No upcoming events
                 </div>
               </div>

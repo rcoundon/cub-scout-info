@@ -114,8 +114,8 @@ const deleteUser = async (id: string, email: string) => {
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
       <div>
-        <h1 class="text-3xl font-display font-bold text-gray-900">Users</h1>
-        <p class="text-gray-600 mt-1">Manage user accounts and permissions</p>
+        <h1 class="text-3xl font-display font-bold text-gray-900 dark:text-gray-100">Users</h1>
+        <p class="text-gray-600 dark:text-gray-300 mt-1">Manage user accounts and permissions</p>
       </div>
       <NuxtLink to="/admin/users/new">
         <BaseButton variant="primary">
@@ -161,11 +161,11 @@ const deleteUser = async (id: string, email: string) => {
 
     <!-- Users List -->
     <div v-if="usersStore.loading" class="text-center py-12">
-      <p class="text-gray-600">Loading users...</p>
+      <p class="text-gray-600 dark:text-gray-300">Loading users...</p>
     </div>
 
     <div v-else-if="filteredUsers.length === 0" class="text-center py-12">
-      <p class="text-gray-600">No users found</p>
+      <p class="text-gray-600 dark:text-gray-300">No users found</p>
     </div>
 
     <div v-else class="space-y-4">
@@ -173,7 +173,7 @@ const deleteUser = async (id: string, email: string) => {
         <div class="flex items-start justify-between">
           <div class="flex-1">
             <div class="flex items-center gap-3 mb-2">
-              <h3 class="text-lg font-semibold text-gray-900">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {{ user.first_name }} {{ user.last_name }}
               </h3>
               <BaseBadge :variant="getRoleBadgeVariant(user.role)">
@@ -189,9 +189,9 @@ const deleteUser = async (id: string, email: string) => {
               </BaseBadge>
             </div>
 
-            <p class="text-gray-600 mb-3">{{ user.email }}</p>
+            <p class="text-gray-600 dark:text-gray-300 mb-3">{{ user.email }}</p>
 
-            <div class="flex flex-wrap gap-4 text-sm text-gray-500">
+            <div class="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
               <div class="flex items-center gap-1">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />

@@ -1,8 +1,8 @@
 <template>
   <div class="w-full">
-    <label v-if="label" :for="inputId" class="block text-sm font-medium text-gray-700 mb-1">
+    <label v-if="label" :for="inputId" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
       {{ label }}
-      <span v-if="required" class="text-red-500">*</span>
+      <span v-if="required" class="text-red-500 dark:text-red-400">*</span>
     </label>
 
     <ClientOnly>
@@ -20,18 +20,18 @@
         :class="wrapperClasses"
       >
         <template #input-icon>
-          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </template>
       </VueDatePicker>
     </ClientOnly>
 
-    <p v-if="error" class="mt-1 text-sm text-red-600">
+    <p v-if="error" class="mt-1 text-sm text-red-600 dark:text-red-400">
       {{ error }}
     </p>
 
-    <p v-else-if="hint" class="mt-1 text-sm text-gray-500">
+    <p v-else-if="hint" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
       {{ hint }}
     </p>
   </div>
@@ -111,11 +111,15 @@ const wrapperClasses = computed(() => {
 :deep(.dp__input) {
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
-  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  padding: 0.5rem 0.75rem 0.5rem 3rem;
   width: 100%;
   font-size: 1rem;
   line-height: 1.5;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+:deep(.dp__input_icon) {
+  left: 0.75rem;
 }
 
 :deep(.dp__input:focus) {
@@ -144,5 +148,81 @@ const wrapperClasses = computed(() => {
 :deep(.dp-disabled .dp__input) {
   background-color: #f3f4f6;
   cursor: not-allowed;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  :deep(.dp__input) {
+    background-color: #1f2937;
+    border-color: #4b5563;
+    color: #f3f4f6;
+  }
+
+  :deep(.dp__input::placeholder) {
+    color: #9ca3af;
+  }
+
+  :deep(.dp__input:focus) {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  }
+
+  :deep(.dp__input:disabled) {
+    background-color: #374151;
+    opacity: 0.6;
+  }
+
+  :deep(.dp-disabled .dp__input) {
+    background-color: #374151;
+  }
+
+  /* Dark mode time picker popup */
+  :deep(.dp__menu) {
+    background-color: #1f2937;
+    border-color: #4b5563;
+  }
+
+  :deep(.dp__time_input) {
+    background-color: #374151;
+    color: #f3f4f6;
+    border-color: #4b5563;
+  }
+
+  :deep(.dp__time_col_reg_block) {
+    background-color: #1f2937;
+  }
+
+  :deep(.dp__time_display) {
+    color: #f3f4f6;
+  }
+
+  :deep(.dp__inc_dec_button) {
+    color: #f3f4f6;
+  }
+
+  :deep(.dp__inc_dec_button:hover) {
+    background-color: #374151;
+  }
+
+  :deep(.dp__button) {
+    color: #f3f4f6;
+  }
+
+  :deep(.dp__button:hover) {
+    background-color: #374151;
+  }
+
+  :deep(.dp__overlay_cell) {
+    color: #f3f4f6;
+  }
+
+  :deep(.dp__overlay_cell:hover) {
+    background-color: #374151;
+  }
+
+  :deep(.dp__overlay_cell_active) {
+    background-color: #6366f1;
+    color: #ffffff;
+  }
 }
 </style>

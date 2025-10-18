@@ -119,8 +119,8 @@ const deleteEvent = async (id: string, title: string) => {
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
       <div>
-        <h1 class="text-3xl font-display font-bold text-gray-900">Events</h1>
-        <p class="text-gray-600 mt-1">Manage Cubs Scout events and activities</p>
+        <h1 class="text-3xl font-display font-bold text-gray-900 dark:text-gray-100">Events</h1>
+        <p class="text-gray-600 dark:text-gray-300 mt-1">Manage Cubs Scout events and activities</p>
       </div>
       <NuxtLink to="/admin/events/new">
         <BaseButton variant="primary">
@@ -155,11 +155,11 @@ const deleteEvent = async (id: string, title: string) => {
 
     <!-- Events List -->
     <div v-if="eventsStore.loading" class="text-center py-12">
-      <p class="text-gray-600">Loading events...</p>
+      <p class="text-gray-600 dark:text-gray-300">Loading events...</p>
     </div>
 
     <div v-else-if="filteredEvents.length === 0" class="text-center py-12">
-      <p class="text-gray-600">No events found</p>
+      <p class="text-gray-600 dark:text-gray-300">No events found</p>
     </div>
 
     <div v-else class="space-y-4">
@@ -167,14 +167,14 @@ const deleteEvent = async (id: string, title: string) => {
         <div class="flex items-start justify-between">
           <div class="flex-1">
             <div class="flex items-center gap-3 mb-2 flex-wrap">
-              <h3 class="text-lg font-semibold text-gray-900">{{ event.title }}</h3>
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ event.title }}</h3>
               <BaseBadge variant="primary">
                 {{ event.event_type }}
               </BaseBadge>
               <BaseBadge :variant="getStatusBadgeVariant(event.status)">
                 {{ event.status }}
               </BaseBadge>
-              <span v-if="event.is_recurring" class="px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 flex items-center gap-1">
+              <span v-if="event.is_recurring" class="px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-300 flex items-center gap-1">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
@@ -182,15 +182,15 @@ const deleteEvent = async (id: string, title: string) => {
               </span>
             </div>
 
-            <p class="text-gray-600 mb-3">{{ event.description }}</p>
+            <p class="text-gray-600 dark:text-gray-300 mb-3">{{ event.description }}</p>
 
-            <div v-if="event.is_recurring && getRecurrenceInfo(event)" class="mb-3 text-sm text-indigo-700 bg-indigo-50 rounded-lg p-2 inline-block">
+            <div v-if="event.is_recurring && getRecurrenceInfo(event)" class="mb-3 text-sm text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg p-2 inline-block">
               <span class="font-medium">Repeats {{ getRecurrenceInfo(event)?.frequency }}</span>
               · ~{{ getRecurrenceInfo(event)?.occurrences }} occurrences
               · Until {{ getRecurrenceInfo(event)?.until }}
             </div>
 
-            <div class="flex flex-wrap gap-4 text-sm text-gray-500">
+            <div class="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
               <div class="flex items-center gap-1">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />

@@ -103,8 +103,8 @@ const deleteAnnouncement = async (id: string, title: string) => {
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
       <div>
-        <h1 class="text-3xl font-display font-bold text-gray-900">Announcements</h1>
-        <p class="text-gray-600 mt-1">Manage important announcements for parents and scouts</p>
+        <h1 class="text-3xl font-display font-bold text-gray-900 dark:text-gray-100">Announcements</h1>
+        <p class="text-gray-600 dark:text-gray-300 mt-1">Manage important announcements for parents and scouts</p>
       </div>
       <NuxtLink to="/admin/announcements/new">
         <BaseButton variant="primary">
@@ -138,11 +138,11 @@ const deleteAnnouncement = async (id: string, title: string) => {
 
     <!-- Announcements List -->
     <div v-if="announcementsStore.loading" class="text-center py-12">
-      <p class="text-gray-600">Loading announcements...</p>
+      <p class="text-gray-600 dark:text-gray-300">Loading announcements...</p>
     </div>
 
     <div v-else-if="filteredAnnouncements.length === 0" class="text-center py-12">
-      <p class="text-gray-600">No announcements found</p>
+      <p class="text-gray-600 dark:text-gray-300">No announcements found</p>
     </div>
 
     <div v-else class="space-y-4">
@@ -150,7 +150,7 @@ const deleteAnnouncement = async (id: string, title: string) => {
         <div class="flex items-start justify-between">
           <div class="flex-1">
             <div class="flex items-center gap-3 mb-2">
-              <h3 class="text-lg font-semibold text-gray-900">{{ announcement.title }}</h3>
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ announcement.title }}</h3>
               <BaseBadge :variant="getStatusBadgeVariant(announcement.status)">
                 {{ announcement.status }}
               </BaseBadge>
@@ -159,9 +159,9 @@ const deleteAnnouncement = async (id: string, title: string) => {
               </BaseBadge>
             </div>
 
-            <p class="text-gray-600 mb-3 whitespace-pre-wrap">{{ announcement.content }}</p>
+            <p class="text-gray-600 dark:text-gray-300 mb-3 whitespace-pre-wrap">{{ announcement.content }}</p>
 
-            <div class="flex flex-wrap gap-4 text-sm text-gray-500">
+            <div class="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
               <div class="flex items-center gap-1">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -187,7 +187,7 @@ const deleteAnnouncement = async (id: string, title: string) => {
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                 </svg>
-                <a :href="announcement.attachment_url" target="_blank" class="text-primary-600 hover:text-primary-700 underline">
+                <a :href="announcement.attachment_url" target="_blank" class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 underline">
                   View attachment
                 </a>
               </div>

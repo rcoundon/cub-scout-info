@@ -349,29 +349,29 @@ const handleCancel = () => {
   <div>
     <!-- Header -->
     <div class="mb-6">
-      <h1 class="text-3xl font-display font-bold text-gray-900">{{ pageTitle }}</h1>
-      <p class="text-gray-600 mt-1">{{ isNew ? 'Create a new event' : 'Update event details' }}</p>
+      <h1 class="text-3xl font-display font-bold text-gray-900 dark:text-gray-100">{{ pageTitle }}</h1>
+      <p class="text-gray-600 dark:text-gray-300 mt-1">{{ isNew ? 'Create a new event' : 'Update event details' }}</p>
     </div>
 
     <!-- Metadata (for existing events) -->
-    <BaseCard v-if="!isNew && currentEvent" class="mb-6 bg-gray-50">
-      <h3 class="text-sm font-medium text-gray-700 mb-3">Event Information</h3>
+    <BaseCard v-if="!isNew && currentEvent" class="mb-6 bg-gray-50 dark:bg-gray-800">
+      <h3 class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">Event Information</h3>
       <div class="flex flex-wrap gap-6 text-sm">
-        <div class="flex items-center gap-2 text-gray-600">
+        <div class="flex items-center gap-2 text-gray-600 dark:text-gray-300">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
           <span>Created by <strong>{{ currentEvent.creator_name || 'Unknown' }}</strong></span>
         </div>
 
-        <div class="flex items-center gap-2 text-gray-600">
+        <div class="flex items-center gap-2 text-gray-600 dark:text-gray-300">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
           <span>{{ formatDateTime(currentEvent.created_at) }}</span>
         </div>
 
-        <div v-if="currentEvent.updated_at && currentEvent.updated_at !== currentEvent.created_at" class="flex items-center gap-2 text-gray-600">
+        <div v-if="currentEvent.updated_at && currentEvent.updated_at !== currentEvent.created_at" class="flex items-center gap-2 text-gray-600 dark:text-gray-300">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
@@ -396,10 +396,10 @@ const handleCancel = () => {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Event Type -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Event Type <span class="text-red-500">*</span>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+              Event Type <span class="text-red-500 dark:text-red-400">*</span>
             </label>
-            <select v-model="form.event_type" class="input">
+            <select v-model="form.event_type" class="input dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600">
               <option value="meeting">Meeting</option>
               <option value="camp">Camp</option>
               <option value="trip">Trip</option>
@@ -411,10 +411,10 @@ const handleCancel = () => {
 
           <!-- Age Group -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Age Group <span class="text-red-500">*</span>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+              Age Group <span class="text-red-500 dark:text-red-400">*</span>
             </label>
-            <select v-model="form.age_group" class="input">
+            <select v-model="form.age_group" class="input dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600">
               <option value="beavers">Beaver Colony (6-8 years)</option>
               <option value="cubs">Cub Pack (8-10½ years)</option>
               <option value="scouts">Scout Troop (10½-14 years)</option>
@@ -424,17 +424,17 @@ const handleCancel = () => {
 
         <!-- Description -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Description <span class="text-red-500">*</span>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+            Description <span class="text-red-500 dark:text-red-400">*</span>
           </label>
           <textarea
             v-model="form.description"
             rows="4"
-            class="input"
+            class="input dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600"
             placeholder="Provide details about the event..."
             :class="{ 'border-red-500': errors.description }"
           />
-          <p v-if="errors.description" class="mt-1 text-sm text-red-600">
+          <p v-if="errors.description" class="mt-1 text-sm text-red-600 dark:text-red-400">
             {{ errors.description }}
           </p>
         </div>
@@ -498,23 +498,23 @@ const handleCancel = () => {
         </div>
 
         <!-- Recurring Event -->
-        <div class="border-t border-gray-200 pt-6">
+        <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
           <div class="flex items-center mb-4">
             <input
               id="is_recurring"
               v-model="form.is_recurring"
               type="checkbox"
-              class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+              class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded"
             />
-            <label for="is_recurring" class="ml-2 block text-sm font-medium text-gray-700">
+            <label for="is_recurring" class="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-200">
               Recurring Event
             </label>
           </div>
 
-          <div v-if="form.is_recurring" class="ml-6 space-y-4 bg-indigo-50 border-2 border-indigo-200 p-4 rounded-lg">
+          <div v-if="form.is_recurring" class="ml-6 space-y-4 bg-indigo-50 dark:bg-indigo-900/30 border-2 border-indigo-200 dark:border-indigo-800 p-4 rounded-lg">
             <div class="mb-4">
-              <p class="text-sm text-indigo-900 font-medium mb-2">📅 Recurrence Schedule</p>
-              <p class="text-sm text-indigo-700">
+              <p class="text-sm text-indigo-900 dark:text-indigo-100 font-medium mb-2">📅 Recurrence Schedule</p>
+              <p class="text-sm text-indigo-700 dark:text-indigo-300">
                 The start date and times above define when each occurrence happens and how long it lasts. Below you set how often it repeats and when to stop creating occurrences.
               </p>
             </div>
@@ -522,15 +522,15 @@ const handleCancel = () => {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <!-- Frequency -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                   Repeat Every
                 </label>
-                <select v-model="form.recurrence_frequency" class="input">
+                <select v-model="form.recurrence_frequency" class="input dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600">
                   <option value="DAILY">Day</option>
                   <option value="WEEKLY">Week (Standard)</option>
                   <option value="MONTHLY">Month</option>
                 </select>
-                <p class="mt-1 text-sm text-gray-500">How often the event repeats</p>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">How often the event repeats</p>
               </div>
 
               <!-- Recurrence End Date -->
@@ -543,12 +543,12 @@ const handleCancel = () => {
               />
             </div>
 
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
               <div class="flex">
-                <svg class="w-5 h-5 text-blue-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <div class="text-sm text-blue-800">
+                <div class="text-sm text-blue-800 dark:text-blue-200">
                   <p class="font-medium">Summary:</p>
                   <p class="mt-1">
                     This event will repeat
@@ -594,16 +594,16 @@ const handleCancel = () => {
 
         <!-- What to Bring -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
             What to Bring
           </label>
           <textarea
             v-model="form.what_to_bring"
             rows="3"
-            class="input"
+            class="input dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600"
             placeholder="List items Cubs should bring..."
           />
-          <p class="mt-1 text-sm text-gray-500">Optional</p>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Optional</p>
         </div>
 
         <!-- Organiser Info -->
@@ -625,10 +625,10 @@ const handleCancel = () => {
 
         <!-- Status -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Status <span class="text-red-500">*</span>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+            Status <span class="text-red-500 dark:text-red-400">*</span>
           </label>
-          <select v-model="form.status" class="input">
+          <select v-model="form.status" class="input dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600">
             <option value="draft">Draft</option>
             <option value="published">Published</option>
             <option value="cancelled">Cancelled</option>
@@ -637,26 +637,26 @@ const handleCancel = () => {
         </div>
 
         <!-- Cancellation Reason (shown when status is cancelled) -->
-        <div v-if="form.status === 'cancelled'" class="bg-red-50 border-2 border-red-200 rounded-lg p-4">
-          <label class="block text-sm font-medium text-red-900 mb-2">
+        <div v-if="form.status === 'cancelled'" class="bg-red-50 dark:bg-red-900/30 border-2 border-red-200 dark:border-red-800 rounded-lg p-4">
+          <label class="block text-sm font-medium text-red-900 dark:text-red-100 mb-2">
             Cancellation Reason
-            <span class="text-xs font-normal text-red-700 ml-2">(Will be displayed to the public)</span>
+            <span class="text-xs font-normal text-red-700 dark:text-red-300 ml-2">(Will be displayed to the public)</span>
           </label>
           <textarea
             v-model="form.cancellation_reason"
             rows="3"
-            class="input"
+            class="input dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600"
             placeholder="Explain why this event has been cancelled..."
           />
-          <p class="mt-2 text-sm text-red-700">
+          <p class="mt-2 text-sm text-red-700 dark:text-red-200">
             ℹ️ This event will remain visible to the public with a prominent cancellation notice.
           </p>
         </div>
 
         <!-- File Attachments (only for existing events) -->
-        <div v-if="!isNew" class="border-t border-gray-200 pt-6">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">File Attachments</h3>
-          <p class="text-sm text-gray-600 mb-4">Upload documents, forms, or images related to this event.</p>
+        <div v-if="!isNew" class="border-t border-gray-200 dark:border-gray-700 pt-6">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">File Attachments</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">Upload documents, forms, or images related to this event.</p>
           <FileUpload
             v-model="attachments"
             parent-type="events"
@@ -665,7 +665,7 @@ const handleCancel = () => {
         </div>
 
         <!-- External Links -->
-        <div class="border-t border-gray-200 pt-6">
+        <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
           <ExternalLinkManager
             v-model="externalLinks"
             parent-type="event"
@@ -676,7 +676,7 @@ const handleCancel = () => {
         <!-- Submit Error -->
         <div
           v-if="errors.submit"
-          class="p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600"
+          class="p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-200"
         >
           {{ errors.submit }}
         </div>

@@ -136,8 +136,8 @@ const moveDown = async (link: any, index: number) => {
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
       <div>
-        <h1 class="text-3xl font-display font-bold text-gray-900">External Links</h1>
-        <p class="text-gray-600 mt-1">Manage external website links displayed on the site</p>
+        <h1 class="text-3xl font-display font-bold text-gray-900 dark:text-gray-100">External Links</h1>
+        <p class="text-gray-600 dark:text-gray-300 mt-1">Manage external website links displayed on the site</p>
       </div>
       <BaseButton variant="primary" @click="openCreateModal">
         Add Link
@@ -146,11 +146,11 @@ const moveDown = async (link: any, index: number) => {
 
     <!-- Links List -->
     <div v-if="linksStore.loading" class="text-center py-12">
-      <p class="text-gray-600">Loading links...</p>
+      <p class="text-gray-600 dark:text-gray-300">Loading links...</p>
     </div>
 
     <div v-else-if="linksStore.externalLinks.length === 0" class="text-center py-12">
-      <p class="text-gray-600 mb-4">No external links yet</p>
+      <p class="text-gray-600 dark:text-gray-300 mb-4">No external links yet</p>
       <BaseButton variant="primary" @click="openCreateModal">
         Add Your First Link
       </BaseButton>
@@ -166,7 +166,7 @@ const moveDown = async (link: any, index: number) => {
           <!-- Link Info -->
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-3 mb-2">
-              <h3 class="text-lg font-semibold text-gray-900 truncate">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
                 {{ link.label || link.url }}
               </h3>
               <BaseBadge :variant="link.is_active ? 'success' : 'secondary'">
@@ -178,12 +178,12 @@ const moveDown = async (link: any, index: number) => {
               :href="link.url"
               target="_blank"
               rel="noopener noreferrer"
-              class="text-sm text-primary-600 hover:text-primary-700 underline break-all"
+              class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 underline break-all"
             >
               {{ link.url }}
             </a>
 
-            <div class="flex items-center gap-4 mt-2 text-xs text-gray-500">
+            <div class="flex items-center gap-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
               <span>Order: {{ link.display_order }}</span>
               <span>Created {{ new Date(link.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }}</span>
             </div>
@@ -249,17 +249,17 @@ const moveDown = async (link: any, index: number) => {
         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
         @click.self="closeModal"
       >
-        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
           <div class="p-6">
-            <h2 class="text-2xl font-display font-bold text-gray-900 mb-4">
+            <h2 class="text-2xl font-display font-bold text-gray-900 dark:text-gray-100 mb-4">
               {{ editingLink ? 'Edit Link' : 'Add New Link' }}
             </h2>
 
             <form @submit.prevent="saveLink" class="space-y-4">
               <!-- URL -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  URL <span class="text-red-500">*</span>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                  URL <span class="text-red-500 dark:text-red-400">*</span>
                 </label>
                 <BaseInput
                   v-model="newLink.url"
@@ -267,14 +267,14 @@ const moveDown = async (link: any, index: number) => {
                   placeholder="https://example.com"
                   required
                 />
-                <p class="text-xs text-gray-500 mt-1">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   The full URL including https://
                 </p>
               </div>
 
               <!-- Label -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                   Label (optional)
                 </label>
                 <BaseInput
@@ -282,7 +282,7 @@ const moveDown = async (link: any, index: number) => {
                   type="text"
                   placeholder="Link display name"
                 />
-                <p class="text-xs text-gray-500 mt-1">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   If not provided, the URL will be displayed
                 </p>
               </div>
@@ -293,9 +293,9 @@ const moveDown = async (link: any, index: number) => {
                   id="is_active"
                   v-model="newLink.is_active"
                   type="checkbox"
-                  class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  class="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500"
                 />
-                <label for="is_active" class="text-sm font-medium text-gray-700">
+                <label for="is_active" class="text-sm font-medium text-gray-700 dark:text-gray-200">
                   Show this link on the website
                 </label>
               </div>

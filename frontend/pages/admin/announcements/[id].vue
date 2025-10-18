@@ -165,29 +165,29 @@ const handleCancel = () => {
   <div>
     <!-- Header -->
     <div class="mb-6">
-      <h1 class="text-3xl font-display font-bold text-gray-900">{{ pageTitle }}</h1>
-      <p class="text-gray-600 mt-1">{{ isNew ? 'Create a new announcement' : 'Update announcement details' }}</p>
+      <h1 class="text-3xl font-display font-bold text-gray-900 dark:text-gray-100">{{ pageTitle }}</h1>
+      <p class="text-gray-600 dark:text-gray-300 mt-1">{{ isNew ? 'Create a new announcement' : 'Update announcement details' }}</p>
     </div>
 
     <!-- Metadata (for existing announcements) -->
-    <BaseCard v-if="!isNew && currentAnnouncement" class="mb-6 bg-gray-50">
-      <h3 class="text-sm font-medium text-gray-700 mb-3">Announcement Information</h3>
+    <BaseCard v-if="!isNew && currentAnnouncement" class="mb-6 bg-gray-50 dark:bg-gray-800">
+      <h3 class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">Announcement Information</h3>
       <div class="flex flex-wrap gap-6 text-sm">
-        <div class="flex items-center gap-2 text-gray-600">
+        <div class="flex items-center gap-2 text-gray-600 dark:text-gray-300">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
           <span>Created by <strong>{{ currentAnnouncement.creator_name || 'Unknown' }}</strong></span>
         </div>
 
-        <div class="flex items-center gap-2 text-gray-600">
+        <div class="flex items-center gap-2 text-gray-600 dark:text-gray-300">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
           <span>{{ formatDateTime(currentAnnouncement.created_at) }}</span>
         </div>
 
-        <div v-if="currentAnnouncement.updated_at && currentAnnouncement.updated_at !== currentAnnouncement.created_at" class="flex items-center gap-2 text-gray-600">
+        <div v-if="currentAnnouncement.updated_at && currentAnnouncement.updated_at !== currentAnnouncement.created_at" class="flex items-center gap-2 text-gray-600 dark:text-gray-300">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
@@ -210,8 +210,8 @@ const handleCancel = () => {
 
         <!-- Content -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Content <span class="text-red-500">*</span>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+            Content <span class="text-red-500 dark:text-red-400">*</span>
           </label>
           <textarea
             v-model="form.content"
@@ -220,7 +220,7 @@ const handleCancel = () => {
             placeholder="Enter the announcement content..."
             :class="{ 'border-red-500': errors.content }"
           />
-          <p v-if="errors.content" class="mt-1 text-sm text-red-600">
+          <p v-if="errors.content" class="mt-1 text-sm text-red-600 dark:text-red-400">
             {{ errors.content }}
           </p>
         </div>
@@ -228,21 +228,21 @@ const handleCancel = () => {
         <!-- Priority, Category & Status Row -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Priority <span class="text-red-500">*</span>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+              Priority <span class="text-red-500 dark:text-red-400">*</span>
             </label>
             <select v-model="form.priority" class="input">
               <option value="low">Low</option>
               <option value="medium">Medium</option>
               <option value="high">High</option>
             </select>
-            <p class="mt-1 text-sm text-gray-500">
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
               High priority announcements appear at the top
             </p>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               Category
             </label>
             <select v-model="form.category" class="input">
@@ -252,14 +252,14 @@ const handleCancel = () => {
               <option value="urgent">Urgent</option>
               <option value="achievement">Achievement</option>
             </select>
-            <p class="mt-1 text-sm text-gray-500">
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Helps organise announcements
             </p>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Status <span class="text-red-500">*</span>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+              Status <span class="text-red-500 dark:text-red-400">*</span>
             </label>
             <select v-model="form.status" class="input">
               <option value="draft">Draft</option>
@@ -277,9 +277,9 @@ const handleCancel = () => {
         />
 
         <!-- File Attachments (only for existing announcements) -->
-        <div v-if="!isNew" class="border-t border-gray-200 pt-6">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">File Attachments</h3>
-          <p class="text-sm text-gray-600 mb-4">Upload documents, forms, or images related to this announcement.</p>
+        <div v-if="!isNew" class="border-t border-gray-200 dark:border-gray-700 pt-6">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">File Attachments</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">Upload documents, forms, or images related to this announcement.</p>
           <FileUpload
             v-model="attachments"
             parent-type="announcements"
@@ -288,7 +288,7 @@ const handleCancel = () => {
         </div>
 
         <!-- External Links -->
-        <div class="border-t border-gray-200 pt-6">
+        <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
           <ExternalLinkManager
             v-model="externalLinks"
             parent-type="announcement"

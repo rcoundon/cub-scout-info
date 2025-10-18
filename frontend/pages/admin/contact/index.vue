@@ -178,8 +178,8 @@ onMounted(() => {
   <div>
     <div class="flex justify-between items-center mb-6">
       <div>
-        <h1 class="text-3xl font-display font-bold text-gray-900">Contact Messages</h1>
-        <p class="text-gray-600 mt-1">Manage contact form submissions</p>
+        <h1 class="text-3xl font-display font-bold text-gray-900 dark:text-gray-100">Contact Messages</h1>
+        <p class="text-gray-600 dark:text-gray-300 mt-1">Manage contact form submissions</p>
       </div>
 
       <BaseButton @click="fetchMessages" variant="secondary" size="sm">
@@ -205,7 +205,7 @@ onMounted(() => {
         :class="
           selectedStatus === status
             ? 'bg-primary-600 text-white'
-            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
         "
       >
         {{ status.charAt(0).toUpperCase() + status.slice(1) }}
@@ -240,14 +240,14 @@ onMounted(() => {
 
     <!-- Loading State -->
     <div v-if="loading" class="text-center py-12">
-      <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-      <p class="text-gray-600 mt-4">Loading messages...</p>
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 dark:border-primary-400"></div>
+      <p class="text-gray-600 dark:text-gray-300 mt-4">Loading messages...</p>
     </div>
 
     <!-- Error State -->
     <div
       v-else-if="error"
-      class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800"
+      class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-4 text-red-800 dark:text-red-200"
     >
       {{ error }}
     </div>
@@ -255,7 +255,7 @@ onMounted(() => {
     <!-- Empty State -->
     <div v-else-if="filteredMessages.length === 0" class="text-center py-12">
       <svg
-        class="mx-auto h-12 w-12 text-gray-400"
+        class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -267,8 +267,8 @@ onMounted(() => {
           d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
         />
       </svg>
-      <h3 class="mt-2 text-sm font-medium text-gray-900">No messages</h3>
-      <p class="mt-1 text-sm text-gray-500">
+      <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No messages</h3>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
         {{ searchQuery ? 'No messages match your search.' : 'No contact messages yet.' }}
       </p>
     </div>
@@ -281,12 +281,12 @@ onMounted(() => {
           <div class="flex justify-between items-start">
             <div class="flex-1">
               <div class="flex items-center gap-3 mb-2">
-                <h3 class="text-lg font-semibold text-gray-900">{{ message.subject }}</h3>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ message.subject }}</h3>
                 <BaseBadge :variant="getStatusBadgeVariant(message.status)">
                   {{ message.status.charAt(0).toUpperCase() + message.status.slice(1) }}
                 </BaseBadge>
               </div>
-              <div class="flex items-center gap-4 text-sm text-gray-600">
+              <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
                 <span class="flex items-center gap-1">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -307,7 +307,7 @@ onMounted(() => {
                       d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                     />
                   </svg>
-                  <a :href="`mailto:${message.email}`" class="text-primary-600 hover:text-primary-700">
+                  <a :href="`mailto:${message.email}`" class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
                     {{ message.email }}
                   </a>
                 </span>
@@ -345,13 +345,13 @@ onMounted(() => {
           </div>
 
           <!-- Message Content -->
-          <div class="bg-gray-50 rounded-lg p-4">
-            <p class="text-gray-700 whitespace-pre-wrap">{{ message.message }}</p>
+          <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+            <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ message.message }}</p>
           </div>
 
           <!-- Status Actions -->
-          <div class="flex items-center gap-2 pt-2 border-t border-gray-200">
-            <span class="text-sm text-gray-600 mr-2">Update status:</span>
+          <div class="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+            <span class="text-sm text-gray-600 dark:text-gray-300 mr-2">Update status:</span>
             <button
               v-for="status in ['new', 'read', 'replied', 'archived']"
               :key="status"
@@ -360,8 +360,8 @@ onMounted(() => {
               class="px-3 py-1 text-sm rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               :class="
                 message.status === status
-                  ? 'bg-gray-200 text-gray-600 cursor-default'
-                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                  ? 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 cursor-default'
+                  : 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
               "
             >
               {{ status.charAt(0).toUpperCase() + status.slice(1) }}

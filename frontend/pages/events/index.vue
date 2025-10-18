@@ -268,8 +268,8 @@ const getEventTypeIcon = (type: string) => {
   <div class="container mx-auto px-4 py-12">
     <!-- Header -->
     <div class="text-center mb-8 sm:mb-12 px-4">
-      <h1 class="text-3xl sm:text-4xl font-display font-bold text-primary-900 mb-3 sm:mb-4">Upcoming Events</h1>
-      <p class="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto mb-4 sm:mb-6">
+      <h1 class="text-3xl sm:text-4xl font-display font-bold text-primary-900 dark:text-primary-300 mb-3 sm:mb-4">Upcoming Events</h1>
+      <p class="text-base sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-4 sm:mb-6">
         Join us for exciting Cubs activities, camps, trips, and special events throughout the year.
       </p>
 
@@ -296,8 +296,8 @@ const getEventTypeIcon = (type: string) => {
       </div>
       <div class="px-4 max-w-2xl mx-auto">
         <!-- Age group filter notice -->
-        <div v-if="selectedAgeGroups.length > 0 && selectedAgeGroups.length < 3" class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <p class="text-xs sm:text-sm text-blue-800 text-center flex items-center justify-center gap-2">
+        <div v-if="selectedAgeGroups.length > 0 && selectedAgeGroups.length < 3" class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg">
+          <p class="text-xs sm:text-sm text-blue-800 dark:text-blue-200 text-center flex items-center justify-center gap-2">
             <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -308,14 +308,14 @@ const getEventTypeIcon = (type: string) => {
             </span>
           </p>
         </div>
-        <p class="text-xs sm:text-sm text-gray-600 mt-3 text-center">
-          <span class="font-medium text-primary-700">📅 Subscribe for automatic updates</span> - New events appear automatically in your calendar
+        <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-3 text-center">
+          <span class="font-medium text-primary-700 dark:text-primary-400">📅 Subscribe for automatic updates</span> - New events appear automatically in your calendar
         </p>
-        <p class="text-xs text-gray-500 mt-1 text-center">
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
           Or download a one-time snapshot that won't update when events change
         </p>
-        <p class="text-xs text-gray-600 mt-2 flex items-start sm:items-center justify-center gap-1">
-          <svg class="w-4 h-4 text-primary-600 flex-shrink-0 mt-0.5 sm:mt-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <p class="text-xs text-gray-600 dark:text-gray-300 mt-2 flex items-start sm:items-center justify-center gap-1">
+          <svg class="w-4 h-4 text-primary-600 dark:text-primary-400 flex-shrink-0 mt-0.5 sm:mt-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span>You can also click on any event below to add it individually to Google Calendar or download as .ics</span>
@@ -422,8 +422,8 @@ const getEventTypeIcon = (type: string) => {
     <div class="mb-8">
       <div class="flex flex-col gap-4">
         <!-- Age Group Filter -->
-        <div class="bg-white rounded-lg border border-gray-200 p-4">
-          <label class="block text-sm font-semibold text-gray-700 mb-3">Show Events For:</label>
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Show Events For:</label>
           <div class="flex flex-wrap gap-3">
             <label
               v-for="group in ['beavers', 'cubs', 'scouts']"
@@ -432,7 +432,7 @@ const getEventTypeIcon = (type: string) => {
               :class="
                 selectedAgeGroups.includes(group)
                   ? getAgeGroupColor(group) + ' text-white border-transparent'
-                  : 'bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-300'
+                  : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
               "
             >
               <input
@@ -481,12 +481,12 @@ const getEventTypeIcon = (type: string) => {
 
         <!-- View Toggle -->
         <div class="flex justify-center">
-          <div class="inline-flex rounded-lg border border-gray-200 p-1 bg-gray-50">
+          <div class="inline-flex rounded-lg border border-gray-200 dark:border-gray-700 p-1 bg-gray-50 dark:bg-gray-800">
             <button
               @click="viewMode = 'list'"
               :class="{
-                'bg-white shadow-sm': viewMode === 'list',
-                'text-gray-600 hover:text-gray-900': viewMode !== 'list',
+                'bg-white dark:bg-gray-700 shadow-sm': viewMode === 'list',
+                'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200': viewMode !== 'list',
               }"
               class="px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2"
             >
@@ -498,8 +498,8 @@ const getEventTypeIcon = (type: string) => {
             <button
               @click="viewMode = 'calendar'"
               :class="{
-                'bg-white shadow-sm': viewMode === 'calendar',
-                'text-gray-600 hover:text-gray-900': viewMode !== 'calendar',
+                'bg-white dark:bg-gray-700 shadow-sm': viewMode === 'calendar',
+                'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200': viewMode !== 'calendar',
               }"
               class="px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2"
             >
@@ -515,13 +515,13 @@ const getEventTypeIcon = (type: string) => {
 
     <!-- Loading State -->
     <div v-if="eventsStore.loading" class="text-center py-12">
-      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      <p class="text-gray-600 mt-4">Loading events...</p>
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 dark:border-primary-400"></div>
+      <p class="text-gray-600 dark:text-gray-300 mt-4">Loading events...</p>
     </div>
 
     <!-- Error State -->
     <div v-else-if="eventsStore.error" class="text-center py-12">
-      <p class="text-red-600">{{ eventsStore.error }}</p>
+      <p class="text-red-600 dark:text-red-400">{{ eventsStore.error }}</p>
     </div>
 
     <!-- Calendar View -->
@@ -533,7 +533,7 @@ const getEventTypeIcon = (type: string) => {
     <div v-else>
       <!-- Upcoming Events -->
       <div v-if="upcomingEvents.length > 0" class="mb-12">
-        <h2 class="text-2xl font-display font-bold text-gray-900 mb-6">Upcoming Events</h2>
+        <h2 class="text-2xl font-display font-bold text-gray-900 dark:text-gray-100 mb-6">Upcoming Events</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <NuxtLink
             v-for="event in upcomingEvents"
@@ -541,7 +541,7 @@ const getEventTypeIcon = (type: string) => {
             :to="{ path: `/events/${event.id}`, query: { ...route.query } }"
             class="block"
           >
-            <div :class="{ 'stacked-card': event.is_recurring }">
+            <div :class="{ 'card-stacked': event.is_recurring }">
               <div :class="{ 'ring-2 ring-red-300 ring-offset-0 rounded-lg': event.status === 'cancelled' }">
                 <!-- Cancelled Banner or Spacer -->
                 <div v-if="event.status === 'cancelled'" class="bg-red-600 text-white text-center py-1 text-xs font-bold uppercase tracking-wide rounded-t-lg">
@@ -553,18 +553,18 @@ const getEventTypeIcon = (type: string) => {
                 <!-- Age Group and Event Type Badges -->
                 <div class="mb-3 flex items-center gap-2 flex-wrap">
                   <!-- Age Group Badge (Primary) -->
-                  <span :class="getAgeGroupColor(event.age_group)" class="px-3 py-1 rounded-full text-xs font-medium text-white">
+                  <span :class="`badge-${event.age_group}`">
                     {{ getAgeGroupLabel(event.age_group) }}
                   </span>
-                  <!-- Event Type with Icon -->
-                  <div class="flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                  <!-- Event Type Badge with Icon -->
+                  <div :class="`badge-${event.event_type}`">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="getEventTypeIcon(event.event_type)" />
                     </svg>
                     <span>{{ getEventTypeLabel(event.event_type) }}</span>
                   </div>
                   <!-- Recurring Badge -->
-                  <span v-if="event.is_recurring" class="px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 flex items-center gap-1">
+                  <span v-if="event.is_recurring" class="badge-recurring">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
@@ -573,10 +573,10 @@ const getEventTypeIcon = (type: string) => {
                 </div>
 
                 <!-- Title -->
-                <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ event.title }}</h3>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">{{ event.title }}</h3>
 
                 <!-- Date & Time -->
-                <div class="flex items-center gap-2 text-gray-600 mb-2">
+                <div class="flex items-center gap-2 text-gray-600 dark:text-gray-300 mb-2">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
@@ -587,7 +587,7 @@ const getEventTypeIcon = (type: string) => {
                 </div>
 
                 <!-- Location -->
-                <div class="flex items-center gap-2 text-gray-600 mb-3">
+                <div class="flex items-center gap-2 text-gray-600 dark:text-gray-300 mb-3">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -596,27 +596,27 @@ const getEventTypeIcon = (type: string) => {
                 </div>
 
                 <!-- Description -->
-                <p class="text-gray-600 mb-3 line-clamp-3">{{ event.description }}</p>
+                <p class="text-gray-600 dark:text-gray-300 mb-3 line-clamp-3">{{ event.description }}</p>
 
                 <!-- Creator Info -->
-                <p class="text-xs text-gray-500 mb-4">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
                   Created by {{ event.creator_name || 'Unknown' }}
                 </p>
               </div>
 
               <!-- Footer -->
-              <div class="flex items-center justify-between pt-4 border-t border-gray-200">
-                <div v-if="event.cost !== undefined" class="flex items-center gap-1 text-primary-600 font-semibold">
+              <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div v-if="event.cost !== undefined" class="flex items-center gap-1 text-primary-600 dark:text-primary-400 font-semibold">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <span>£{{ event.cost.toFixed(2) }}</span>
                 </div>
-                <div v-else class="text-green-600 font-semibold">
+                <div v-else class="text-green-600 dark:text-green-400 font-semibold">
                   Free
                 </div>
 
-                <span class="text-primary-600 text-sm font-medium">
+                <span class="text-primary-600 dark:text-primary-400 text-sm font-medium">
                   View details →
                 </span>
               </div>
@@ -629,7 +629,7 @@ const getEventTypeIcon = (type: string) => {
 
       <!-- Past Events -->
       <div v-if="pastEvents.length > 0">
-        <h2 class="text-2xl font-display font-bold text-gray-900 mb-6">Past Events</h2>
+        <h2 class="text-2xl font-display font-bold text-gray-900 dark:text-gray-100 mb-6">Past Events</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <NuxtLink
             v-for="event in pastEvents"
@@ -637,7 +637,7 @@ const getEventTypeIcon = (type: string) => {
             :to="{ path: `/events/${event.id}`, query: { ...route.query } }"
             class="block"
           >
-            <div :class="{ 'stacked-card': event.is_recurring }">
+            <div :class="{ 'card-stacked': event.is_recurring }">
               <div :class="{ 'ring-2 ring-red-300 ring-offset-0 rounded-lg': event.status === 'cancelled' }">
                 <!-- Cancelled Banner or Spacer -->
                 <div v-if="event.status === 'cancelled'" class="bg-red-600 text-white text-center py-1 text-xs font-bold uppercase tracking-wide rounded-t-lg">
@@ -649,18 +649,18 @@ const getEventTypeIcon = (type: string) => {
                 <!-- Age Group and Event Type Badges -->
                 <div class="mb-3 flex items-center gap-2 flex-wrap">
                   <!-- Age Group Badge (Primary) -->
-                  <span :class="getAgeGroupColor(event.age_group)" class="px-3 py-1 rounded-full text-xs font-medium text-white">
+                  <span :class="`badge-${event.age_group}`">
                     {{ getAgeGroupLabel(event.age_group) }}
                   </span>
-                  <!-- Event Type with Icon -->
-                  <div class="flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                  <!-- Event Type Badge with Icon -->
+                  <div :class="`badge-${event.event_type}`">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="getEventTypeIcon(event.event_type)" />
                     </svg>
                     <span>{{ getEventTypeLabel(event.event_type) }}</span>
                   </div>
                   <!-- Recurring Badge -->
-                  <span v-if="event.is_recurring" class="px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 flex items-center gap-1">
+                  <span v-if="event.is_recurring" class="badge-recurring">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
@@ -669,10 +669,10 @@ const getEventTypeIcon = (type: string) => {
                 </div>
 
                 <!-- Title -->
-                <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ event.title }}</h3>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">{{ event.title }}</h3>
 
                 <!-- Date -->
-                <div class="flex items-center gap-2 text-gray-600 mb-2">
+                <div class="flex items-center gap-2 text-gray-600 dark:text-gray-300 mb-2">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
@@ -680,7 +680,7 @@ const getEventTypeIcon = (type: string) => {
                 </div>
 
                 <!-- Location -->
-                <div class="flex items-center gap-2 text-gray-600 mb-3">
+                <div class="flex items-center gap-2 text-gray-600 dark:text-gray-300 mb-3">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -689,10 +689,10 @@ const getEventTypeIcon = (type: string) => {
                 </div>
 
                 <!-- Description -->
-                <p class="text-gray-600 mb-2 line-clamp-2">{{ event.description }}</p>
+                <p class="text-gray-600 dark:text-gray-300 mb-2 line-clamp-2">{{ event.description }}</p>
 
                 <!-- Creator Info -->
-                <p class="text-xs text-gray-500">
+                <p class="text-xs text-gray-500 dark:text-gray-400">
                   Created by {{ event.creator_name || 'Unknown' }}
                 </p>
               </div>
@@ -705,11 +705,11 @@ const getEventTypeIcon = (type: string) => {
 
       <!-- No Events -->
       <div v-if="upcomingEvents.length === 0 && pastEvents.length === 0" class="text-center py-12">
-        <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
-        <p class="text-gray-600 text-lg">No events found</p>
-        <p class="text-gray-500 mt-2">Check back soon for upcoming Cubs activities!</p>
+        <p class="text-gray-600 dark:text-gray-300 text-lg">No events found</p>
+        <p class="text-gray-500 dark:text-gray-400 mt-2">Check back soon for upcoming Cubs activities!</p>
       </div>
     </div>
 
