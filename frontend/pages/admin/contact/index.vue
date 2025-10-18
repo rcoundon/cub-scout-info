@@ -21,8 +21,12 @@ interface ContactMessage {
 const messages = ref<ContactMessage[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
+const toast = useToast()
 const selectedStatus = ref<ContactStatus | 'all'>('all')
 const searchQuery = ref('')
+const showDeleteModal = ref(false)
+const deletingMessage = ref<ContactMessage | null>(null)
+const deleting = ref(false)
 
 const filteredMessages = computed(() => {
   let filtered = messages.value
@@ -119,22 +123,42 @@ const updateStatus = async (id: string, status: ContactStatus) => {
       message.status = status
       message.updated_at = new Date().toISOString()
     }
+
+    toast.add({
+      title: 'Status updated',
+      description: 'Message status has been updated successfully.',
+      color: 'success',
+    })
   } catch (err: any) {
     console.error('Failed to update status:', err)
-    alert('Failed to update status: ' + (err.data?.error || 'Unknown error'))
+    toast.add({
+      title: 'Error',
+      description: 'Failed to update status: ' + (err.data?.error || 'Unknown error'),
+      color: 'error',
+    })
   }
 }
 
-const deleteMessage = async (id: string) => {
-  if (!confirm('Are you sure you want to delete this message? This cannot be undone.')) {
-    return
-  }
+const openDeleteModal = (message: ContactMessage) => {
+  deletingMessage.value = message
+  showDeleteModal.value = true
+}
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+  deletingMessage.value = null
+}
+
+const confirmDelete = async () => {
+  if (!deletingMessage.value) return
+
+  deleting.value = true
 
   try {
     const authStore = useAuthStore()
     const config = useRuntimeConfig()
 
-    await $fetch(`${config.public.apiUrl}/api/contact/admin/${id}`, {
+    await $fetch(`${config.public.apiUrl}/api/contact/admin/${deletingMessage.value.id}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${authStore.accessToken}`,
@@ -142,10 +166,23 @@ const deleteMessage = async (id: string) => {
     })
 
     // Remove from local state
-    messages.value = messages.value.filter((m) => m.id !== id)
+    messages.value = messages.value.filter((m) => m.id !== deletingMessage.value?.id)
+
+    toast.add({
+      title: 'Message deleted',
+      description: 'Contact message has been deleted successfully.',
+      color: 'success',
+    })
+    closeDeleteModal()
   } catch (err: any) {
     console.error('Failed to delete message:', err)
-    alert('Failed to delete message: ' + (err.data?.error || 'Unknown error'))
+    toast.add({
+      title: 'Error',
+      description: 'Failed to delete message: ' + (err.data?.error || 'Unknown error'),
+      color: 'error',
+    })
+  } finally {
+    deleting.value = false
   }
 }
 
@@ -328,8 +365,8 @@ onMounted(() => {
             <!-- Actions -->
             <div class="flex items-center gap-2">
               <button
-                @click="deleteMessage(message.id)"
-                class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                @click="openDeleteModal(message)"
+                class="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                 title="Delete message"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -370,5 +407,31 @@ onMounted(() => {
         </div>
       </BaseCard>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <BaseConfirmDialog
+      v-model="showDeleteModal"
+      title="Delete Contact Message"
+      message="This will permanently delete the contact message. This action cannot be undone."
+      confirm-text="Delete Message"
+      :loading="deleting"
+      loading-text="Deleting..."
+      @confirm="confirmDelete"
+      @cancel="closeDeleteModal"
+    >
+      <div v-if="deletingMessage" class="space-y-2">
+        <div>
+          <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+            {{ deletingMessage.subject }}
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            From: {{ deletingMessage.name }} ({{ deletingMessage.email }})
+          </p>
+        </div>
+        <p class="text-sm text-gray-600 dark:text-gray-300">
+          {{ deletingMessage.message.substring(0, 100) }}{{ deletingMessage.message.length > 100 ? '...' : '' }}
+        </p>
+      </div>
+    </BaseConfirmDialog>
   </div>
 </template>

@@ -69,7 +69,11 @@ const onFileSelected = (event: Event) => {
   // Validate file type
   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
   if (!allowedTypes.includes(file.type)) {
-    alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)')
+    toast.add({
+      title: 'Invalid file type',
+      description: 'Please select a valid image file (JPEG, PNG, GIF, or WebP).',
+      color: 'error',
+    })
     target.value = ''
     return
   }
@@ -77,7 +81,11 @@ const onFileSelected = (event: Event) => {
   // Validate file size (10MB)
   const maxSize = 10 * 1024 * 1024
   if (file.size > maxSize) {
-    alert('File size must be less than 10MB')
+    toast.add({
+      title: 'File too large',
+      description: 'File size must be less than 10MB.',
+      color: 'error',
+    })
     target.value = ''
     return
   }

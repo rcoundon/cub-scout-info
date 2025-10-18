@@ -8,6 +8,7 @@ definePageMeta({
 })
 
 const linksStore = useExternalLinksStore()
+const toast = useToast()
 
 const showCreateModal = ref(false)
 const editingLink = ref<any | null>(null)
@@ -16,6 +17,9 @@ const newLink = ref({
   label: '',
   is_active: true,
 })
+const showDeleteModal = ref(false)
+const deletingLink = ref<any | null>(null)
+const deleting = ref(false)
 
 onMounted(async () => {
   await linksStore.fetchAllExternalLinks()
@@ -53,7 +57,11 @@ const closeModal = () => {
 
 const saveLink = async () => {
   if (!newLink.value.url) {
-    alert('URL is required')
+    toast.add({
+      title: 'Missing information',
+      description: 'URL is required.',
+      color: 'error',
+    })
     return
   }
 
@@ -61,7 +69,11 @@ const saveLink = async () => {
   try {
     new URL(newLink.value.url)
   } catch {
-    alert('Please enter a valid URL')
+    toast.add({
+      title: 'Invalid URL',
+      description: 'Please enter a valid URL.',
+      color: 'error',
+    })
     return
   }
 
@@ -83,14 +95,55 @@ const saveLink = async () => {
   }
 
   if (success) {
+    toast.add({
+      title: editingLink.value ? 'Link updated' : 'Link created',
+      description: editingLink.value ? 'External link has been updated successfully.' : 'External link has been created successfully.',
+      color: 'success',
+    })
     closeModal()
+  } else {
+    toast.add({
+      title: 'Error',
+      description: `Failed to ${editingLink.value ? 'update' : 'create'} link. Please try again.`,
+      color: 'error',
+    })
   }
 }
 
-const deleteLink = async (id: string, label?: string) => {
-  const displayName = label || 'this link'
-  if (confirm(`Are you sure you want to delete "${displayName}"?`)) {
-    await linksStore.deleteExternalLink(id)
+const openDeleteModal = (link: any) => {
+  deletingLink.value = link
+  showDeleteModal.value = true
+}
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+  deletingLink.value = null
+}
+
+const confirmDelete = async () => {
+  if (!deletingLink.value) return
+
+  deleting.value = true
+  const linkLabel = deletingLink.value.label || deletingLink.value.url
+
+  try {
+    const success = await linksStore.deleteExternalLink(deletingLink.value.id)
+    if (success) {
+      toast.add({
+        title: 'Link deleted',
+        description: `"${linkLabel}" has been deleted successfully.`,
+        color: 'success',
+      })
+      closeDeleteModal()
+    } else {
+      toast.add({
+        title: 'Error',
+        description: 'Failed to delete link. Please try again.',
+        color: 'error',
+      })
+    }
+  } finally {
+    deleting.value = false
   }
 }
 
@@ -233,7 +286,7 @@ const moveDown = async (link: any, index: number) => {
             <BaseButton
               variant="outline"
               size="sm"
-              @click="deleteLink(link.id, link.label)"
+              @click="openDeleteModal(link)"
             >
               Delete
             </BaseButton>
@@ -321,5 +374,31 @@ const moveDown = async (link: any, index: number) => {
         </div>
       </div>
     </Teleport>
+
+    <!-- Delete Confirmation Modal -->
+    <BaseConfirmDialog
+      v-model="showDeleteModal"
+      title="Delete External Link"
+      message="This will permanently delete the external link."
+      confirm-text="Delete Link"
+      :loading="deleting"
+      loading-text="Deleting..."
+      @confirm="confirmDelete"
+      @cancel="closeDeleteModal"
+    >
+      <div v-if="deletingLink">
+        <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+          {{ deletingLink.label || deletingLink.url }}
+        </p>
+        <a
+          :href="deletingLink.url"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 underline break-all mt-1 inline-block"
+        >
+          {{ deletingLink.url }}
+        </a>
+      </div>
+    </BaseConfirmDialog>
   </div>
 </template>

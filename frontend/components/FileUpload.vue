@@ -108,8 +108,8 @@
             </svg>
           </a>
           <button
-            @click="deleteAttachment(attachment.id)"
-            class="p-2 text-red-600 hover:bg-red-50 rounded"
+            @click="openDeleteModal(attachment)"
+            class="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
             title="Delete"
             :disabled="deleting === attachment.id"
           >
@@ -126,6 +126,27 @@
       </div>
     </div>
   </div>
+
+  <!-- Delete Confirmation Modal -->
+  <BaseConfirmDialog
+    v-model="showDeleteModal"
+    title="Delete File"
+    message="This will permanently delete the file. This action cannot be undone."
+    confirm-text="Delete File"
+    :loading="!!deleting"
+    loading-text="Deleting..."
+    @confirm="confirmDelete"
+    @cancel="closeDeleteModal"
+  >
+    <div v-if="deletingAttachment">
+      <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+        {{ deletingAttachment.original_name || deletingAttachment.file_name }}
+      </p>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        {{ formatFileSize(deletingAttachment.file_size) }}
+      </p>
+    </div>
+  </BaseConfirmDialog>
 </template>
 
 <script setup lang="ts">
@@ -156,12 +177,15 @@ const emit = defineEmits<{
 }>();
 
 const config = useRuntimeConfig();
+const toast = useToast();
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const uploading = ref(false);
 const uploadingFileName = ref('');
 const uploadProgress = ref(0);
 const errorMessage = ref('');
 const deleting = ref<string | null>(null);
+const showDeleteModal = ref(false);
+const deletingAttachment = ref<Attachment | null>(null);
 
 const acceptedTypes = [
   'application/pdf',
@@ -302,22 +326,34 @@ function getDownloadUrl(attachment: Attachment): string {
   return `${config.public.apiUrl}/api/attachments/${props.parentType}/${props.parentId}/${attachment.id}/download-url`;
 }
 
-async function deleteAttachment(attachmentId: string) {
-  if (!confirm('Are you sure you want to delete this file?')) {
+function openDeleteModal(attachment: Attachment) {
+  if (!props.parentId) {
+    toast.add({
+      title: 'Cannot delete',
+      description: 'Parent ID is not set.',
+      color: 'error',
+    });
     return;
   }
 
-  if (!props.parentId) {
-    errorMessage.value = 'Cannot delete file: Parent ID is not set';
-    return;
-  }
+  deletingAttachment.value = attachment;
+  showDeleteModal.value = true;
+}
+
+function closeDeleteModal() {
+  showDeleteModal.value = false;
+  deletingAttachment.value = null;
+}
+
+async function confirmDelete() {
+  if (!deletingAttachment.value) return;
 
   try {
-    deleting.value = attachmentId;
+    deleting.value = deletingAttachment.value.id;
     const authStore = useAuthStore();
 
     await $fetch(
-      `${config.public.apiUrl}/api/attachments/${props.parentType}/${props.parentId}/${attachmentId}`,
+      `${config.public.apiUrl}/api/attachments/${props.parentType}/${props.parentId}/${deletingAttachment.value.id}`,
       {
         method: 'DELETE',
         headers: {
@@ -327,10 +363,21 @@ async function deleteAttachment(attachmentId: string) {
     );
 
     // Remove from attachments list
-    attachments.value = attachments.value.filter((a) => a.id !== attachmentId);
+    attachments.value = attachments.value.filter((a) => a.id !== deletingAttachment.value?.id);
+
+    toast.add({
+      title: 'File deleted',
+      description: 'The file has been deleted successfully.',
+      color: 'success',
+    });
+    closeDeleteModal();
   } catch (error) {
     console.error('Delete error:', error);
-    errorMessage.value = 'Failed to delete file';
+    toast.add({
+      title: 'Error',
+      description: 'Failed to delete file. Please try again.',
+      color: 'error',
+    });
   } finally {
     deleting.value = null;
   }

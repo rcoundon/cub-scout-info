@@ -10,9 +10,13 @@ definePageMeta({
 
 const usersStore = useUsersStore()
 const authStore = useAuthStore()
+const toast = useToast()
 const searchQuery = ref('')
 const roleFilter = ref<'all' | 'admin' | 'editor' | 'viewer'>('all')
 const statusFilter = ref<'all' | 'invited' | 'active' | 'expired'>('all')
+const showDeleteModal = ref(false)
+const deletingUser = ref<any | null>(null)
+const deleting = ref(false)
 
 onMounted(async () => {
   await usersStore.fetchAllUsers()
@@ -94,17 +98,49 @@ const canDeleteUser = (userId: string) => {
   return authStore.user?.id !== userId
 }
 
-const deleteUser = async (id: string, email: string) => {
-  if (!canDeleteUser(id)) {
-    alert('You cannot delete your own account')
+const openDeleteModal = (user: any) => {
+  if (!canDeleteUser(user.id)) {
+    toast.add({
+      title: 'Cannot delete',
+      description: 'You cannot delete your own account.',
+      color: 'error',
+    })
     return
   }
 
-  if (confirm(`Are you sure you want to delete user "${email}"? This action cannot be undone.`)) {
-    const success = await usersStore.deleteUser(id)
+  deletingUser.value = user
+  showDeleteModal.value = true
+}
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+  deletingUser.value = null
+}
+
+const confirmDelete = async () => {
+  if (!deletingUser.value) return
+
+  deleting.value = true
+  const userEmail = deletingUser.value.email
+
+  try {
+    const success = await usersStore.deleteUser(deletingUser.value.id)
     if (success) {
-      // User deleted successfully
+      toast.add({
+        title: 'User deleted',
+        description: `"${userEmail}" has been deleted successfully.`,
+        color: 'success',
+      })
+      closeDeleteModal()
+    } else {
+      toast.add({
+        title: 'Error',
+        description: 'Failed to delete user. Please try again.',
+        color: 'error',
+      })
     }
+  } finally {
+    deleting.value = false
   }
 }
 </script>
@@ -217,7 +253,7 @@ const deleteUser = async (id: string, email: string) => {
             <BaseButton
               variant="outline"
               size="sm"
-              @click="deleteUser(user.id, user.email)"
+              @click="openDeleteModal(user)"
               :disabled="!canDeleteUser(user.id)"
             >
               Delete
@@ -226,5 +262,29 @@ const deleteUser = async (id: string, email: string) => {
         </div>
       </BaseCard>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <BaseConfirmDialog
+      v-model="showDeleteModal"
+      title="Delete User"
+      message="This will permanently delete the user account and all associated data."
+      confirm-text="Delete User"
+      :loading="deleting"
+      loading-text="Deleting..."
+      @confirm="confirmDelete"
+      @cancel="closeDeleteModal"
+    >
+      <div v-if="deletingUser">
+        <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+          {{ deletingUser.first_name }} {{ deletingUser.last_name }}
+        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          {{ deletingUser.email }}
+        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Role: <span class="font-medium">{{ deletingUser.role }}</span>
+        </p>
+      </div>
+    </BaseConfirmDialog>
   </div>
 </template>

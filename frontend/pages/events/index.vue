@@ -17,6 +17,7 @@ useHead({
 const eventsStore = useEventsStore()
 const route = useRoute()
 const router = useRouter()
+const toast = useToast()
 const searchQuery = ref('')
 const eventTypeFilter = ref<'all' | 'meeting' | 'camp' | 'trip' | 'special' | 'fundraising' | 'other'>('all')
 const viewMode = ref<'list' | 'calendar'>('list')
@@ -89,9 +90,17 @@ const copyFeedUrl = async () => {
   const url = getCalendarFeedUrl()
   try {
     await navigator.clipboard.writeText(url)
-    alert('Calendar feed URL copied to clipboard!')
+    toast.add({
+      title: 'Copied to clipboard',
+      description: 'Calendar feed URL has been copied to your clipboard.',
+      color: 'success',
+    })
   } catch (err) {
-    alert(`Calendar feed URL: ${url}`)
+    toast.add({
+      title: 'Calendar feed URL',
+      description: url,
+      color: 'neutral',
+    })
   }
 }
 

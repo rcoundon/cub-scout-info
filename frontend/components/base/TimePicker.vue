@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full">
+  <div class="w-full" :class="colorMode.value === 'dark' ? 'time-picker-dark' : ''">
     <label v-if="label" :for="inputId" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
       {{ label }}
       <span v-if="required" class="text-red-500 dark:text-red-400">*</span>
@@ -62,6 +62,7 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
+const colorMode = useColorMode()
 const inputId = `timepicker-${useId()}`
 const time = ref<{ hours: number; minutes: number } | null>(null)
 
@@ -151,78 +152,76 @@ const wrapperClasses = computed(() => {
 }
 
 /* Dark mode */
-@media (prefers-color-scheme: dark) {
-  :deep(.dp__input) {
-    background-color: #1f2937;
-    border-color: #4b5563;
-    color: #f3f4f6;
-  }
+.time-picker-dark :deep(.dp__input) {
+  background-color: #1f2937;
+  border-color: #4b5563;
+  color: #f3f4f6;
+}
 
-  :deep(.dp__input::placeholder) {
-    color: #9ca3af;
-  }
+.time-picker-dark :deep(.dp__input::placeholder) {
+  color: #9ca3af;
+}
 
-  :deep(.dp__input:focus) {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-  }
+.time-picker-dark :deep(.dp__input:focus) {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
 
-  :deep(.dp__input:disabled) {
-    background-color: #374151;
-    opacity: 0.6;
-  }
+.time-picker-dark :deep(.dp__input:disabled) {
+  background-color: #374151;
+  opacity: 0.6;
+}
 
-  :deep(.dp-disabled .dp__input) {
-    background-color: #374151;
-  }
+.time-picker-dark :deep(.dp-disabled .dp__input) {
+  background-color: #374151;
+}
 
-  /* Dark mode time picker popup */
-  :deep(.dp__menu) {
-    background-color: #1f2937;
-    border-color: #4b5563;
-  }
+/* Dark mode time picker popup */
+.time-picker-dark :deep(.dp__menu) {
+  background-color: #1f2937;
+  border-color: #4b5563;
+}
 
-  :deep(.dp__time_input) {
-    background-color: #374151;
-    color: #f3f4f6;
-    border-color: #4b5563;
-  }
+.time-picker-dark :deep(.dp__time_input) {
+  background-color: #374151;
+  color: #f3f4f6;
+  border-color: #4b5563;
+}
 
-  :deep(.dp__time_col_reg_block) {
-    background-color: #1f2937;
-  }
+.time-picker-dark :deep(.dp__time_col_reg_block) {
+  background-color: #1f2937;
+}
 
-  :deep(.dp__time_display) {
-    color: #f3f4f6;
-  }
+.time-picker-dark :deep(.dp__time_display) {
+  color: #f3f4f6;
+}
 
-  :deep(.dp__inc_dec_button) {
-    color: #f3f4f6;
-  }
+.time-picker-dark :deep(.dp__inc_dec_button) {
+  color: #f3f4f6;
+}
 
-  :deep(.dp__inc_dec_button:hover) {
-    background-color: #374151;
-  }
+.time-picker-dark :deep(.dp__inc_dec_button:hover) {
+  background-color: #374151;
+}
 
-  :deep(.dp__button) {
-    color: #f3f4f6;
-  }
+.time-picker-dark :deep(.dp__button) {
+  color: #f3f4f6;
+}
 
-  :deep(.dp__button:hover) {
-    background-color: #374151;
-  }
+.time-picker-dark :deep(.dp__button:hover) {
+  background-color: #374151;
+}
 
-  :deep(.dp__overlay_cell) {
-    color: #f3f4f6;
-  }
+.time-picker-dark :deep(.dp__overlay_cell) {
+  color: #f3f4f6;
+}
 
-  :deep(.dp__overlay_cell:hover) {
-    background-color: #374151;
-  }
+.time-picker-dark :deep(.dp__overlay_cell:hover) {
+  background-color: #374151;
+}
 
-  :deep(.dp__overlay_cell_active) {
-    background-color: #6366f1;
-    color: #ffffff;
-  }
+.time-picker-dark :deep(.dp__overlay_cell_active) {
+  background-color: #6366f1;
+  color: #ffffff;
 }
 </style>

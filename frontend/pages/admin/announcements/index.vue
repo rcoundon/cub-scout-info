@@ -8,8 +8,12 @@ definePageMeta({
 })
 
 const announcementsStore = useAnnouncementsStore()
+const toast = useToast()
 const searchQuery = ref('')
 const statusFilter = ref<'all' | 'published' | 'draft'>('all')
+const showDeleteModal = ref(false)
+const deletingAnnouncement = ref<any | null>(null)
+const deleting = ref(false)
 
 onMounted(async () => {
   await announcementsStore.fetchAllAnnouncements()
@@ -88,12 +92,40 @@ const formatDateTime = (dateString: string) => {
   })
 }
 
-const deleteAnnouncement = async (id: string, title: string) => {
-  if (confirm(`Are you sure you want to delete "${title}"?`)) {
-    const success = await announcementsStore.deleteAnnouncement(id)
+const openDeleteModal = (announcement: any) => {
+  deletingAnnouncement.value = announcement
+  showDeleteModal.value = true
+}
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+  deletingAnnouncement.value = null
+}
+
+const confirmDelete = async () => {
+  if (!deletingAnnouncement.value) return
+
+  deleting.value = true
+  const announcementTitle = deletingAnnouncement.value.title
+
+  try {
+    const success = await announcementsStore.deleteAnnouncement(deletingAnnouncement.value.id)
     if (success) {
-      // Announcement deleted successfully
+      toast.add({
+        title: 'Announcement deleted',
+        description: `"${announcementTitle}" has been deleted successfully.`,
+        color: 'success',
+      })
+      closeDeleteModal()
+    } else {
+      toast.add({
+        title: 'Error',
+        description: 'Failed to delete announcement. Please try again.',
+        color: 'error',
+      })
     }
+  } finally {
+    deleting.value = false
   }
 }
 </script>
@@ -203,7 +235,7 @@ const deleteAnnouncement = async (id: string, title: string) => {
             <BaseButton
               variant="outline"
               size="sm"
-              @click="deleteAnnouncement(announcement.id, announcement.title)"
+              @click="openDeleteModal(announcement)"
             >
               Delete
             </BaseButton>
@@ -211,5 +243,26 @@ const deleteAnnouncement = async (id: string, title: string) => {
         </div>
       </BaseCard>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <BaseConfirmDialog
+      v-model="showDeleteModal"
+      title="Delete Announcement"
+      message="This will permanently delete the announcement."
+      confirm-text="Delete Announcement"
+      :loading="deleting"
+      loading-text="Deleting..."
+      @confirm="confirmDelete"
+      @cancel="closeDeleteModal"
+    >
+      <div v-if="deletingAnnouncement">
+        <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+          {{ deletingAnnouncement.title }}
+        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          {{ deletingAnnouncement.content.substring(0, 100) }}{{ deletingAnnouncement.content.length > 100 ? '...' : '' }}
+        </p>
+      </div>
+    </BaseConfirmDialog>
   </div>
 </template>

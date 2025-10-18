@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full">
+  <div class="w-full" :class="colorMode.value === 'dark' ? 'date-picker-dark' : ''">
     <label v-if="label" :for="inputId" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
       {{ label }}
       <span v-if="required" class="text-red-500 dark:text-red-400">*</span>
@@ -76,6 +76,7 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
+const colorMode = useColorMode()
 const inputId = `datepicker-${useId()}`
 const date = ref<Date | null>(null)
 
@@ -157,85 +158,83 @@ const wrapperClasses = computed(() => {
 }
 
 /* Dark mode */
-@media (prefers-color-scheme: dark) {
-  :deep(.dp__input) {
-    background-color: #1f2937;
-    border-color: #4b5563;
-    color: #f3f4f6;
-  }
+.date-picker-dark :deep(.dp__input) {
+  background-color: #1f2937;
+  border-color: #4b5563;
+  color: #f3f4f6;
+}
 
-  :deep(.dp__input::placeholder) {
-    color: #9ca3af;
-  }
+.date-picker-dark :deep(.dp__input::placeholder) {
+  color: #9ca3af;
+}
 
-  :deep(.dp__input:focus) {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-  }
+.date-picker-dark :deep(.dp__input:focus) {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
 
-  :deep(.dp__input:disabled) {
-    background-color: #374151;
-    opacity: 0.6;
-  }
+.date-picker-dark :deep(.dp__input:disabled) {
+  background-color: #374151;
+  opacity: 0.6;
+}
 
-  :deep(.dp-disabled .dp__input) {
-    background-color: #374151;
-  }
+.date-picker-dark :deep(.dp-disabled .dp__input) {
+  background-color: #374151;
+}
 
-  /* Dark mode calendar popup */
-  :deep(.dp__menu) {
-    background-color: #1f2937;
-    border-color: #4b5563;
-  }
+/* Dark mode calendar popup */
+.date-picker-dark :deep(.dp__menu) {
+  background-color: #1f2937;
+  border-color: #4b5563;
+}
 
-  :deep(.dp__calendar_header) {
-    background-color: #374151;
-  }
+.date-picker-dark :deep(.dp__calendar_header) {
+  background-color: #374151;
+}
 
-  :deep(.dp__calendar_header_item) {
-    color: #d1d5db;
-  }
+.date-picker-dark :deep(.dp__calendar_header_item) {
+  color: #d1d5db;
+}
 
-  :deep(.dp__cell_inner) {
-    color: #f3f4f6;
-  }
+.date-picker-dark :deep(.dp__cell_inner) {
+  color: #f3f4f6;
+}
 
-  :deep(.dp__cell_disabled) {
-    color: #6b7280;
-  }
+.date-picker-dark :deep(.dp__cell_disabled) {
+  color: #6b7280;
+}
 
-  :deep(.dp__today) {
-    border-color: #6366f1;
-  }
+.date-picker-dark :deep(.dp__today) {
+  border-color: #6366f1;
+}
 
-  :deep(.dp__active_date) {
-    background-color: #6366f1;
-    color: #ffffff;
-  }
+.date-picker-dark :deep(.dp__active_date) {
+  background-color: #6366f1;
+  color: #ffffff;
+}
 
-  :deep(.dp__calendar_item:hover) {
-    background-color: #374151;
-  }
+.date-picker-dark :deep(.dp__calendar_item:hover) {
+  background-color: #374151;
+}
 
-  :deep(.dp__month_year_select) {
-    color: #f3f4f6;
-  }
+.date-picker-dark :deep(.dp__month_year_select) {
+  color: #f3f4f6;
+}
 
-  :deep(.dp__month_year_select:hover) {
-    background-color: #374151;
-  }
+.date-picker-dark :deep(.dp__month_year_select:hover) {
+  background-color: #374151;
+}
 
-  :deep(.dp__arrow_top),
-  :deep(.dp__arrow_bottom) {
-    color: #f3f4f6;
-  }
+.date-picker-dark :deep(.dp__arrow_top),
+.date-picker-dark :deep(.dp__arrow_bottom) {
+  color: #f3f4f6;
+}
 
-  :deep(.dp__button) {
-    color: #f3f4f6;
-  }
+.date-picker-dark :deep(.dp__button) {
+  color: #f3f4f6;
+}
 
-  :deep(.dp__button:hover) {
-    background-color: #374151;
-  }
+.date-picker-dark :deep(.dp__button:hover) {
+  background-color: #374151;
 }
 </style>

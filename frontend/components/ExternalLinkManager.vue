@@ -110,6 +110,7 @@ const emit = defineEmits<{
 }>()
 
 const linksStore = useExternalLinksStore()
+const toast = useToast()
 const globalLinks = ref<ExternalLink[]>([])
 const selectedGlobalLinkId = ref('')
 const newLink = ref({
@@ -164,7 +165,11 @@ const addNewLink = () => {
   try {
     new URL(newLink.value.url)
   } catch {
-    alert('Please enter a valid URL')
+    toast.add({
+      title: 'Invalid URL',
+      description: 'Please enter a valid URL.',
+      color: 'error',
+    })
     return
   }
 

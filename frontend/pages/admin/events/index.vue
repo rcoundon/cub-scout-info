@@ -8,8 +8,12 @@ definePageMeta({
 })
 
 const eventsStore = useEventsStore()
+const toast = useToast()
 const searchQuery = ref('')
 const statusFilter = ref<'all' | 'published' | 'draft' | 'cancelled'>('all')
+const showDeleteModal = ref(false)
+const deletingEvent = ref<any | null>(null)
+const deleting = ref(false)
 
 onMounted(async () => {
   await eventsStore.fetchAllEvents()
@@ -104,12 +108,40 @@ const getRecurrenceInfo = (event: any) => {
   }
 }
 
-const deleteEvent = async (id: string, title: string) => {
-  if (confirm(`Are you sure you want to delete "${title}"?`)) {
-    const success = await eventsStore.deleteEvent(id)
+const openDeleteModal = (event: any) => {
+  deletingEvent.value = event
+  showDeleteModal.value = true
+}
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+  deletingEvent.value = null
+}
+
+const confirmDelete = async () => {
+  if (!deletingEvent.value) return
+
+  deleting.value = true
+  const eventTitle = deletingEvent.value.title
+
+  try {
+    const success = await eventsStore.deleteEvent(deletingEvent.value.id)
     if (success) {
-      // Event deleted successfully
+      toast.add({
+        title: 'Event deleted',
+        description: `"${eventTitle}" has been deleted successfully.`,
+        color: 'success',
+      })
+      closeDeleteModal()
+    } else {
+      toast.add({
+        title: 'Error',
+        description: 'Failed to delete event. Please try again.',
+        color: 'error',
+      })
     }
+  } finally {
+    deleting.value = false
   }
 }
 </script>
@@ -238,7 +270,7 @@ const deleteEvent = async (id: string, title: string) => {
             <BaseButton
               variant="outline"
               size="sm"
-              @click="deleteEvent(event.id, event.title)"
+              @click="openDeleteModal(event)"
             >
               Delete
             </BaseButton>
@@ -246,5 +278,31 @@ const deleteEvent = async (id: string, title: string) => {
         </div>
       </BaseCard>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <BaseConfirmDialog
+      v-model="showDeleteModal"
+      title="Delete Event"
+      message="This will permanently delete the event and all associated data."
+      confirm-text="Delete Event"
+      :loading="deleting"
+      loading-text="Deleting..."
+      @confirm="confirmDelete"
+      @cancel="closeDeleteModal"
+    >
+      <div v-if="deletingEvent" class="space-y-2">
+        <div>
+          <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+            {{ deletingEvent.title }}
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            {{ formatDate(deletingEvent.start_date) }} at {{ deletingEvent.location }}
+          </p>
+        </div>
+        <div v-if="deletingEvent.is_recurring" class="text-sm text-red-600 dark:text-red-400">
+          Note: This is a recurring event. All occurrences will be deleted.
+        </div>
+      </div>
+    </BaseConfirmDialog>
   </div>
 </template>
