@@ -251,7 +251,7 @@ const buildRecurrenceRule = () => {
   if (!form.value.is_recurring) return undefined
 
   const endDate = form.value.recurrence_end_date || defaultRecurrenceEndDate.value
-  const until = endDate.replace(/-/g, '') // Convert YYYY-MM-DD to YYYYMMDD
+  const until = endDate?.replace(/-/g, '') // Convert YYYY-MM-DD to YYYYMMDD
 
   return `FREQ=${form.value.recurrence_frequency};UNTIL=${until}`
 }

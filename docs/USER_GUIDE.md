@@ -187,6 +187,7 @@ Get automatic updates when events are added, changed, or cancelled:
 3. Follow the instructions for your calendar app:
 
 **Google Calendar:**
+
 - Open Google Calendar on your computer
 - Click the + button next to "Other calendars"
 - Select "From URL"
@@ -194,6 +195,7 @@ Get automatic updates when events are added, changed, or cancelled:
 - Click "Add calendar"
 
 **Apple Calendar:**
+
 - Open Calendar on your Mac
 - Go to File → New Calendar Subscription
 - Paste the Cubs calendar feed URL
@@ -201,12 +203,14 @@ Get automatic updates when events are added, changed, or cancelled:
 - Choose your preferred update frequency
 
 **Outlook:**
+
 - Open Outlook Calendar
 - Click "Add Calendar" → "Subscribe from web"
 - Paste the Cubs calendar feed URL
 - Give it a name and click Import
 
 **Benefits:**
+
 - Events update automatically (usually within 24 hours)
 - Cancelled events are removed automatically
 - New events appear without manual action
@@ -220,17 +224,20 @@ Add a single event without automatic updates:
 2. Choose one of the calendar options:
 
 **Google Calendar:**
+
 - Click "Google Calendar" button
 - Review the pre-filled details
 - Click "Save" in Google Calendar
 
 **Other Calendars (.ics file):**
+
 - Click "Other Calendars (.ics)" button
 - Download the .ics file
 - Open it with your calendar app (Apple Calendar, Outlook, etc.)
 - Confirm to add the event
 
 **When to use:**
+
 - You only want specific events
 - You don't want automatic updates
 - You use a calendar app that doesn't support subscriptions
@@ -316,7 +323,7 @@ We take child safety seriously:
 
 ### Need Help?
 
-- **Email**: Use the contact form or cubs@example.com
+- **Email**: Use the contact form or <cubs@example.com>
 - **Phone**: 01234 567890
 - **In Person**: Visit during meeting times
 - **Documentation**: This guide and FAQ section

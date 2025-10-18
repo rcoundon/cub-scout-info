@@ -21,6 +21,7 @@ export interface Event {
   status: 'draft' | 'published' | 'cancelled' | 'archived'
   cancellation_reason?: string
   created_by: string
+  creator_name?: string
   created_at: string
   updated_at: string
 }
