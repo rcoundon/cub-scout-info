@@ -8,15 +8,19 @@ definePageMeta({
 })
 
 const photosStore = usePhotosStore()
+const toast = useToast()
 
 const showUploadModal = ref(false)
 const showEditModal = ref(false)
+const showDeleteModal = ref(false)
 const editingPhoto = ref<any | null>(null)
+const deletingPhoto = ref<any | null>(null)
 const selectedFile = ref<File | null>(null)
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const uploadCaption = ref('')
 const editCaption = ref('')
 const uploading = ref(false)
+const deleting = ref(false)
 const previewUrl = ref<string | null>(null)
 
 onMounted(async () => {
@@ -90,7 +94,11 @@ const onFileSelected = (event: Event) => {
 
 const uploadPhoto = async () => {
   if (!selectedFile.value || !uploadCaption.value) {
-    alert('Please select a file and enter a caption')
+    toast.add({
+      title: 'Missing information',
+      description: 'Please select a file and enter a caption.',
+      color: 'error',
+    })
     return
   }
 
@@ -107,10 +115,26 @@ const uploadPhoto = async () => {
     if (photo) {
       closeUploadModal()
       await photosStore.fetchAllPhotos()
+
+      toast.add({
+        title: 'Photo uploaded',
+        description: `"${uploadCaption.value}" has been uploaded successfully.`,
+        color: 'success',
+      })
+    } else {
+      toast.add({
+        title: 'Upload failed',
+        description: 'Failed to upload photo. Please try again.',
+        color: 'error',
+      })
     }
   } catch (error) {
     console.error('Error uploading photo:', error)
-    alert('Failed to upload photo. Please try again.')
+    toast.add({
+      title: 'Upload failed',
+      description: 'An unexpected error occurred while uploading.',
+      color: 'error',
+    })
   } finally {
     uploading.value = false
   }
@@ -118,7 +142,11 @@ const uploadPhoto = async () => {
 
 const saveEdit = async () => {
   if (!editingPhoto.value || !editCaption.value) {
-    alert('Caption is required')
+    toast.add({
+      title: 'Missing information',
+      description: 'Caption is required.',
+      color: 'error',
+    })
     return
   }
 
@@ -128,24 +156,89 @@ const saveEdit = async () => {
 
   if (success) {
     closeEditModal()
+    toast.add({
+      title: 'Photo updated',
+      description: 'Caption has been updated successfully.',
+      color: 'success',
+    })
+  } else {
+    toast.add({
+      title: 'Error',
+      description: 'Failed to update photo caption.',
+      color: 'error',
+    })
   }
 }
 
-const toggleActive = async (photo: any) => {
-  await photosStore.updatePhoto(photo.id, {
+const toggleVisibility = async (photo: any) => {
+  const action = photo.is_active ? 'hidden' : 'shown'
+  const success = await photosStore.updatePhoto(photo.id, {
     is_active: !photo.is_active,
   })
-}
 
-const deletePhoto = async (photo: any) => {
-  if (confirm(`Are you sure you want to delete "${photo.caption}"? This will hide the photo but not permanently delete it.`)) {
-    await photosStore.deletePhoto(photo.id, false)
+  if (success) {
+    // Refresh the list to ensure UI is in sync
+    await photosStore.fetchAllPhotos()
+
+    toast.add({
+      title: 'Photo updated',
+      description: `Photo "${photo.caption}" is now ${action}.`,
+      color: 'success',
+    })
+  } else {
+    toast.add({
+      title: 'Error',
+      description: 'Failed to update photo visibility.',
+      color: 'error',
+    })
   }
 }
 
-const permanentlyDeletePhoto = async (photo: any) => {
-  if (confirm(`Are you sure you want to PERMANENTLY delete "${photo.caption}"? This action cannot be undone and will remove the photo from storage.`)) {
-    await photosStore.deletePhoto(photo.id, true)
+const openDeleteModal = (photo: any) => {
+  deletingPhoto.value = photo
+  showDeleteModal.value = true
+}
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+  deletingPhoto.value = null
+}
+
+const confirmDelete = async () => {
+  if (!deletingPhoto.value) return
+
+  deleting.value = true
+  const photoCaption = deletingPhoto.value.caption
+
+  try {
+    const success = await photosStore.deletePhoto(deletingPhoto.value.id, true)
+    if (success) {
+      // Refresh the list to ensure UI is in sync
+      await photosStore.fetchAllPhotos()
+
+      toast.add({
+        title: 'Photo deleted',
+        description: `"${photoCaption}" has been permanently deleted.`,
+        color: 'success',
+      })
+
+      closeDeleteModal()
+    } else {
+      toast.add({
+        title: 'Error',
+        description: 'Failed to delete photo. Please try again.',
+        color: 'error',
+      })
+    }
+  } catch (error) {
+    console.error('Error deleting photo:', error)
+    toast.add({
+      title: 'Error',
+      description: 'An unexpected error occurred.',
+      color: 'error',
+    })
+  } finally {
+    deleting.value = false
   }
 }
 
@@ -232,7 +325,7 @@ const formatFileSize = (bytes: number) => {
                 {{ photo.caption }}
               </h3>
               <BaseBadge :variant="photo.is_active ? 'success' : 'secondary'">
-                {{ photo.is_active ? 'Active' : 'Inactive' }}
+                {{ photo.is_active ? 'Shown' : 'Hidden' }}
               </BaseBadge>
             </div>
 
@@ -290,7 +383,7 @@ const formatFileSize = (bytes: number) => {
               <BaseButton
                 variant="outline"
                 size="sm"
-                @click="toggleActive(photo)"
+                @click="toggleVisibility(photo)"
               >
                 {{ photo.is_active ? 'Hide' : 'Show' }}
               </BaseButton>
@@ -304,7 +397,7 @@ const formatFileSize = (bytes: number) => {
               <BaseButton
                 variant="outline"
                 size="sm"
-                @click="deletePhoto(photo)"
+                @click="openDeleteModal(photo)"
               >
                 Delete
               </BaseButton>
@@ -448,32 +541,96 @@ const formatFileSize = (bytes: number) => {
               </div>
 
               <!-- Actions -->
-              <div class="flex justify-between pt-4">
+              <div class="flex justify-end gap-3 pt-4">
                 <BaseButton
                   type="button"
                   variant="outline"
-                  @click="permanentlyDeletePhoto(editingPhoto)"
-                  class="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"
+                  @click="closeEditModal"
                 >
-                  Permanently Delete
+                  Cancel
                 </BaseButton>
-                <div class="flex gap-3">
-                  <BaseButton
-                    type="button"
-                    variant="outline"
-                    @click="closeEditModal"
-                  >
-                    Cancel
-                  </BaseButton>
-                  <BaseButton
-                    type="submit"
-                    variant="primary"
-                  >
-                    Update Photo
-                  </BaseButton>
-                </div>
+                <BaseButton
+                  type="submit"
+                  variant="primary"
+                >
+                  Update Photo
+                </BaseButton>
               </div>
             </form>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- Delete Confirmation Modal -->
+    <Teleport to="body">
+      <div
+        v-if="showDeleteModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+        @click.self="closeDeleteModal"
+      >
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
+          <div class="p-6">
+            <h2 class="text-2xl font-display font-bold text-gray-900 dark:text-gray-100 mb-4">
+              Delete Photo
+            </h2>
+
+            <div class="space-y-4">
+              <!-- Warning Message -->
+              <div class="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <svg class="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div>
+                  <p class="text-sm font-medium text-red-800 dark:text-red-200">
+                    This action cannot be undone
+                  </p>
+                  <p class="text-sm text-red-700 dark:text-red-300 mt-1">
+                    This will permanently delete the photo and remove it from storage.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Photo Info -->
+              <div v-if="deletingPhoto" class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                <div class="flex items-center gap-4">
+                  <img
+                    :src="deletingPhoto.url"
+                    :alt="deletingPhoto.caption"
+                    class="w-20 h-20 object-cover rounded"
+                  />
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                      {{ deletingPhoto.caption }}
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      {{ formatFileSize(deletingPhoto.file_size) }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="flex justify-end gap-3 pt-4">
+                <BaseButton
+                  type="button"
+                  variant="outline"
+                  @click="closeDeleteModal"
+                  :disabled="deleting"
+                >
+                  Cancel
+                </BaseButton>
+                <BaseButton
+                  type="button"
+                  variant="outline"
+                  @click="confirmDelete"
+                  :disabled="deleting"
+                  class="!border-red-600 !text-red-600 hover:!bg-red-50 dark:!border-red-500 dark:!text-red-500 dark:hover:!bg-red-900/20"
+                >
+                  {{ deleting ? 'Deleting...' : 'Delete Photo' }}
+                </BaseButton>
+              </div>
+            </div>
           </div>
         </div>
       </div>

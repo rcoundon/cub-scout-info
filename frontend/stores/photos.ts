@@ -269,10 +269,13 @@ export const usePhotosStore = defineStore('photos', () => {
       if (permanent) {
         photos.value = photos.value.filter((p) => p.id !== id)
       } else {
-        // Update is_active to false
+        // Update is_active to false - create new object to ensure reactivity
         const index = photos.value.findIndex((p) => p.id === id)
         if (index !== -1) {
-          photos.value[index].is_active = false
+          photos.value[index] = {
+            ...photos.value[index],
+            is_active: false,
+          }
         }
       }
 

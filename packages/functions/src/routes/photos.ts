@@ -251,8 +251,8 @@ app.put(
 
 /**
  * DELETE /api/photos/:id - Delete photo (requires editor role)
- * Soft deletes by default (sets is_active to false)
- * Use ?permanent=true to hard delete and remove from S3
+ * By default, this soft deletes (sets is_active to false) to hide the photo
+ * Use ?permanent=true to permanently delete and remove from S3
  */
 app.delete('/:id', requireEditor, async (c) => {
   try {
@@ -286,7 +286,7 @@ app.delete('/:id', requireEditor, async (c) => {
 
       return c.json({
         success: true,
-        message: 'Photo deactivated',
+        message: 'Photo hidden',
       });
     }
   } catch (error) {
