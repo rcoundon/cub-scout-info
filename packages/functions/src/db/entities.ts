@@ -666,6 +666,103 @@ export const ExternalLinkEntity = new Entity(
 );
 
 /**
+ * Photo Entity
+ * Manages photos displayed in the gallery
+ */
+export const PhotoEntity = new Entity(
+  {
+    model: {
+      entity: 'Photo',
+      version: '1',
+      service: 'cubs-site',
+    },
+    attributes: {
+      id: {
+        type: 'string',
+        required: true,
+        readOnly: true,
+        default: () => crypto.randomUUID(),
+      },
+      url: {
+        type: 'string',
+        required: true,
+      },
+      s3_key: {
+        type: 'string',
+        required: true,
+      },
+      caption: {
+        type: 'string',
+        required: true,
+      },
+      display_order: {
+        type: 'number',
+        required: true,
+        default: 0,
+      },
+      is_active: {
+        type: 'boolean',
+        required: true,
+        default: true,
+      },
+      file_size: {
+        type: 'number',
+        required: true,
+      },
+      content_type: {
+        type: 'string',
+        required: true,
+      },
+      uploaded_by: {
+        type: 'string',
+        required: true,
+      },
+      created_at: {
+        type: 'string',
+        required: true,
+        readOnly: true,
+        default: () => new Date().toISOString(),
+      },
+      updated_at: {
+        type: 'string',
+        required: false,
+        readOnly: true,
+        watch: '*',
+        set: () => new Date().toISOString(),
+      },
+    },
+    indexes: {
+      primary: {
+        pk: {
+          field: 'PK',
+          composite: ['id'],
+          template: 'PHOTO#${id}',
+        },
+        sk: {
+          field: 'SK',
+          composite: [],
+          template: 'METADATA',
+        },
+      },
+      byStatus: {
+        index: 'GSI1',
+        pk: {
+          field: 'GSI1PK',
+          composite: ['is_active'],
+          template: 'PHOTO_ACTIVE#${is_active}',
+        },
+        sk: {
+          field: 'GSI1SK',
+          composite: ['display_order', 'id'],
+          template: 'ORDER#${display_order}#${id}',
+        },
+      },
+    },
+  },
+  { client, table: tableName }
+);
+
+/**
  * Create a Service to access all entities
  * This allows for transactions and batch operations
  */
@@ -678,6 +775,7 @@ export const CubsService = new Service(
     audit: AuditEntity,
     contactMessage: ContactMessageEntity,
     externalLink: ExternalLinkEntity,
+    photo: PhotoEntity,
   },
   { client, table: tableName }
 );

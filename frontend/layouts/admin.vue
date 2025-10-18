@@ -105,6 +105,11 @@ const navItems = [
     icon: 'svg',
   },
   {
+    label: 'Photo Gallery',
+    path: '/admin/photos',
+    icon: 'svg',
+  },
+  {
     label: 'Users',
     path: '/admin/users',
     icon: 'svg',

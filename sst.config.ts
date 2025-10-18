@@ -50,7 +50,7 @@ export default $config({
       },
     });
 
-    // S3 Bucket for file uploads
+    // S3 Bucket for file uploads (private)
     const uploadsBucket = new sst.aws.Bucket('CubsSiteUploads', {
       public: false,
       transform: {
@@ -58,7 +58,19 @@ export default $config({
           args.versionings = [{
             enabled: true,
           }];
-        }              
+        }
+      },
+    });
+
+    // S3 Bucket for photo gallery (private with presigned URLs)
+    const photosBucket = new sst.aws.Bucket('PhotosBucket', {
+      public: false,
+      transform: {
+        bucket: (args, _opts) => {
+          args.versionings = [{
+            enabled: true,
+          }];
+        }
       },
     });
 
@@ -80,7 +92,7 @@ export default $config({
     // Hono API
     const api = new sst.aws.Function('CubsSiteApi', {
       handler: 'packages/functions/src/api.handler',
-      link: [table, uploadsBucket, auth],
+      link: [table, uploadsBucket, photosBucket, auth],
       runtime: 'nodejs22.x',
       url: {
         cors: {

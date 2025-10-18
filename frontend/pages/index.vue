@@ -249,6 +249,11 @@ const getEventTypeIcon = (type: string) => {
         </div>
       </div>
 
+      <!-- Photo Gallery Section -->
+      <div class="mt-20 -mx-4 sm:mx-0">
+        <PhotoGallery />
+      </div>
+
       <!-- External Links Section -->
       <div class="mt-20 max-w-2xl mx-auto">
         <ExternalLinks />

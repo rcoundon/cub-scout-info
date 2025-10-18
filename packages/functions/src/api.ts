@@ -8,6 +8,7 @@ import attachmentsRoutes from './routes/attachments';
 import adminUsersRoutes from './routes/admin-users';
 import contactRoutes from './routes/contact';
 import externalLinksRoutes from './routes/external-links';
+import photosRoutes from './routes/photos';
 
 const app = new Hono();
 
@@ -58,6 +59,9 @@ app.route('/api/contact', contactRoutes);
 
 // External links routes
 app.route('/api/external-links', externalLinksRoutes);
+
+// Photos routes
+app.route('/api/photos', photosRoutes);
 
 // 404 handler
 app.notFound((c) => {
